@@ -3,9 +3,10 @@
     <div class="logo">
       <img
         alt="logo"
-        src="//p3-armor.byteimg.com/tos-cn-i-49unhts6dw/dfdba5317c0c20ce20e64fac803d52bc.svg~tplv-49unhts6dw-image.image"
+        src="../../assets/images/logos/custom2.png"
+        style="height: 34px"
       />
-      <div class="logo-text">Arco Design Pro</div>
+      <div class="logo-text">Blog Admin</div>
     </div>
     <LoginBanner />
     <div class="content">
