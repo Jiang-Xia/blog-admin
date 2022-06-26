@@ -1,193 +1,81 @@
 <template>
-  <div class="login">
-    <section class="login-box animated flipInY">
-      <!-- 左侧 -->
-      <div class="login-left">
-        <img class="login-img" src="@/assets/svgs/login-img.svg" />
+  <div class="container">
+    <div class="logo">
+      <img
+        alt="logo"
+        src="//p3-armor.byteimg.com/tos-cn-i-49unhts6dw/dfdba5317c0c20ce20e64fac803d52bc.svg~tplv-49unhts6dw-image.image"
+      />
+      <div class="logo-text">Arco Design Pro</div>
+    </div>
+    <LoginBanner />
+    <div class="content">
+      <div class="content-inner">
+        <LoginForm />
       </div>
-      <!-- 右侧 -->
-      <div class="login-right">
-        <a-form
-          :model="form"
-          :style="{ width: '84%' }"
-          :label-col-style="{ display: 'none' }"
-          :wrapper-col-style="{ flex: 1 }"
-        >
-          <h3 class="login-form-title" data-v-6b0ccce2="">
-            <!-- <img class="logo" src="@/assets/images/logo.gif" /> -->
-            <span>Blog Admin</span>
-          </h3>
-          <a-form-item field="username">
-            <a-input
-              v-model="form.mobile"
-              placeholder="账号"
-              size="medium"
-              allow-clear
-              :max-length="11"
-            >
-              <template #prefix
-                ><icon-user :stroke-width="1" :style="{ fontSize: '20px' }"
-              /></template>
-            </a-input>
-          </a-form-item>
-          <a-form-item field="password">
-            <a-input-password
-              v-model="form.password"
-              placeholder="密码"
-              size="medium"
-              allow-clear
-              :max-length="16"
-            >
-              <template #prefix
-                ><icon-lock :stroke-width="1" :style="{ fontSize: '20px' }"
-              /></template>
-            </a-input-password>
-          </a-form-item>
-          <a-form-item>
-            <a-row justify="space-between" align="center" style="width: 100%">
-              <a-checkbox v-model="checked">记住密码</a-checkbox>
-              <a-link>忘记密码</a-link>
-            </a-row>
-          </a-form-item>
-          <a-form-item>
-            <a-space direction="vertical" fill style="width: 100%">
-              <a-button type="primary" size="large" long :loading="loading" @click="handleSubmit"
-                >登录</a-button
-              >
-              <a-button type="text" size="large" long class="register-btn">注册账号</a-button>
-            </a-space>
-          </a-form-item>
-        </a-form>
+      <div class="footer">
+        <Footer />
       </div>
-    </section>
-
-    <GiThemeBtn class="theme-btn"></GiThemeBtn>
-
-    <LoginBg></LoginBg>
+    </div>
   </div>
 </template>
 
-<script setup lang="ts" name="Login">
-import { reactive, ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { Message } from '@arco-design/web-vue'
-import LoginBg from './components/LoginBg/index.vue'
-import { registerUser, userLogin } from '@/api/user'
-import { useUserStore } from '@/store'
-const userStore = useUserStore()
-
-const router = useRouter()
-
-// type LoginForm = { username: string; password: string }
-
-const defaultForm = {
-  mobile: '',
-  nickname: '',
-  password: '',
-  passwordRepeat: ''
-}
-const form = ref({ ...defaultForm })
-
-// 记住密码
-let checked = ref<boolean>(false)
-// 登录加载
-let loading = ref<boolean>(false)
-const handleSubmit = async () => {
-  if (!form.value.mobile) {
-    return Message.warning('请输入账户名称')
-  }
-  if (!form.value.password) {
-    return Message.warning('请输入账户密码')
-  }
-  const res = await userLogin({ ...form.value })
-  const user = res.info.user
-  const token = res.info.token
-  userStore.setToekn(token)
-  userStore.setUser(user)
-  loading.value = true
-  setTimeout(() => {
-    router.push('/')
-    loading.value = false
-    Message.success('登录成功')
-  }, 600)
-}
+<script lang="ts" setup>
+  import Footer from '@/components/footer/index.vue';
+  import LoginBanner from './components/banner.vue';
+  import LoginForm from './components/login-form.vue';
 </script>
 
-<style lang="scss" scoped>
-.register-btn,
-.register-btn:hover {
-  color: var(--color-text-2);
-}
-
-.login-form-title {
-  color: var(--color-text-1);
-  font-weight: 500;
-  font-size: 20px;
-  line-height: 32px;
-  margin-bottom: 20px;
-  text-align: center;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  .logo {
-    width: 32px;
-    height: 32px;
-    margin-right: 6px;
-  }
-}
-
-.theme-btn {
-  position: fixed;
-  top: 20px;
-  left: 30px;
-  z-index: 9999;
-}
-
-.login {
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: var(--color-bg-5);
-  &-box {
-    width: 720px;
-    height: 380px;
+<style lang="less" scoped>
+  .container {
     display: flex;
-    z-index: 999;
-    box-shadow: 0 2px 4px 2px rgba(0, 0, 0, 0.08);
-  }
-}
+    height: 100vh;
 
-.login-left {
-  flex: 1;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-  overflow: hidden;
-  background: linear-gradient(60deg, rgb(var(--primary-6)), rgb(var(--primary-3)));
-  .login-img {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    transition: all 0.3s;
-    object-fit: cover;
-  }
-}
+    .banner {
+      width: 550px;
+      background: linear-gradient(163.85deg, #1d2129 0%, #00308f 100%);
+    }
 
-.login-right {
-  width: 270px;
-  height: 100%;
-  background: var(--color-bg-2);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding-top: 30px;
-  box-sizing: border-box;
-}
+    .content {
+      position: relative;
+      display: flex;
+      flex: 1;
+      align-items: center;
+      justify-content: center;
+      padding-bottom: 40px;
+    }
+
+    .footer {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+    }
+  }
+
+  .logo {
+    position: fixed;
+    top: 24px;
+    left: 22px;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+
+    &-text {
+      margin-right: 4px;
+      margin-left: 4px;
+      color: var(--color-fill-1);
+      font-size: 20px;
+    }
+  }
+</style>
+
+<style lang="less" scoped>
+  // responsive
+  @media (max-width: @screen-lg) {
+    .container {
+      .banner {
+        width: 25%;
+      }
+    }
+  }
 </style>
