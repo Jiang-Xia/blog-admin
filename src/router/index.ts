@@ -1,7 +1,7 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import { useAppStore, useMenuStore } from '@/store'
 
-const routes = [
+export const routes = [
   {
     path: '/login',
     name: 'Login',
@@ -11,7 +11,7 @@ const routes = [
   {
     path: '/',
     name: 'Layout',
-    redirect: '/article-manage',
+    redirect: '/article-manage/list',
     component: () => import('@/layout/index.vue'),
     meta: { title: '首页', keepAlive: false },
     children: [
@@ -21,6 +21,37 @@ const routes = [
         component: () => import('@/views/home/index.vue'),
         meta: { title: '首页', keepAlive: false }
       },
+      {
+        path: '/article-manage/list',
+        name: 'article-list',
+        component: () => import('@/views/article-manage/list.vue'),
+        meta: { title: '文章列表', keepAlive: false }
+      },
+      {
+        path: '/article-manage/add',
+        name: 'article-add',
+        component: () => import('@/views/article-manage/add.vue'),
+        meta: { title: '新增文章', keepAlive: false }
+      },
+      {
+        path: '/article-manage/edit',
+        name: 'article-edit',
+        component: () => import('@/views/article-manage/add.vue'),
+        meta: { title: '编辑文章', keepAlive: false }
+      },
+      {
+        path: '/article-tag',
+        name: 'article-tag',
+        component: () => import('@/views/article-tag/index.vue'),
+        meta: { title: '文章标签', keepAlive: false }
+      },
+      {
+        path: '/article-category',
+        name: 'article-category',
+        component: () => import('@/views/article-category/index.vue'),
+        meta: { title: '文章分类', keepAlive: false }
+      },
+
       {
         path: '/about',
         name: 'About',

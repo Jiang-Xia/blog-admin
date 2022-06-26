@@ -15,22 +15,22 @@ export const useMenuStore = defineStore({
           name: '仪表盘',
           path: '/',
           keepAlive: false,
-          hidden: false
-          // children: [
-          //   {
-          //     id: 'GZT',
-          //     name: '工作台',
-          //     path: '/home',
-          //     keepAlive: false,
-          //     hidden: false
-          //   }
-          // ]
+          hidden: false,
+          children: [
+            {
+              id: 'GZT',
+              name: '工作台',
+              path: '/home',
+              keepAlive: false,
+              hidden: false
+            }
+          ]
         },
         {
           icon: 'menu-indicator',
           id: 'ZBGL',
           name: '文章管理',
-          path: '/article-manage',
+          // path: '/article-manage',
           keepAlive: true,
           hidden: false,
           children: [
@@ -51,7 +51,7 @@ export const useMenuStore = defineStore({
             {
               id: 'article-edit',
               name: '编辑文章',
-              path: '/article-manage/add',
+              path: '/article-manage/edit',
               keepAlive: false,
               hidden: false
             }
@@ -65,30 +65,6 @@ export const useMenuStore = defineStore({
           keepAlive: true,
           hidden: false
         },
-        // {
-        //   icon: 'menu-form',
-        //   id: 'BDGL',
-        //   name: '表单管理',
-        //   path: '/form-manage',
-        //   keepAlive: true,
-        //   hidden: false,
-        //   children: [
-        //     {
-        //       id: 'JCBD',
-        //       name: '基础表单',
-        //       path: '/form-manage/base-form',
-        //       keepAlive: false,
-        //       hidden: false
-        //     },
-        //     {
-        //       id: 'FBBD',
-        //       name: '分步表单',
-        //       path: '/form-manage/step-form',
-        //       keepAlive: false,
-        //       hidden: false
-        //     }
-        //   ]
-        // },
         {
           icon: 'menu-table',
           id: 'article-category',

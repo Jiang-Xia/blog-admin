@@ -18,13 +18,29 @@
             <span>Blog Admin</span>
           </h3>
           <a-form-item field="username">
-            <a-input v-model="form.username" placeholder="账号" size="medium" allow-clear>
-              <template #prefix><icon-user :stroke-width="1" :style="{ fontSize: '20px' }" /></template>
+            <a-input
+              v-model="form.mobile"
+              placeholder="账号"
+              size="medium"
+              allow-clear
+              :max-length="11"
+            >
+              <template #prefix
+                ><icon-user :stroke-width="1" :style="{ fontSize: '20px' }"
+              /></template>
             </a-input>
           </a-form-item>
           <a-form-item field="password">
-            <a-input-password v-model="form.password" placeholder="密码" size="medium" allow-clear>
-              <template #prefix><icon-lock :stroke-width="1" :style="{ fontSize: '20px' }" /></template>
+            <a-input-password
+              v-model="form.password"
+              placeholder="密码"
+              size="medium"
+              allow-clear
+              :max-length="16"
+            >
+              <template #prefix
+                ><icon-lock :stroke-width="1" :style="{ fontSize: '20px' }"
+              /></template>
             </a-input-password>
           </a-form-item>
           <a-form-item>
@@ -35,7 +51,9 @@
           </a-form-item>
           <a-form-item>
             <a-space direction="vertical" fill style="width: 100%">
-              <a-button type="primary" size="large" long :loading="loading" @click="login">登录</a-button>
+              <a-button type="primary" size="large" long :loading="loading" @click="handleSubmit"
+                >登录</a-button
+              >
               <a-button type="text" size="large" long class="register-btn">注册账号</a-button>
             </a-space>
           </a-form-item>
@@ -54,31 +72,41 @@ import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { Message } from '@arco-design/web-vue'
 import LoginBg from './components/LoginBg/index.vue'
+import { registerUser, userLogin } from '@/api/user'
+import { useUserStore } from '@/store'
+const userStore = useUserStore()
+
 const router = useRouter()
 
-type LoginForm = { username: string; password: string }
+// type LoginForm = { username: string; password: string }
 
-const form: LoginForm = reactive({
-  username: 'admin',
-  password: '123'
-})
+const defaultForm = {
+  mobile: '',
+  nickname: '',
+  password: '',
+  passwordRepeat: ''
+}
+const form = ref({ ...defaultForm })
 
 // 记住密码
 let checked = ref<boolean>(false)
 // 登录加载
 let loading = ref<boolean>(false)
-
-// 点击登录
-const login = () => {
-  if (!form.username) {
+const handleSubmit = async () => {
+  if (!form.value.mobile) {
     return Message.warning('请输入账户名称')
   }
-  if (!form.password) {
+  if (!form.value.password) {
     return Message.warning('请输入账户密码')
   }
+  const res = await userLogin({ ...form.value })
+  const user = res.info.user
+  const token = res.info.token
+  userStore.setToekn(token)
+  userStore.setUser(user)
   loading.value = true
   setTimeout(() => {
-    router.push('/home')
+    router.push('/')
     loading.value = false
     Message.success('登录成功')
   }, 600)

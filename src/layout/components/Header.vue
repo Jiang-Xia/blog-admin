@@ -32,8 +32,8 @@
       <a-tooltip content="全屏切换" position="bottom">
         <a-button size="mini" class="gi_hover_btn" @click="onToggleFullScreen">
           <template #icon>
-            <icon-fullscreen :size="18" v-if="!isFullScreen" />
-            <icon-fullscreen-exit :size="18" v-else />
+            <icon-fullscreen v-if="!isFullScreen" :size="18" />
+            <icon-fullscreen-exit v-else :size="18" />
           </template>
         </a-button>
       </a-tooltip>
@@ -55,22 +55,25 @@
           <icon-down />
         </a-button>
         <template #content>
-          <a-doption @click="toUser">
+          <!-- <a-doption @click="toUser">
             <template #icon>
               <span class="doption-icon" style="background: rgba(var(--primary-6))"><icon-user /></span>
             </template>
             <template #default>个人中心</template>
-          </a-doption>
+          </a-doption> -->
           <a-doption @click="toGitPath">
             <template #icon
-              ><span class="doption-icon" style="background: rgba(var(--success-6))"><icon-github /></span
+              ><span class="doption-icon" style="background: rgba(var(--success-6))"
+                ><icon-github /></span
             ></template>
             <template #default>项目地址</template>
           </a-doption>
           <a-divider style="margin: 0" />
           <a-doption @click="logout">
             <template #icon>
-              <span class="doption-icon" style="background: rgba(var(--warning-6))"><icon-export /></span>
+              <span class="doption-icon" style="background: rgba(var(--warning-6))"
+                ><icon-export
+              /></span>
             </template>
             <template #default>退出登录</template>
           </a-doption>
@@ -123,7 +126,7 @@ const logout = () => {
 
 // 跳转项目地址
 const toGitPath = () => {
-  window.open('https://gitee.com/lin0716/gi-demo')
+  window.open('https://gitee.com/jiang-xia/blog-admin')
 }
 </script>
 

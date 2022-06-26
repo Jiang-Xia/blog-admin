@@ -20,6 +20,8 @@ const appStore = useAppStore()
 const menuStore = useMenuStore()
 
 const handleClickItem = (item: Menu.MenuItem) => {
+  console.warn(item.path)
+
   if (item.path) {
     appStore.setActivePath(item.path)
     router.push({ path: item.path })
