@@ -1,37 +1,22 @@
 import { defineStore } from 'pinia';
-import {
-  login as userLogin,
-  logout as userLogout,
-  getUserInfo,
-  LoginData,
-} from '@/api/user';
+import { LoginData } from '@/api/user';
 import { setToken, clearToken } from '@/utils/auth';
 import { removeRouteListener } from '@/utils/route-listener';
-import { UserState } from './types';
+import { userLogin } from '@/api/login';
+// import { UserState } from './types';
 import useAppStore from '../app';
 
+export interface AnyPropName {
+  [propName: string]: any;
+}
 const useUserStore = defineStore('user', {
-  state: (): UserState => ({
-    name: undefined,
-    avatar: undefined,
-    job: undefined,
-    organization: undefined,
-    location: undefined,
-    email: undefined,
-    introduction: undefined,
-    personalWebsite: undefined,
-    jobName: undefined,
-    organizationName: undefined,
-    locationName: undefined,
-    phone: undefined,
-    registrationDate: undefined,
-    accountId: undefined,
-    certification: undefined,
-    role: '',
+  state: (): AnyPropName => ({
+    nickname: '',
+    mobile: '',
   }),
 
   getters: {
-    userInfo(state: UserState): UserState {
+    userInfo(state) {
       return { ...state };
     },
   },
@@ -44,27 +29,28 @@ const useUserStore = defineStore('user', {
       });
     },
     // Set user's information
-    setInfo(partial: Partial<UserState>) {
+    setInfo(partial) {
       this.$patch(partial);
     },
-
     // Reset user's information
     resetInfo() {
       this.$reset();
     },
 
     // Get user's information
-    async info() {
-      const res = await getUserInfo();
-
-      this.setInfo(res.data);
+    async info(info) {
+      this.setInfo(info);
     },
 
     // Login
     async login(loginForm: LoginData) {
       try {
-        const res = await userLogin(loginForm);
-        setToken(res.data.token);
+        const res = await userLogin({
+          mobile: loginForm.username,
+          password: loginForm.password,
+        });
+        setToken(res.info.token);
+        this.info(res.info.user);
       } catch (err) {
         clearToken();
         throw err;
@@ -80,7 +66,7 @@ const useUserStore = defineStore('user', {
     // Logout
     async logout() {
       try {
-        await userLogout();
+        // await userLogout();
       } finally {
         this.logoutCallBack();
       }

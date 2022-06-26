@@ -19,6 +19,7 @@
         <a-input
           v-model="userInfo.username"
           :placeholder="$t('login.form.userName.placeholder')"
+          :max-length="11"
         >
           <template #prefix>
             <icon-user />
@@ -35,6 +36,7 @@
           v-model="userInfo.password"
           :placeholder="$t('login.form.password.placeholder')"
           allow-clear
+          :max-length="16"
         >
           <template #prefix>
             <icon-lock />
@@ -82,8 +84,8 @@
 
   const loginConfig = useStorage('login-config', {
     rememberPassword: true,
-    username: 'admin', // 演示默认值
-    password: 'admin', // demo default value
+    username: '18377777777', // 演示默认值
+    password: '123456', // demo default value
   });
   const userInfo = reactive({
     username: loginConfig.value.username,

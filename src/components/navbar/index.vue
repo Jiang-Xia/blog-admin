@@ -11,7 +11,7 @@
           :style="{ margin: 0, fontSize: '18px' }"
           :heading="5"
         >
-          Xia Admin
+          Blog Admin
         </a-typography-title>
         <icon-menu-fold
           v-if="appStore.device === 'mobile'"
@@ -145,7 +145,8 @@
             :size="32"
             :style="{ marginRight: '8px', cursor: 'pointer' }"
           >
-            <img alt="avatar" :src="avatar" />
+            <!-- <img alt="avatar" :src="avatar" /> -->
+            {{ nickname }}
           </a-avatar>
           <template #content>
             <a-doption>
@@ -205,6 +206,9 @@
   const locales = [...LOCALE_OPTIONS];
   const avatar = computed(() => {
     return userStore.avatar;
+  });
+  const nickname = computed(() => {
+    return userStore.nickname;
   });
   const theme = computed(() => {
     return appStore.theme;
