@@ -1,0 +1,94 @@
+.x-markdown-reader {
+  // 代码回显样式
+  .copy-btn {
+    margin-left: 20px;
+    font-style: normal;
+  }
+
+  .copy-btn:hover {
+    color: var(--main-color);
+  }
+
+  .code-left-bar {
+    position: absolute;
+    top: 8px;
+    right: 5px;
+    color: hsla(0, 0%, 54.9%, 0.8);
+    font-size: 12px;
+    line-height: 1;
+    cursor: pointer;
+    transition: color 0.1s;
+  }
+
+  img {
+    max-width: 100%;
+  }
+
+  pre {
+    position: relative;
+    max-height: 400px;
+    margin: 10px 0;
+    padding-top: 30px;
+    font-size: 1em;
+    // overflow: auto;
+    background-color: var(--main-bgc);
+    border-radius: 5px;
+
+    &::before {
+      position: absolute;
+      top: -4px;
+      display: block;
+      width: 100%;
+      height: 30px;
+      background-image: url(@/assets/img/icons/code-btn.png);
+      background-repeat: no-repeat;
+      background-position: 10px 10px;
+      background-size: 55px;
+      content: '';
+    }
+  }
+
+  code {
+    display: inline-block;
+    max-height: 370px;
+    margin: 0 3px;
+    margin: 0;
+    padding: 3px 5px;
+    color: var(--text-color);
+    word-wrap: break-word;
+    word-break: break-all;
+    background-color: var(--main-bgc);
+    border-radius: 3px;
+
+    @at-root pre {
+      overflow: hidden;
+    }
+  }
+
+  blockquote {
+    display: block;
+    margin: 10px 0;
+    padding: 5px 10px;
+    font-size: 100%;
+    line-height: 1.4;
+    background-color: var(--main-bgc);
+    border-left: 8px solid var(--main-color);
+  }
+
+  p,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  table,
+  pre {
+    margin: 10px 0;
+    line-height: 1.5;
+  }
+
+  a {
+    color: #2a6496;
+    text-decoration: underline;
+  }
+}

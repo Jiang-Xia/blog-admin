@@ -23,3 +23,7 @@ export const regexUrl = new RegExp(
 );
 
 export default null;
+
+export function copy(text: string) {
+  return '';
+}

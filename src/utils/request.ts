@@ -2,7 +2,7 @@
  * @Author: 酱
  * @LastEditors: 酱
  * @Date: 2021-11-17 16:26:53
- * @LastEditTime: 2022-07-09 12:42:00
+ * @LastEditTime: 2022-07-09 18:58:01
  * @Description:
  * @FilePath: \blog-admin\src\utils\request.ts
  */
@@ -13,6 +13,7 @@ import { Message } from '@arco-design/web-vue';
 // import { getCode } from '@/utils/common'
 // import showXiaLogin from '@/components/xia-login/main'
 import { baseUrl } from '@/config';
+import { getToken } from './auth';
 
 interface MessageConfig {
   message: string;
@@ -29,8 +30,13 @@ const $axios = axios.create({
 $axios.interceptors.request.use(
   (config: AxiosRequestConfig) => {
     // openLoading()
-    // const { token } = useStore().state;
-    const token = '';
+    const token = getToken();
+    config.headers = {};
+    if (token) {
+      // 请求头部添加token
+      config.headers.Authorization = `Bearer ${token}`;
+      console.log('token: ', config.headers.Authorization);
+    }
     // const token = getToken()
     config.headers = {};
     config.baseURL = baseUrl;
