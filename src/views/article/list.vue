@@ -1,7 +1,224 @@
-<script setup lang="ts">
-  import { reactive, ref } from 'vue';
+<template>
+  <div class="container">
+    <!-- <Breadcrumb :items="['menu.list', 'menu.list.searchTable']" /> -->
+    <a-card class="general-card" title="文章查询">
+      <a-row>
+        <a-col :flex="1">
+          <a-form
+            :model="formModel"
+            :label-col-props="{ span: 6 }"
+            :wrapper-col-props="{ span: 18 }"
+            label-align="left"
+          >
+            <a-row :gutter="16">
+              <a-col :span="8">
+                <a-form-item label="标题">
+                  <a-input
+                    v-model="formModel.title"
+                    placeholder="请输入关键字"
+                  />
+                </a-form-item>
+              </a-col>
+              <a-col :span="8">
+                <a-form-item label="描述">
+                  <a-input
+                    v-model="formModel.description"
+                    placeholder="请输入描述"
+                  />
+                </a-form-item>
+              </a-col>
+              <a-col :span="8">
+                <a-form-item label="内容">
+                  <a-input
+                    v-model="formModel.content"
+                    placeholder="请输入文章内容"
+                  />
+                </a-form-item>
+              </a-col>
+            </a-row>
+          </a-form>
+        </a-col>
+        <a-col :span="5" style="text-align: right">
+          <a-space :size="8">
+            <a-button type="primary" @click="search">
+              <template #icon>
+                <icon-search />
+              </template>
+              {{ '搜索' }}
+            </a-button>
+            <a-button @click="reset">
+              <template #icon>
+                <icon-refresh />
+              </template>
+              {{ '重置' }}
+            </a-button>
+          </a-space>
+        </a-col>
+      </a-row>
+
+      <a-divider style="margin-top: 0" />
+
+      <a-row style="margin-bottom: 16px">
+        <a-col :span="16">
+          <a-space>
+            <a-button
+              type="primary"
+              @click="$router.push('/article/edit?type=add')"
+            >
+              <template #icon>
+                <icon-plus />
+              </template>
+              {{ '新建' }}
+            </a-button>
+          </a-space>
+        </a-col>
+      </a-row>
+      <a-table
+        :loading="loading"
+        row-key="id"
+        :pagination="pagination"
+        :data="renderData"
+        :bordered="false"
+        @page-change="onPageChange"
+      >
+        <template #columns>
+          <a-table-column title="标题" data-index="title" />
+          <a-table-column title="描述" data-index="description" />
+          <a-table-column title="分类" data-index="category">
+            <template #cell="{ record }">
+              <!-- <span :style="{ color: record.category['color'] }">
+                {{ record.category['label'] }}
+              </span> -->
+              {{ record.category }}
+            </template>
+          </a-table-column>
+          <a-table-column title="标签" data-index="tag">
+            <template #cell="{ record }">
+              {{ record.tag }}
+            </template>
+          </a-table-column>
+          <a-table-column title="查看" data-index="views" />
+          <a-table-column title="点赞" data-index="likes" />
+          <a-table-column title="评论" data-index="commentCount" />
+          <a-table-column title="更新时间" data-index="uTime" />
+          <a-table-column title="操作" data-index="operations">
+            <template #cell="{ record }">
+              <a-space :size="8">
+                <a-button
+                  size="mini"
+                  type="primary"
+                  @click="
+                    () => {
+                      $router.push(`/article/edit?type=add?id=${record.id}`);
+                    }
+                  "
+                >
+                  <icon-edit />
+                </a-button>
+                <!-- v-permission="['admin']" -->
+                <a-button
+                  size="mini"
+                  type="primary"
+                  status="danger"
+                  @click="delArticleHandle(record.id)"
+                >
+                  <icon-delete />
+                </a-button>
+              </a-space>
+            </template>
+          </a-table-column>
+        </template>
+      </a-table>
+    </a-card>
+  </div>
+</template>
+
+<script lang="ts" setup>
+  import { computed, ref, reactive } from 'vue';
+  import { useI18n } from 'vue-i18n';
+  import useLoading from '@/hooks/loading';
+  import { Pagination } from '@/types/global';
+  import { getArticleInfo, getArticleList, delArticle } from '@/api/article';
+  import { Message, Modal } from '@arco-design/web-vue';
+
+  const generateFormModel = () => {
+    return {
+      page: 1,
+      category: '',
+      tags: [],
+      pageSize: 20,
+      total: 0,
+      title: '',
+      description: '',
+      content: '',
+      uid: 1,
+    };
+  };
+  const { loading, setLoading } = useLoading(true);
+  const { t } = useI18n();
+  const renderData = ref([{}]);
+  const formModel = ref(generateFormModel());
+  const basePagination: Pagination = {
+    current: 1,
+    pageSize: 20,
+  };
+  const pagination = reactive({
+    ...basePagination,
+  });
+  const getArticleListHandle = async (val = 1) => {
+    setLoading(true);
+    const res = await getArticleList(formModel.value);
+    renderData.value = res.list.map((v: any) => {
+      v.category = v.category.label;
+      v.tag = v.tags.map((v: any) => v.label).join();
+      // console.log(v.category);
+      return v;
+    });
+    pagination.total = res.pagination.total;
+    setLoading(false);
+  };
+  const search = () => {
+    getArticleListHandle();
+  };
+  const onPageChange = (current: number) => {
+    getArticleListHandle();
+  };
+  getArticleListHandle();
+  const reset = () => {
+    formModel.value = generateFormModel();
+  };
+  const delArticleHandle = async (id: any) => {
+    Modal.confirm({
+      title: '删除文章',
+      content: '确定删除该文章嘛？',
+      onOk: async () => {
+        const res = await delArticle({ id });
+        Message.success('删除成功');
+      },
+    });
+  };
 </script>
 
-<template><div>list</div></template>
+<script lang="ts">
+  export default {
+    name: 'SearchTable',
+  };
+</script>
 
-<style lang="scss" scoped></style>
+<style scoped lang="less">
+  .container {
+    padding: 20px;
+  }
+
+  :deep(.arco-table-th) {
+    &:last-child {
+      .arco-table-th-item-title {
+        margin-left: 16px;
+      }
+    }
+  }
+
+  .arco-card-body {
+    min-height: 30vh;
+  }
+</style>
