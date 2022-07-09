@@ -159,6 +159,26 @@ setupMock({
             },
           ],
         },
+        {
+          path: '/user',
+          name: 'User',
+          meta: {
+            locale: 'menu.server.user',
+            requiresAuth: true,
+            icon: 'icon-user',
+            order: 1,
+          },
+          children: [
+            {
+              path: 'set',
+              name: 'UserSet',
+              meta: {
+                locale: 'menu.server.userSet',
+                requiresAuth: true,
+              },
+            },
+          ],
+        },
       ];
       return successResponseWrap(menuList);
     });

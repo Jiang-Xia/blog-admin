@@ -35,6 +35,9 @@ export default {
 
   'menu.server.tag': '标签管理',
   'menu.server.tagList': '标签列表',
+
+  'menu.server.user': '个人中心',
+  'menu.server.userSet': '用户设置',
   ...localeSettings,
   ...localeMessageBox,
   ...localeLogin,

@@ -35,6 +35,9 @@ export default {
 
   'menu.server.tag': 'Tag',
   'menu.server.tagList': 'List',
+
+  'menu.server.user': 'Me',
+  'menu.server.userSet': 'UserSet',
   ...localeSettings,
   ...localeMessageBox,
   ...localeLogin,

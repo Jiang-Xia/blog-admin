@@ -6,11 +6,11 @@
   "hideMenu": false,
   "menuCollapse": false,
   "footer": true,
-  "themeColor": "#165DFF",
+  "themeColor": "#00adb5",
   "menuWidth": 220,
   "globalSettings": false,
   "device": "desktop",
-  "tabBar": false,
+  "tabBar": true,
   "menuFromServer": true,
   "serverMenu": []
 }
