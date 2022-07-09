@@ -15,7 +15,7 @@ if (mode === 'production') {
 } else {
   url = 'http://localhost:5000';
   // url = 'http://42.192.145.236:5000'
-  url = 'https://jiang-xia.top/x-api/blog-server';
+  // url = 'https://jiang-xia.top/x-api/blog-server';
 }
 export const baseUrl: string = url;
 export default config;

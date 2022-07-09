@@ -3,6 +3,7 @@ import NProgress from 'nprogress'; // progress bar
 
 import usePermission from '@/hooks/permission';
 import { useUserStore, useAppStore } from '@/store';
+import { getToken } from '@/utils/auth';
 import { appRoutes } from '../routes';
 import { WHITE_LIST, NOT_FOUND } from '../constants';
 
@@ -12,7 +13,18 @@ export default function setupPermissionGuard(router: Router) {
     const userStore = useUserStore();
     const Permission = usePermission();
     const permissionsAllow = Permission.accessRouter(to);
-    if (appStore.menuFromServer) {
+    const hasToken = getToken();
+
+    // 自定义
+    if (!hasToken) {
+      // 未登录 访问登录页未白名单直接next
+      if (WHITE_LIST.findIndex((v) => v.name === to.path)) {
+        next();
+      } else {
+        // 访问其他页跳转login
+        next({ name: 'login' });
+      }
+    } else if (appStore.menuFromServer) {
       // 针对来自服务端的菜单配置进行处理
       // Handle routing configuration from the server
 

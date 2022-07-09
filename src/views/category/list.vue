@@ -2,6 +2,6 @@
   import { reactive, ref } from 'vue';
 </script>
 
-<template> list</template>
+<template> <div>list</div></template>
 
 <style lang="scss" scoped></style>

@@ -2,6 +2,6 @@
   import { reactive, ref } from 'vue';
 </script>
 
-<template> edit</template>
+<template> <div>edit</div></template>
 
 <style lang="scss" scoped></style>

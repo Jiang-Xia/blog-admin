@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import { LoginData } from '@/api/user';
 import { setToken, clearToken } from '@/utils/auth';
 import { removeRouteListener } from '@/utils/route-listener';
-import { userLogin } from '@/api/login';
+import { userInfo, userLogin } from '@/api/login';
 // import { UserState } from './types';
 import useAppStore from '../app';
 
@@ -69,6 +69,15 @@ const useUserStore = defineStore('user', {
         // await userLogout();
       } finally {
         this.logoutCallBack();
+      }
+    },
+    async getInfo() {
+      try {
+        const res = await userInfo();
+        this.info(res);
+      } catch (err) {
+        clearToken();
+        throw err;
       }
     },
   },
