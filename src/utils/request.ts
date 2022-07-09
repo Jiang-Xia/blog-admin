@@ -2,12 +2,11 @@
  * @Author: 酱
  * @LastEditors: 酱
  * @Date: 2021-11-17 16:26:53
- * @LastEditTime: 2022-06-26 20:39:52
+ * @LastEditTime: 2022-07-09 12:42:00
  * @Description:
  * @FilePath: \blog-admin\src\utils\request.ts
  */
-import axios from 'axios';
-import { AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 // import router from '@/router/'
 // import { useStore } from '@/store';
 import { Message } from '@arco-design/web-vue';

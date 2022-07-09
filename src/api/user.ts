@@ -22,6 +22,7 @@ export function getUserInfo() {
   return axios.post<UserState>('/api/user/info');
 }
 
+// 获取菜单数据
 export function getMenuList() {
   return axios.post<RouteRecordNormalized[]>('/api/user/menu');
 }

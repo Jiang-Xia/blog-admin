@@ -29,7 +29,7 @@ const useUserStore = defineStore('user', {
       });
     },
     // Set user's information
-    setInfo(partial) {
+    setInfo(partial: any) {
       this.$patch(partial);
     },
     // Reset user's information
@@ -38,7 +38,7 @@ const useUserStore = defineStore('user', {
     },
 
     // Get user's information
-    async info(info) {
+    async info(info: any) {
       this.setInfo(info);
     },
 

@@ -6,7 +6,7 @@ import appClientMenus from '@/router/appMenus';
 
 export default function useMenuTree() {
   const permission = usePermission();
-  const appStore = useAppStore();
+  const appStore = useAppStore(); // 应用路由数据
   const appRoute = computed(() => {
     if (appStore.menuFromServer) {
       return appStore.appAsyncMenus;
@@ -61,7 +61,7 @@ export default function useMenuTree() {
     }
     return travel(copyRouter, 0);
   });
-
+  console.log('menuTree:', menuTree);
   return {
     menuTree,
   };

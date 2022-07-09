@@ -88,11 +88,72 @@ setupMock({
                 requiresAuth: true,
               },
             },
+          ],
+        },
+        {
+          path: '/article',
+          name: 'Article',
+          meta: {
+            locale: 'menu.server.article',
+            requiresAuth: true,
+            icon: 'icon-book',
+            order: 1,
+          },
+          children: [
             {
-              path: 'https://arco.design',
-              name: 'arcoWebsite',
+              path: 'list',
+              name: 'ArticleList',
               meta: {
-                locale: 'menu.arcoWebsite',
+                locale: 'menu.server.articleList',
+                requiresAuth: true,
+              },
+            },
+            {
+              path: 'edit',
+              name: 'ArticleEdit',
+              meta: {
+                locale: 'menu.server.articleEdit',
+                requiresAuth: true,
+              },
+            },
+          ],
+        },
+        {
+          path: '/category',
+          name: 'Category',
+          meta: {
+            locale: 'menu.server.category',
+            requiresAuth: true,
+            icon: 'icon-sort',
+            order: 1,
+          },
+          children: [
+            {
+              path: 'list',
+              name: 'CategoryList',
+              meta: {
+                locale: 'menu.server.categoryList',
+                requiresAuth: true,
+              },
+            },
+          ],
+        },
+
+        {
+          path: '/tag',
+          name: 'Tag',
+          meta: {
+            locale: 'menu.server.tag',
+            requiresAuth: true,
+            icon: 'icon-tag',
+            order: 1,
+          },
+          children: [
+            {
+              path: 'list',
+              name: 'TagList',
+              meta: {
+                locale: 'menu.server.tagList',
                 requiresAuth: true,
               },
             },

@@ -14,6 +14,7 @@ export default {
     {
       path: 'workplace',
       name: 'Workplace',
+      // 也需要手动写import组件
       component: () => import('@/views/dashboard/workplace/index.vue'),
       meta: {
         locale: 'menu.dashboard.workplace',
