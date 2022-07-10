@@ -2,7 +2,7 @@
  * @Author: 酱
  * @LastEditors: 酱
  * @Date: 2021-11-17 16:26:53
- * @LastEditTime: 2022-07-09 18:58:01
+ * @LastEditTime: 2022-07-10 14:52:32
  * @Description:
  * @FilePath: \blog-admin\src\utils\request.ts
  */
@@ -62,8 +62,8 @@ $axios.interceptors.request.use(
 $axios.interceptors.response.use(
   (response: AxiosResponse) => {
     // console.log(response.data)
-    const { status } = response;
-    const { code } = response.data;
+    const { status } = response; // http自带状态码
+    const { code } = response.data; // 自定义状态码
     if ((status >= 200 && status < 300) || status === 304) {
       // const pollingStatus = response.data.data.status
       if (code === 200) {

@@ -1,4 +1,4 @@
-import request from '@/utils/request';
+import request from 'axios';
 
 export const getTagById = async (id: number) => {
   const res = await request({

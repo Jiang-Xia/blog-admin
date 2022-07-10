@@ -15,7 +15,7 @@
     "lib": ["es2020", "dom"],
     "skipLibCheck": true
   },
-  "include": ["src/**/*", "src/**/*.vue"],
+  "include": ["src/**/*", "src/**/*.vue","src/**/*.tsx",],
   // "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue", "types/*.d.ts"],
   "exclude": ["node_modules"]
 }

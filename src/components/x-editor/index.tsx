@@ -1,5 +1,5 @@
 import { defineComponent, onMounted, onBeforeUnmount } from 'vue';
-import './index.less';
+import './style.less';
 import E from 'wangeditor';
 import hljs from 'highlight.js';
 import dayjs from 'dayjs';
@@ -93,3 +93,5 @@ export default defineComponent({
     );
   },
 });
+
+// 目前改项目tsx无法动态导入组件失败

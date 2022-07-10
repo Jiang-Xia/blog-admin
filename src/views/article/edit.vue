@@ -2,9 +2,7 @@
   <div class="container">
     <a-card class="general-card">
       <template #title>
-        <!-- <a-typography-title :heading="5"> -->
         {{ title }}
-        <!-- </a-typography-title> -->
       </template>
 
       <!-- body -->
@@ -56,11 +54,6 @@
                 placeholder="选择一种分类"
               >
               </a-select>
-              <a-button type="text" @click="showConfirm('分类')">
-                <template #icon>
-                  <XIcon icon="blog-plus-square" />
-                </template>
-              </a-button>
             </a-form-item>
 
             <a-form-item
@@ -77,20 +70,15 @@
                 class="tag-select"
               >
               </a-select>
-              <a-button type="text" @click="showConfirm('标签')">
-                <template #icon>
-                  <XIcon icon="blog-plus-square" />
-                </template>
-              </a-button>
             </a-form-item>
             <a-form-item label="内容" name="content" field="content">
             </a-form-item>
-            <!-- <x-editor
-            custom-class="x-editor"
-            :config="editorConfig"
-            @change="editorChange"
-            @created="createdHandle"
-          /> -->
+            <x-editor
+              custom-class="x-editor"
+              :config="editorConfig"
+              @change="editorChange"
+              @created="createdHandle"
+            />
             <a-form-item :wrapper-col-props="{ span: 13, offset: 7 }">
               <a-button type="primary" html-type="submit">提交</a-button>
               <a-button style="margin-left: 10px" @click="resetForm"
@@ -99,9 +87,6 @@
             </a-form-item>
           </a-form>
         </div>
-        <!-- vue3 v-model使用方法 -->
-        <!-- <CreateModal v-model:value="visibale" type="分类" @ok="ceateOkHandle" /> -->
-        <!-- <CreateModal v-model:value="visibale2" type="标签" @ok="ceateOkHandle" /> -->
       </section>
     </a-card>
   </div>
@@ -123,8 +108,7 @@
   import { ValidatedError } from '@arco-design/web-vue/es/form/interface';
   // import { computed, onBeforeUnmount, onMounted } from 'vue'
   import api from '@/api/index';
-  // import XEditor from '@/components/x-editor/index';
-  // import CreateModal from './components/create-modal.vue';
+  import XEditor from '@/components/x-editor/index.vue';
   import { categoryOptions, tagsOptions, getOptions } from './common';
 
   const router = useRouter();
@@ -146,8 +130,8 @@
   const defaultForm = {
     title: '',
     description: '',
-    content: '1',
-    contentHtml: '1',
+    content: '',
+    contentHtml: '',
     category: '',
     cover: '',
     tags: [],
@@ -239,7 +223,7 @@ type C = { name: string; type: string }
       const res = await createArticle(params);
       Message.success('新建成功！');
     }
-    router.push('/home');
+    router.push('/article/list');
   };
   // 提交失败
   const handleFinishFailed = (errors: ValidatedError) => {
@@ -262,8 +246,8 @@ type C = { name: string; type: string }
     formState.category = res.category.id;
     formState.cover = res.cover;
     formState.tags = res.tags.map((v: any) => v.id);
-    // console.log(formState)
-    // console.log(editor)
+    // console.log(formState);
+    // console.log(res.contentHtml);
     if (editor) {
       // 使用html渲染效率比较高
       editor.txt.html(res.contentHtml);
@@ -285,7 +269,7 @@ type C = { name: string; type: string }
     // console.log('change 之后最新的 html', html)
   };
   const createdHandle = (editor: any) => {
-    console.log('已创建', editor);
+    // console.log('已创建', editor);
     if (route.query.id) {
       getArticleInfoHandle(editor);
     }
@@ -310,30 +294,31 @@ type C = { name: string; type: string }
       // position: relative;
       margin: 0 auto 0;
       // box-shadow: $box-shadow;
-      background-color: var(--minor-bgc);
-      border-radius: var(--layout-border-radius);
+      background-color: var(--color-menu-light-bg);
+      border-radius: var(--border-radius-small);
       // padding: 40px 20px 20px 20px;
       @media screen and (max-width: 768px) {
         width: 95%;
       }
 
       .x-editor {
+        z-index: 999;
         width: 83.3%;
         margin-top: -56px;
         margin-bottom: 24px;
         margin-left: 12.5%;
-        border-color: transparent !important;
+        border-color: var(--color-fill-2) !important;
         border-radius: 4px;
 
         :deep(.w-e-toolbar),
         :deep(.w-e-text-container) {
-          color: var(--text-color2);
-          background-color: var(--main-bgc) !important;
-          border-color: var(--main-bgc) !important;
+          color: var(--color-text-1);
+          background-color: var(--color-fill-2) !important;
+          border-color: var(--color-fill-2) !important;
         }
 
         :deep(.w-e-text code) {
-          background-color: var(--minor-bgc) !important;
+          background-color: var(--color-menu-light-bg) !important;
         }
       }
     }

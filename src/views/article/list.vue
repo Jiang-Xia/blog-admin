@@ -109,7 +109,7 @@
                   type="primary"
                   @click="
                     () => {
-                      $router.push(`/article/edit?type=add?id=${record.id}`);
+                      $router.push(`/article/edit?type=add&id=${record.id}`);
                     }
                   "
                 >
@@ -194,6 +194,7 @@
       onOk: async () => {
         const res = await delArticle({ id });
         Message.success('删除成功');
+        getArticleListHandle();
       },
     });
   };

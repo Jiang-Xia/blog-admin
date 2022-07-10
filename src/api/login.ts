@@ -2,11 +2,12 @@
  * @Author: 酱
  * @LastEditors: 酱
  * @Date: 2021-11-17 16:25:44
- * @LastEditTime: 2022-07-09 14:38:29
+ * @LastEditTime: 2022-07-10 14:40:42
  * @Description:
  * @FilePath: \blog-admin\src\api\login.ts
  */
-import request from '@/utils/request';
+// import request from '@/utils/request';
+import request from 'axios';
 
 export const registerUser = async (data: any) => {
   const res = await request({

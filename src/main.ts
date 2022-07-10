@@ -11,6 +11,7 @@ import App from './App.vue';
 import '@arco-design/web-vue/dist/arco.less';
 import '@/assets/style/global.less';
 import '@/api/interceptor';
+import '@/assets/style/atom-one-dark.css';
 
 const app = createApp(App);
 

@@ -17,11 +17,13 @@
         <Footer />
       </div>
     </div>
+    <x-editor></x-editor>
   </div>
 </template>
 
 <script lang="ts" setup>
   import Footer from '@/components/footer/index.vue';
+  import XEditor from '@/components/x-editor/index';
   import LoginBanner from './components/banner.vue';
   import LoginForm from './components/login-form.vue';
 </script>
