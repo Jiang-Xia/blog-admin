@@ -160,7 +160,7 @@
     content: [{ required: true, trigger: 'change' }],
   };
   // 提交成功
-  const handleFinish = async (values: FormState) => {
+  const handleFinish = async (values: any) => {
     // console.log('values', values)
     const params = {
       ...values,
@@ -184,7 +184,7 @@
     router.push('/article/list');
   };
   // 提交失败
-  const handleFinishFailed = (errors: ValidatedError) => {
+  const handleFinishFailed = (errors: any) => {
     console.log(errors);
   };
   const resetForm = () => {

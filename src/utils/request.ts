@@ -2,7 +2,7 @@
  * @Author: 酱
  * @LastEditors: 酱
  * @Date: 2021-11-17 16:26:53
- * @LastEditTime: 2022-07-10 14:52:32
+ * @LastEditTime: 2022-07-10 18:18:37
  * @Description:
  * @FilePath: \blog-admin\src\utils\request.ts
  */
@@ -70,7 +70,7 @@ $axios.interceptors.response.use(
         // 全部json数据
         return Promise.resolve(response.data);
       }
-      errorMsg(response.message as string);
+      errorMsg(response.data.message as string);
       return Promise.reject(new Error(response.data || 'Error'));
     }
     return Promise.reject(response);
