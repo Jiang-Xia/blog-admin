@@ -89,3 +89,32 @@ export const updateLikesHandle = async (item: any) => {
     item.checked = 1;
   }
 };
+
+// 新建分类和标签
+type C = { name: string; type: string };
+export const ceateOkHandle = async ({ name, type }: C) => {
+  const obj = {
+    label: name,
+    value: name,
+  };
+  if (type === '分类') {
+    await api.createCategory(obj);
+    Message.success('添加成功！');
+    getOptions(type);
+  } else {
+    await api.createTag(obj);
+    getOptions(type);
+    Message.success('添加成功！');
+  }
+};
+
+// 删除 分类和标签
+export const delCategoryTag = async (type: string, id: string) => {
+  if (type === '分类') {
+    const res = await api.delCategory(id);
+    return res;
+    // console.log(res)
+  }
+  const res = await api.delTag(id);
+  return res;
+};

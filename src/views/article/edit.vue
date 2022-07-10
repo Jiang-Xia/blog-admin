@@ -96,20 +96,13 @@
   import { computed, ref, reactive } from 'vue';
   import useLoading from '@/hooks/loading';
   import { Pagination } from '@/types/global';
-  import {
-    getArticleInfo,
-    getArticleList,
-    delArticle,
-    createArticle,
-    editArticle,
-  } from '@/api/article';
+  import { getArticleInfo, createArticle, editArticle } from '@/api/article';
   import { Message, Modal } from '@arco-design/web-vue';
   import { useRoute, useRouter } from 'vue-router';
   import { ValidatedError } from '@arco-design/web-vue/es/form/interface';
   // import { computed, onBeforeUnmount, onMounted } from 'vue'
-  import api from '@/api/index';
   import XEditor from '@/components/x-editor/index.vue';
-  import { categoryOptions, tagsOptions, getOptions } from './common';
+  import { categoryOptions, tagsOptions } from './common';
 
   const router = useRouter();
   const route = useRoute();
@@ -166,41 +159,6 @@
     cover: [{ required: true, message: '封面为必填！', trigger: 'blur' }],
     content: [{ required: true, trigger: 'change' }],
   };
-
-  const visibale = ref(false);
-  const visibale2 = ref(false);
-  // 分类 标签
-  const showConfirm = (type: string) => {
-    if (type === '分类') {
-      visibale.value = !visibale.value;
-    } else {
-      visibale2.value = !visibale2.value;
-    }
-  };
-  /*
-函数参数解构
-type C = { name: string; type: string }
-{ name, type }: C
- */
-  type C = { name: string; type: string };
-  const ceateOkHandle = async ({ name, type }: C) => {
-    const obj = {
-      label: name,
-      value: name,
-    };
-    if (type === '分类') {
-      await api.createCategory(obj);
-      Message.success('添加成功！');
-      getOptions(type);
-    } else {
-      await api.createTag(obj);
-      getOptions(type);
-      Message.success('添加成功！');
-    }
-  };
-  getOptions('标签');
-  getOptions('分类');
-
   // 提交成功
   const handleFinish = async (values: FormState) => {
     // console.log('values', values)

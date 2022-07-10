@@ -30,7 +30,7 @@ export const updateTag = async (data: any) => {
   });
   return res.data;
 };
-export const delTag = async (id: number) => {
+export const delTag = async (id: string) => {
   const res = await request({
     url: `/tag/${id}`,
     method: 'delete',

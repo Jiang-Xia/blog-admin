@@ -30,7 +30,7 @@ export const updateCategory = async (data: any) => {
   });
   return res.data;
 };
-export const delCategory = async (id: number) => {
+export const delCategory = async (id: string) => {
   const res = await request({
     url: `/category/${id}`,
     method: 'delete',
