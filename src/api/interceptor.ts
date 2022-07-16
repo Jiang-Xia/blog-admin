@@ -2,7 +2,7 @@ import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { Message, Modal } from '@arco-design/web-vue';
 import { useUserStore } from '@/store';
 import { getToken } from '@/utils/auth';
-import { baseUrl } from '@/config';
+// import { baseUrl } from '@/config';
 
 // 自定义请求和相应拦截器
 export interface HttpResponse<T = unknown> {
@@ -14,8 +14,9 @@ export interface HttpResponse<T = unknown> {
 function errorMsg(msg: string) {
   Message.error(msg);
 }
+// 这是baseUrl使用 环境模式中写的变量  或者也可以使用config index中配置地址
 if (import.meta.env.VITE_API_BASE_URL) {
-  axios.defaults.baseURL = baseUrl;
+  axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL;
 }
 
 axios.interceptors.request.use(
