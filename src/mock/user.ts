@@ -72,7 +72,7 @@ setupMock({
       const menuList = [
         {
           path: '/dashboard',
-          name: 'dashboard',
+          name: 'Dashboard',
           meta: {
             locale: 'menu.server.dashboard',
             requiresAuth: true,
@@ -90,6 +90,7 @@ setupMock({
             },
           ],
         },
+
         {
           path: '/article',
           name: 'Article',

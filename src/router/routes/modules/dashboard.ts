@@ -2,7 +2,7 @@ import { DEFAULT_LAYOUT } from '@/router/constants';
 
 export default {
   path: '/dashboard',
-  name: 'dashboard',
+  name: 'Dashboard',
   component: DEFAULT_LAYOUT,
   meta: {
     locale: 'menu.dashboard',

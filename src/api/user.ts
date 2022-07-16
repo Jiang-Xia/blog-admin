@@ -23,6 +23,12 @@ export function getUserInfo() {
 }
 
 // 获取菜单数据
-export function getMenuList() {
-  return axios.post<RouteRecordNormalized[]>('/api/user/menu');
+export async function getMenuList() {
+  // mock
+  // const res2 = await axios.post<RouteRecordNormalized[]>('/api/user/menu');
+  // console.log('res1', res1);
+  // server
+  const res2 = await axios.get<RouteRecordNormalized[]>('/admin/menu');
+  // console.log('res2', res2);
+  return res2;
 }

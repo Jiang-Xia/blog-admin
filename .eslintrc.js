@@ -52,6 +52,7 @@ module.exports = {
     '@typescript-eslint/no-unused-vars': 1,
     '@typescript-eslint/no-empty-function': 1,
     '@typescript-eslint/no-explicit-any': 0,
+    'no-console': 'off', // 允许编写 console
     'import/extensions': [
       2,
       'ignorePackages',

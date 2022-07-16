@@ -39,16 +39,27 @@ export default function setupPermissionGuard(router: Router) {
       const serverMenuConfig = [...appStore.appAsyncMenus, ...WHITE_LIST];
 
       let exist = false;
+      // console.log(
+      //   'serverMenuConfig: ',
+      //   serverMenuConfig,
+      //   serverMenuConfig.length
+      // );
+      // 注意 路由 name 需要首字母大写。服务器路由中的路由name需要和动态导入的组件名字一致
       while (serverMenuConfig.length && !exist) {
         const element = serverMenuConfig.shift();
         if (element?.name === to.name) exist = true;
-
+        // console.log('element,exist: ', element, exist);
         if (element?.children) {
           serverMenuConfig.push(
             ...(element.children as unknown as RouteRecordNormalized[])
           );
         }
       }
+      // console.log(
+      //   'serverMenuConfig: ',
+      //   serverMenuConfig,
+      //   serverMenuConfig.length
+      // );
       if (exist && permissionsAllow) {
         next();
       } else next(NOT_FOUND);
