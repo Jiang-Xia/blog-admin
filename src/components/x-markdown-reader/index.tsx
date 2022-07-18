@@ -1,10 +1,16 @@
-import { defineComponent, onMounted, ref } from 'vue';
+import {
+  defineAsyncComponent,
+  defineComponent,
+  Component,
+  onMounted,
+  ref,
+} from 'vue';
 import './index.less';
 // import hljs from 'highlight.js'
 // import dayjs from 'dayjs'
 import { copy } from '@/utils/index';
 
-export default defineComponent({
+const XMarkdownReader = defineComponent({
   name: 'XMarkdownReader',
   props: {
     content: {
@@ -12,7 +18,7 @@ export default defineComponent({
       default: '',
     },
   },
-  setup(props, { emit }) {
+  setup(props: any, { emit }) {
     const markdownRef = ref();
     onMounted(() => {
       // console.log(markdownRef.value)
@@ -44,17 +50,14 @@ export default defineComponent({
       ></div>
     );
   },
-  //   mounted() {
-  //     // const markdownRef = ref()
-  //     console.log(this.$refs)
-  //     if (this.$refs.markdownRef) {
-  //       const blocks = this.$refs.value.markdownRef.querySelectorAll('pre code')
-  //       blocks.forEach((block: HTMLElement) => {
-  //         const span = document.createElement('span')
-  //         span.classList.add('copy-code-btn')
-  //         span.innerText = block.className.toLowerCase()
-  //         hljs.highlightBlock(block)
-  //       })
-  //     }
-  //   }
 });
+
+export default XMarkdownReader;
+// export default defineAsyncComponent(
+//   () =>
+//     new Promise((resolve, reject) => {
+//       resolve({
+//         template: '<div>I am async!</div>',
+//       });
+//     })
+// );

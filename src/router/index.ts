@@ -22,6 +22,14 @@ const router = createRouter({
         requiresAuth: false,
       },
     },
+    {
+      path: '/useTsx',
+      name: 'useTsx',
+      component: () => import('@/views/user/index.vue'),
+      meta: {
+        requiresAuth: false,
+      },
+    },
     ...appRoutes,
     {
       path: '/:pathMatch(.*)*',

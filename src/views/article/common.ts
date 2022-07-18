@@ -118,3 +118,6 @@ export const delCategoryTag = async (type: string, id: string) => {
   const res = await api.delTag(id);
   return res;
 };
+
+getOptions('标签');
+getOptions('分类');
