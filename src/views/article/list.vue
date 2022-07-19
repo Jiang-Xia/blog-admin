@@ -109,7 +109,7 @@
                   type="primary"
                   @click="
                     () => {
-                      $router.push(`/article/edit?type=add&id=${record.id}`);
+                      $router.push(`/article/edit?type=edit&id=${record.id}`);
                     }
                   "
                 >

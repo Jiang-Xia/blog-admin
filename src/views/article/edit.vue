@@ -71,14 +71,10 @@
               >
               </a-select>
             </a-form-item>
-            <a-form-item label="内容" name="content" field="content">
+            <a-form-item label="内容" name="contentHtml" field="contentHtml">
+              <md-editor v-model="formState.contentHtml" class="x-md-editor" />
             </a-form-item>
-            <x-editor
-              custom-class="x-editor"
-              :config="editorConfig"
-              @change="editorChange"
-              @created="createdHandle"
-            />
+
             <a-form-item :wrapper-col-props="{ span: 13, offset: 7 }">
               <a-button type="primary" html-type="submit">提交</a-button>
               <a-button style="margin-left: 10px" @click="resetForm"
@@ -101,21 +97,22 @@
   import { useRoute, useRouter } from 'vue-router';
   import { ValidatedError } from '@arco-design/web-vue/es/form/interface';
   // import { computed, onBeforeUnmount, onMounted } from 'vue'
-  import XEditor from '@/components/x-editor/index.vue';
+  import MdEditor from 'md-editor-v3';
   import { categoryOptions, tagsOptions } from './common';
+  import 'md-editor-v3/lib/style.css';
 
   const router = useRouter();
   const route = useRoute();
+  const { type } = route.query;
   const title = computed(() => {
-    const { type } = route.query;
     return type === 'edit' ? '编辑文章' : '新增文章';
   });
 
   interface FormState {
     title: string;
     description: string;
-    content: string;
-    contentHtml?: string;
+    // content: string;
+    contentHtml: string;
     category: string;
     cover: string;
     tags: number[];
@@ -123,8 +120,8 @@
   const defaultForm = {
     title: '',
     description: '',
-    content: '',
-    contentHtml: '',
+    // content: '',
+    contentHtml: '**哈喽！有什么灵感的话赶紧写下来吧~**',
     category: '',
     cover: '',
     tags: [],
@@ -157,14 +154,14 @@
     category: [{ required: true, message: '请选择分类！', trigger: 'change' }],
     tags: [{ required: true, message: '请选择标签！', trigger: 'change' }],
     cover: [{ required: true, message: '封面为必填！', trigger: 'blur' }],
-    content: [{ required: true, trigger: 'change' }],
+    contentHtml: [{ required: true, trigger: 'change' }],
   };
   // 提交成功
   const handleFinish = async (values: any) => {
     // console.log('values', values)
     const params = {
       ...values,
-      content: formState.content,
+      // content: formState.content,
       contentHtml: formState.contentHtml,
       id: 0,
       // cover: formState.cover
@@ -193,45 +190,21 @@
 
   // const ArticleInfo = ref({})
   // 文章编辑
-  const getArticleInfoHandle = async (editor: any) => {
+  const getArticleInfoHandle = async () => {
     const { query } = route;
     let res = await getArticleInfo(query);
     res = res.info;
     formState.title = res.title;
     formState.description = res.description;
-    formState.content = res.content;
+    // formState.content = res.content;
     formState.contentHtml = res.contentHtml;
     formState.category = res.category.id;
     formState.cover = res.cover;
     formState.tags = res.tags.map((v: any) => v.id);
-    // console.log(formState);
-    // console.log(res.contentHtml);
-    if (editor) {
-      // 使用html渲染效率比较高
-      editor.txt.html(res.contentHtml);
-      // 使用json数据也可以渲染
-      // editor.txt.setJSON(JSON.parse(res.content))
-    }
   };
-
-  // 编辑器修改
-  const editorConfig = {
-    placeholder: '哈喽！有什么灵感的话赶紧写下来吧~',
-    pasteFilterStyle: true,
-  };
-  const editorChange = (params: any) => {
-    const { html, json, editor } = params;
-    formState.contentHtml = html;
-    formState.content = JSON.stringify(json);
-    // JSON.stringify(json)
-    // console.log('change 之后最新的 html', html)
-  };
-  const createdHandle = (editor: any) => {
-    // console.log('已创建', editor);
-    if (route.query.id) {
-      getArticleInfoHandle(editor);
-    }
-  };
+  if (type === 'edit') {
+    getArticleInfoHandle();
+  }
 </script>
 
 <script lang="ts">
@@ -246,39 +219,21 @@
 
     .create-container {
       z-index: 0;
-      // min-height: 100vh;
-      // min-width: 40%;
-      width: 70%;
-      // position: relative;
+      width: 80%;
+      min-width: 40vh;
+      max-width: 1600px;
       margin: 0 auto 0;
-      // box-shadow: $box-shadow;
       background-color: var(--color-menu-light-bg);
       border-radius: var(--border-radius-small);
-      // padding: 40px 20px 20px 20px;
       @media screen and (max-width: 768px) {
         width: 95%;
       }
-
-      .x-editor {
-        z-index: 999;
-        width: 83.3%;
-        margin-top: -56px;
-        margin-bottom: 24px;
-        margin-left: 12.5%;
-        border-color: var(--color-fill-2) !important;
-        border-radius: 4px;
-
-        :deep(.w-e-toolbar),
-        :deep(.w-e-text-container) {
-          color: var(--color-text-1);
-          background-color: var(--color-fill-2) !important;
-          border-color: var(--color-fill-2) !important;
-        }
-
-        :deep(.w-e-text code) {
-          background-color: var(--color-menu-light-bg) !important;
-        }
-      }
     }
+  }
+
+  .x-md-editor {
+    background-color: var(--color-fill-2) !important;
+    border-color: var(--color-fill-2) !important;
+    border-radius: 4px;
   }
 </style>
