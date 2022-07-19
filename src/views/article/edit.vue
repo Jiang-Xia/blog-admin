@@ -101,7 +101,7 @@
   import { useRoute, useRouter } from 'vue-router';
   import { ValidatedError } from '@arco-design/web-vue/es/form/interface';
   // import { computed, onBeforeUnmount, onMounted } from 'vue'
-  import XEditor from '@/components/x-editor/index.vue';
+  import XEditor from '@/components/x-editor';
   import { categoryOptions, tagsOptions } from './common';
 
   const router = useRouter();
