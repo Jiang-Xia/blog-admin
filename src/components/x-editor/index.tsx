@@ -1,5 +1,5 @@
 import { defineComponent, onMounted, onBeforeUnmount } from 'vue';
-import './style.less';
+import './index.less';
 import E from 'wangeditor';
 import hljs from 'highlight.js';
 import dayjs from 'dayjs';
