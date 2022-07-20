@@ -72,7 +72,11 @@
               </a-select>
             </a-form-item>
             <a-form-item label="内容" name="contentHtml" field="contentHtml">
-              <md-editor v-model="formState.contentHtml" class="x-md-editor" />
+              <md-editor
+                v-model="formState.contentHtml"
+                class="x-md-editor"
+                :theme="theme"
+              />
             </a-form-item>
 
             <a-form-item :wrapper-col-props="{ span: 13, offset: 7 }">
@@ -98,9 +102,11 @@
   import { ValidatedError } from '@arco-design/web-vue/es/form/interface';
   // import { computed, onBeforeUnmount, onMounted } from 'vue'
   import MdEditor from 'md-editor-v3';
+  import { useAppStore } from '@/store';
   import { categoryOptions, tagsOptions } from './common';
   import 'md-editor-v3/lib/style.css';
 
+  const appStore = useAppStore();
   const router = useRouter();
   const route = useRoute();
   const { type } = route.query;
@@ -205,6 +211,12 @@
   if (type === 'edit') {
     getArticleInfoHandle();
   }
+
+  // 主题
+  const theme = computed(() => {
+    if (appStore.theme === 'dark') return 'dark';
+    return 'light';
+  });
 </script>
 
 <script lang="ts">
@@ -232,8 +244,8 @@
   }
 
   .x-md-editor {
-    background-color: var(--color-fill-2) !important;
-    border-color: var(--color-fill-2) !important;
+    // background-color: var(--color-bg-2);
+    // border-color: var(--color-bg-2);
     border-radius: 4px;
   }
 </style>
