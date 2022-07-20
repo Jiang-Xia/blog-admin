@@ -1,3 +1,5 @@
+import dayjs from 'dayjs';
+
 type TargetContext = '_self' | '_parent' | '_blank' | '_top';
 
 export const openWindow = (
@@ -27,3 +29,8 @@ export default null;
 export function copy(text: string) {
   return '';
 }
+
+export const formateDate = (date: Date | string) => {
+  date = new Date(date);
+  return dayjs(date).format('YYYY-MM-DD');
+};

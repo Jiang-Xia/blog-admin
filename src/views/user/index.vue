@@ -9,4 +9,16 @@
   <div> <XMarkdownReader :content="contentHtml" /> </div
 ></template>
 
-<style lang="less" scoped></style>
+<style lang="less" scoped>
+  .my-info {
+    position: relative;
+    z-index: 0;
+    width: 70%;
+    // min-height: 100vh;
+    min-width: 40%;
+    margin: 20px auto 0;
+    padding: 10px 20px 20px 20px;
+    background-color: #fff;
+    border-radius: 12px;
+  }
+</style>

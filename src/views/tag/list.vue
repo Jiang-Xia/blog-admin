@@ -66,20 +66,23 @@
           <a-table-column title="标签名" data-index="label" />
           <a-table-column title="标签文章数" data-index="articleCount">
             <template #cell="{ record }">
-              <a-tag color="#00ADB5" size="small">{{
+              <a-tag :color="record.color" size="small">{{
                 record.articleCount
               }}</a-tag>
             </template>
           </a-table-column>
           <a-table-column title="颜色" data-index="color">
             <template #cell="{ record }">
-              <span :style="{ backgroundColor: record.color }">
-                {{ record.color }}
-              </span>
-              {{ record.category }}
+              <a-tag :color="record.color" size="small">{{
+                record.color
+              }}</a-tag>
             </template>
           </a-table-column>
-          <a-table-column title="创建时间" data-index="createAt" />
+          <a-table-column title="创建时间" data-index="createAt">
+            <template #cell="{ record }">
+              {{ formateDate(record.createAt) }}
+            </template>
+          </a-table-column>
           <a-table-column title="操作" data-index="operations">
             <template #cell="{ record }">
               <a-space :size="8">
@@ -109,6 +112,7 @@
   import { Pagination } from '@/types/global';
   import { Message, Modal } from '@arco-design/web-vue';
   import api from '@/api/index';
+  import { formateDate } from '@/utils';
   import CreateModal from '../category/create-modal.vue';
   import {
     getOptions,
