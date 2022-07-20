@@ -1,5 +1,5 @@
 常用的type类别
-
+type must be one of [build, chore, ci, docs, feat, fix, perf, refactor, revert, style, test] [type-enum]
 type指明git commit的类别，应该使用以下类型，也可根据团队自行增减
 『feat』: 新增功能
 『fix』: 修复 bug
