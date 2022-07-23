@@ -1,28 +1,22 @@
 <template>
   <div class="container">
-    <div class="logo">
-      <img
-        alt="logo"
-        src="../../assets/images/logos/custom2.png"
-        style="height: 34px"
-      />
-      <div class="logo-text">Blog Admin</div>
-    </div>
-    <LoginBanner />
+    <!-- <form method="#" action="index.html" class="form-wrap">
+      <h1>登录</h1>
+      <br />
+      <hr />
+      <input type="text" name="username" placeholder="Username" />
+      <input type="password" name="password" placeholder="Password" />
+      <input type="submit" name="" value="Login" />
+    </form> -->
     <div class="content">
       <div class="content-inner">
         <LoginForm />
-      </div>
-      <div class="footer">
-        <Footer />
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-  import Footer from '@/components/footer/index.vue';
-  import LoginBanner from './components/banner.vue';
   import LoginForm from './components/login-form.vue';
 </script>
 
@@ -30,11 +24,9 @@
   .container {
     display: flex;
     height: 100vh;
-
-    .banner {
-      width: 550px;
-      background: linear-gradient(163.85deg, #1d2129 0%, #00308f 100%);
-    }
+    background-image: url(./images/bg-02.jpg);
+    background-position: center;
+    background-size: cover;
 
     .content {
       position: relative;
@@ -42,41 +34,42 @@
       flex: 1;
       align-items: center;
       justify-content: center;
-      padding-bottom: 40px;
     }
 
-    .footer {
-      position: absolute;
-      right: 0;
-      bottom: 0;
-      width: 100%;
+    .content-inner {
+      padding: 60px 30px;
+      background-color: #fff;
+      border-radius: 12px;
+      box-shadow: 0 0 rgba(0, 0, 0, 0.29);
     }
   }
 
-  .logo {
-    position: fixed;
-    top: 24px;
-    left: 22px;
-    z-index: 1;
-    display: inline-flex;
-    align-items: center;
-
-    &-text {
-      margin-right: 4px;
-      margin-left: 4px;
-      color: var(--color-fill-1);
-      font-size: 20px;
-    }
+  .container::before {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: rgba(93, 84, 240, 0.5);
+    background: -webkit-linear-gradient(
+      left,
+      rgba(0, 168, 255, 0.5),
+      rgba(185, 0, 255, 0.5)
+    );
+    background: -moz-linear-gradient(
+      left,
+      rgba(0, 168, 255, 0.5),
+      rgba(185, 0, 255, 0.5)
+    );
+    content: '';
+    pointer-events: none;
   }
 </style>
 
 <style lang="less" scoped>
   // responsive
   @media (max-width: @screen-lg) {
-    .container {
-      .banner {
-        width: 25%;
-      }
-    }
   }
 </style>

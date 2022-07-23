@@ -57,8 +57,8 @@ axios.interceptors.response.use(
   },
   (error) => {
     console.log('error: ', error.response);
+    const data = error.response && error.response.data;
     if (error.response) {
-      const data = error.response && error.response.data;
       switch (error.response.status) {
         case 401:
           errorMsg(data.message || '权限不足');
@@ -86,6 +86,6 @@ axios.interceptors.response.use(
     } else {
       errorMsg('请求失败，请检查网络是否已连接');
     }
-    return Promise.reject(error);
+    return Promise.reject(data);
   }
 );

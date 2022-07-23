@@ -54,7 +54,13 @@
           </a-checkbox>
           <a-link>{{ $t('login.form.forgetPassword') }}</a-link>
         </div>
-        <a-button type="primary" html-type="submit" long :loading="loading">
+        <a-button
+          type="primary"
+          html-type="submit"
+          long
+          :loading="loading"
+          class="login-btn"
+        >
           {{ $t('login.form.login') }}
         </a-button>
         <a-button type="text" long class="login-form-register-btn">
@@ -84,8 +90,8 @@
 
   const loginConfig = useStorage('login-config', {
     rememberPassword: true,
-    username: '18377777777', // 演示默认值
-    password: '123456', // demo default value
+    username: '', // 演示默认值
+    password: '', // demo default value
   });
   const userInfo = reactive({
     username: loginConfig.value.username,
@@ -132,7 +138,7 @@
 <style lang="less" scoped>
   .login-form {
     &-wrapper {
-      width: 320px;
+      width: 265px;
     }
 
     &-title {
@@ -161,6 +167,22 @@
 
     &-register-btn {
       color: var(--color-text-3) !important;
+    }
+
+    .login-btn {
+      background: rgba(93, 84, 240, 0.5);
+      background: linear-gradient(
+        left,
+        rgba(0, 168, 255, 0.5),
+        rgba(185, 0, 255, 0.5)
+      );
+      background: -webkit-linear-gradient(
+          left,
+          rgba(0, 168, 255, 0.5),
+          rgba(185, 0, 255, 0.5)
+        )
+        no-repeat;
+      border-radius: 5px;
     }
   }
 </style>
