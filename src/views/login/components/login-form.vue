@@ -1,7 +1,7 @@
 <template>
   <div class="login-form-wrapper">
     <div class="login-form-title">{{ $t('login.form.title') }}</div>
-    <div class="login-form-sub-title">{{ $t('login.form.title') }}</div>
+    <div class="login-form-sub-title">{{ $t('login.form.subtitle') }}</div>
     <div class="login-form-error-msg">{{ errorMessage }}</div>
     <a-form
       ref="loginForm"
@@ -138,10 +138,12 @@
 <style lang="less" scoped>
   .login-form {
     &-wrapper {
-      width: 265px;
+      width: 248px;
+      text-align: center;
     }
 
     &-title {
+      margin-bottom: 10px;
       color: var(--color-text-1);
       font-weight: 500;
       font-size: 24px;
@@ -150,7 +152,7 @@
 
     &-sub-title {
       color: var(--color-text-3);
-      font-size: 16px;
+      font-size: 12px;
       line-height: 24px;
     }
 

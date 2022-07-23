@@ -1,13 +1,5 @@
 <template>
   <div class="container">
-    <!-- <form method="#" action="index.html" class="form-wrap">
-      <h1>登录</h1>
-      <br />
-      <hr />
-      <input type="text" name="username" placeholder="Username" />
-      <input type="password" name="password" placeholder="Password" />
-      <input type="submit" name="" value="Login" />
-    </form> -->
     <div class="content">
       <div class="content-inner">
         <LoginForm />
@@ -37,7 +29,7 @@
     }
 
     .content-inner {
-      padding: 60px 30px;
+      padding: 35px 30px;
       background-color: #fff;
       border-radius: 12px;
       box-shadow: 0 0 rgba(0, 0, 0, 0.29);
