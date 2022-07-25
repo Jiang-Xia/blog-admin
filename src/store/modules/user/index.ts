@@ -6,13 +6,24 @@ import { userInfo, userLogin } from '@/api/login';
 // import { UserState } from './types';
 import useAppStore from '../app';
 
-export interface AnyPropName {
-  [propName: string]: any;
+interface UserState {
+  nickname: string;
+  mobile: string;
+  token: string;
+  id: number;
+  role: string;
 }
+/* 
+  使用 const userStore = useUserStore(); userStore.id 
+  state中显示声明了才能使用
+*/
 const useUserStore = defineStore('user', {
-  state: (): AnyPropName => ({
+  state: (): UserState => ({
     nickname: '',
     mobile: '',
+    token: '',
+    id: 0,
+    role: '',
   }),
 
   getters: {
@@ -29,7 +40,7 @@ const useUserStore = defineStore('user', {
       });
     },
     // Set user's information
-    setInfo(partial: any) {
+    setInfo(partial: Partial<UserState>) {
       this.$patch(partial);
     },
     // Reset user's information
@@ -38,7 +49,7 @@ const useUserStore = defineStore('user', {
     },
 
     // Get user's information
-    async info(info: any) {
+    async info(info: Partial<UserState>) {
       this.setInfo(info);
     },
 
@@ -48,9 +59,12 @@ const useUserStore = defineStore('user', {
         const res = await userLogin({
           mobile: loginForm.username,
           password: loginForm.password,
+          admin: true,
         });
+        const user = res.info.user as UserState;
         setToken(res.info.token);
-        this.info(res.info.user);
+        this.$state.token = res.info.token;
+        this.info(user);
       } catch (err) {
         clearToken();
         throw err;

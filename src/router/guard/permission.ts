@@ -11,6 +11,7 @@ export default function setupPermissionGuard(router: Router) {
   router.beforeEach(async (to, from, next) => {
     const appStore = useAppStore();
     const userStore = useUserStore();
+    // console.log({ uid: userStore.id });
     const Permission = usePermission();
     const permissionsAllow = Permission.accessRouter(to);
     const hasToken = getToken();

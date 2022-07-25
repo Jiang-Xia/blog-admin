@@ -2,8 +2,8 @@ import { ref } from 'vue';
 import api from '@/api/index';
 import { LocationQueryValue } from 'vue-router';
 import { Message } from '@arco-design/web-vue';
-import { getToken } from '@/utils/auth';
-import { useAppStore, useUserStore } from '@/store';
+// import { getToken } from '@/utils/auth';
+import { useUserStore } from '@/store';
 
 // 分类
 const categoryOptions = ref([]);
@@ -62,17 +62,16 @@ export const updateLikes = async (data: any) => {
   return res;
 };
 
-const appStore = useUserStore();
-
+const userStore = useUserStore();
 // 更新点赞数
 export const updateLikesHandle = async (item: any) => {
-  if (!appStore.state.token) {
+  if (!userStore.token) {
     Message.warning('请先登录！');
     return;
   }
   const send = {
     articleId: item.id,
-    uid: appStore.getters.userInfo.id,
+    uid: userStore.id,
     status: 1,
   };
   if (item.checked) {
@@ -93,9 +92,11 @@ export const updateLikesHandle = async (item: any) => {
 // 新建分类和标签
 type C = { name: string; type: string };
 export const ceateOkHandle = async ({ name, type }: C) => {
+  // console.log(userStore.createTime);
   const obj = {
     label: name,
     value: name,
+    uid: userStore.id,
   };
   if (type === '分类') {
     await api.createCategory(obj);
