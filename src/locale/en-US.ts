@@ -38,6 +38,9 @@ export default {
 
   'menu.server.user': 'Me',
   'menu.server.userSet': 'UserSet',
+
+  'menu.server.link': 'Link',
+  'menu.server.linkList': 'LinkList',
   ...localeSettings,
   ...localeMessageBox,
   ...localeLogin,
