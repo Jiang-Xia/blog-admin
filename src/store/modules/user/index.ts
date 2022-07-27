@@ -12,6 +12,7 @@ interface UserState {
   token: string;
   id: number;
   role: string;
+  avatar: string;
 }
 /* 
   使用 const userStore = useUserStore(); userStore.id 
@@ -24,6 +25,7 @@ const useUserStore = defineStore('user', {
     token: '',
     id: 0,
     role: '',
+    avatar: '',
   }),
 
   getters: {
