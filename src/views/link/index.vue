@@ -24,9 +24,11 @@
       >
         <template #columns>
           <a-table-column title="标题" data-index="title" />
-          <a-table-column title="网址" data-index="url">
+          <a-table-column title="图标" data-index="url" align="center">
             <template #cell="{ record }">
-              <img :src="record.url" />
+              <a-avatar>
+                <img :alt="record.title" :src="record.icon" />
+              </a-avatar>
             </template>
           </a-table-column>
           <a-table-column title="描述" data-index="desp" />
@@ -37,9 +39,9 @@
           </a-table-column>
           <a-table-column title="状态" data-index="url">
             <template #cell="{ record }">
+              <!-- :disabled="record.agreed" -->
               <a-switch
                 v-model="record.agreed"
-                :disabled="record.agreed"
                 @change="onSwitchChange(record)"
               >
                 <template #checked-icon>
@@ -120,12 +122,12 @@
   const reset = () => {
     formModel.value = generateFormModel();
   };
-  const delHandle = async (id: any) => {
+  const delHandle = async (id: number) => {
     Modal.confirm({
-      title: '删除文章',
-      content: '确定删除该文章嘛？',
+      title: '删除友链',
+      content: '确定删除该友链嘛？',
       onOk: async () => {
-        const res = await axios.delete('/link', { id });
+        const res = await axios.delete('/link', { data: { id } });
         Message.success('删除成功');
         getListHandle();
       },
@@ -133,7 +135,7 @@
   };
   const onSwitchChange = async (record: any) => {
     const { agreed, id } = record;
-    const res = await axios.patch(`/link`, { agreed: true, id });
+    const res = await axios.patch(`/link`, { agreed, id });
     Message.success('设置成功');
   };
 </script>
