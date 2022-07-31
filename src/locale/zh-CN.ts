@@ -41,6 +41,9 @@ export default {
 
   'menu.server.link': '友情链接',
   'menu.server.linkList': '友链列表',
+
+  'menu.server.msgboard': '留言板',
+  'menu.server.msgboardList': '留言板列表',
   ...localeSettings,
   ...localeMessageBox,
   ...localeLogin,

@@ -41,6 +41,9 @@ export default {
 
   'menu.server.link': 'Link',
   'menu.server.linkList': 'LinkList',
+
+  'menu.server.msgboard': 'Msgboard',
+  'menu.server.msgboardList': 'MsgboardList',
   ...localeSettings,
   ...localeMessageBox,
   ...localeLogin,
