@@ -116,6 +116,7 @@
     getListHandle();
   };
   const onPageChange = (current: number) => {
+    pagination.current = 1;
     getListHandle();
   };
   getListHandle();

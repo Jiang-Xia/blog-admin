@@ -100,6 +100,40 @@
           <a-table-column title="查看" data-index="views" />
           <a-table-column title="点赞" data-index="likes" />
           <a-table-column title="评论" data-index="commentCount" />
+          <a-table-column title="置顶" data-index="url">
+            <template #cell="{ record }">
+              <!-- :disabled="record.agreed" -->
+              <a-switch
+                v-model="record.topping"
+                active-color="red"
+                @change="onSwitchTopping(record)"
+              >
+                <template #checked-icon>
+                  <icon-check />
+                </template>
+                <template #unchecked-icon>
+                  <icon-close />
+                </template>
+              </a-switch>
+            </template>
+          </a-table-column>
+          <a-table-column title="禁用" data-index="url">
+            <template #cell="{ record }">
+              <!-- :disabled="record.agreed" -->
+              <a-switch
+                v-model="record.isDelete"
+                active-color="red"
+                @change="onSwitchChange(record)"
+              >
+                <template #checked-icon>
+                  <icon-check />
+                </template>
+                <template #unchecked-icon>
+                  <icon-close />
+                </template>
+              </a-switch>
+            </template>
+          </a-table-column>
           <a-table-column title="更新时间" data-index="uTime" />
           <a-table-column title="操作" data-index="operations">
             <template #cell="{ record }">
@@ -140,13 +174,14 @@
   import { Pagination } from '@/types/global';
   import { getArticleInfo, getArticleList, delArticle } from '@/api/article';
   import { Message, Modal } from '@arco-design/web-vue';
+  import axios from 'axios';
 
   const generateFormModel = () => {
     return {
       page: 1,
       category: '',
       tags: [],
-      pageSize: 20,
+      pageSize: 10,
       total: 0,
       title: '',
       description: '',
@@ -160,13 +195,15 @@
   const formModel = ref(generateFormModel());
   const basePagination: Pagination = {
     current: 1,
-    pageSize: 20,
+    pageSize: 10,
   };
   const pagination = reactive({
     ...basePagination,
   });
   const getArticleListHandle = async (val = 1) => {
     setLoading(true);
+    formModel.value.page = val;
+    pagination.current = val;
     const res = await getArticleList(formModel.value);
     renderData.value = res.list.map((v: any) => {
       v.category = v.category.label;
@@ -178,10 +215,11 @@
     setLoading(false);
   };
   const search = () => {
+    pagination.current = 1;
     getArticleListHandle();
   };
   const onPageChange = (current: number) => {
-    getArticleListHandle();
+    getArticleListHandle(current);
   };
   getArticleListHandle();
   const reset = () => {
@@ -197,6 +235,18 @@
         getArticleListHandle();
       },
     });
+  };
+  // 文章禁用
+  const onSwitchChange = async (record: any) => {
+    const { isDelete, id } = record;
+    const res = await axios.patch(`/article/disabled`, { isDelete, id });
+    Message.success('设置成功');
+  };
+  // 文章置顶
+  const onSwitchTopping = async (record: any) => {
+    const { topping, id } = record;
+    const res = await axios.patch(`/article/topping`, { topping, id });
+    Message.success('设置成功');
   };
 </script>
 

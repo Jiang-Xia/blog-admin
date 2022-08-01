@@ -97,6 +97,7 @@
           if (_route) {
             _route.forEach((element) => {
               // This is demo, modify nodes as needed
+              // 直接渲染acro-design的icon组件
               const icon = element?.meta?.icon
                 ? () => h(compile(`<${element?.meta?.icon}/>`))
                 : null;
@@ -153,6 +154,7 @@
       display: flex;
       align-items: center;
     }
+
     .arco-icon {
       &:not(.arco-icon-down) {
         font-size: 18px;
