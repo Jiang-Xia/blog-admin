@@ -5,6 +5,8 @@ import type { RouteRecordNormalized } from 'vue-router';
 import defaultSettings from '@/config/settings.json';
 import { getMenuList } from '@/api/user';
 import { AppState } from './types';
+import useUserStore from '../user';
+// import useTabBarStore from '../tab-bar';
 
 const useAppStore = defineStore('app', {
   state: (): AppState => ({ ...defaultSettings }),
@@ -45,6 +47,8 @@ const useAppStore = defineStore('app', {
       this.hideMenu = value;
     },
     async fetchServerMenuConfig() {
+      // const tabBarStore = useTabBarStore();
+
       let notifyInstance: NotificationReturn | null = null;
       try {
         notifyInstance = Notification.info({
@@ -52,7 +56,9 @@ const useAppStore = defineStore('app', {
           content: 'loading',
           closable: true,
         });
-        const { data } = await getMenuList();
+        // console.log(this);
+        const { role } = useUserStore();
+        const { data } = await getMenuList(role);
         this.serverMenu = data;
         console.log('serverMenu:', data);
         notifyInstance = Notification.success({

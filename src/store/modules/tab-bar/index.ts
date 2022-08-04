@@ -12,11 +12,12 @@ const formatTag = (route: RouteLocationNormalized): TagProps => {
   };
 };
 
-const useAppStore = defineStore('tabBar', {
+const useTabBarStore = defineStore('tabBar', {
   state: (): TabBarState => ({
     cacheTabList: new Set(),
     tagList: [
       // Set the first element dynamically as needed
+      // 动态设置第一个打开的路由 （工作台一定得有，不然默认打开路由找不到会调整到 not fund）
       {
         title: 'menu.dashboard.workplace',
         name: 'Workplace',
@@ -48,4 +49,4 @@ const useAppStore = defineStore('tabBar', {
   },
 });
 
-export default useAppStore;
+export default useTabBarStore;

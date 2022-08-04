@@ -12,7 +12,7 @@ export default {
   },
   children: [
     {
-      path: 'list',
+      path: '/article/list',
       name: 'ArticleList',
       component: () => import('@/views/article/list.vue'),
       meta: {
@@ -22,7 +22,7 @@ export default {
       },
     },
     {
-      path: 'edit',
+      path: '/article/edit',
       name: 'ArticleEdit',
       component: () => import('@/views/article/edit.vue'),
       meta: {

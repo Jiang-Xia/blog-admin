@@ -14,6 +14,7 @@ export default function usePermission() {
     },
     findFirstPermissionRoute(_routers: any, role = 'admin') {
       const cloneRouters = [..._routers];
+
       while (cloneRouters.length) {
         const firstElement = cloneRouters.shift();
         if (

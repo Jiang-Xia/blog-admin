@@ -61,6 +61,9 @@ export default function setupPermissionGuard(router: Router) {
       //   serverMenuConfig,
       //   serverMenuConfig.length
       // );
+      // console.log({ exist, permissionsAllow });
+      console.log({ fullPath: to.fullPath });
+
       if (exist && permissionsAllow) {
         next();
       } else next(NOT_FOUND);
