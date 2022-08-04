@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <!-- <Breadcrumb :items="['menu.list', 'menu.list.searchTable']" /> -->
-    <a-card class="general-card" title="用户查询">
+    <a-card class="general-card" title="菜单查询">
       <a-row>
         <a-col :flex="1">
           <a-form
@@ -12,10 +12,11 @@
           >
             <a-row :gutter="16">
               <a-col :span="10">
-                <a-form-item label="手机号">
+                <a-form-item label="路由name">
                   <a-input
-                    v-model="formModel.mobile"
-                    placeholder="请输入手机号"
+                    v-model="formModel.content"
+                    placeholder="请输入路由name"
+                    disabled
                   />
                 </a-form-item>
               </a-col>
@@ -39,6 +40,20 @@
           </a-form>
         </a-col>
       </a-row>
+
+      <a-row style="margin-bottom: 16px">
+        <a-col :span="16">
+          <a-space>
+            <a-button type="primary" @click="showModal('add')">
+              <template #icon>
+                <icon-plus />
+              </template>
+              {{ '新建' }}
+            </a-button>
+          </a-space>
+        </a-col>
+      </a-row>
+
       <a-table
         :loading="loading"
         row-key="id"
@@ -48,23 +63,59 @@
         @page-change="onPageChange"
       >
         <template #columns>
-          <a-table-column title="手机号" data-index="mobile" />
-          <a-table-column title="昵称" data-index="nickname" />
-          <!-- <a-table-column title="标签" data-index="tag">
+          <a-table-column title="id" data-index="id" />
+          <a-table-column title="name" data-index="name" />
+          <a-table-column title="path" data-index="path" />
+          <a-table-column title="filePath" data-index="filePath" />
+          <a-table-column title="icon" data-index="meta">
             <template #cell="{ record }">
-              {{ record.tag }}
+              <DynamicIcon
+                v-if="record?.meta?.icon"
+                :icon="record?.meta?.icon"
+              />
             </template>
-          </a-table-column> -->
-          <a-table-column title="角色类型" data-index="role" />
-          <a-table-column title="状态" data-index="status">
+          </a-table-column>
+          <a-table-column title="super" data-index="super">
             <template #cell="{ record }">
-              <!-- :disabled="record.agreed" -->
               <a-switch
-                v-model="record.status"
+                v-model="record.super"
+                size="small"
                 active-color="red"
-                checked-value="active"
-                unchecked-value="locked"
-                @change="onSwitchStatus(record)"
+                @change="onSwitchChange('super', record)"
+              />
+            </template>
+          </a-table-column>
+          <a-table-column title="admin" data-index="admin">
+            <template #cell="{ record }">
+              <a-switch
+                v-model="record.admin"
+                type="line"
+                size="small"
+                active-color="red"
+                @change="onSwitchChange('admin', record)"
+              />
+            </template>
+          </a-table-column>
+          <a-table-column title="author" data-index="status">
+            <template #cell="{ record }">
+              <a-switch
+                v-model="record.author"
+                type="round"
+                size="small"
+                active-color="red"
+                @change="onSwitchChange('author', record)"
+              />
+            </template>
+          </a-table-column>
+          <a-table-column title="禁用" data-index="isDelete">
+            <template #cell="{ record }">
+              <a-switch
+                v-model="record.isDelete"
+                active-color="red"
+                :checked-value="true"
+                :unchecked-value="false"
+                size="small"
+                @change="onSwitchChange('isDelete', record)"
               >
                 <template #checked-icon>
                   <icon-check />
@@ -81,6 +132,13 @@
                 <a-button
                   size="mini"
                   type="primary"
+                  @click="showModal('edit', record.id)"
+                >
+                  <icon-edit />
+                </a-button>
+                <a-button
+                  size="mini"
+                  type="primary"
                   status="danger"
                   @click="delHandle(record.id)"
                 >
@@ -92,29 +150,36 @@
         </template>
       </a-table>
     </a-card>
+    <addMenu :ref="(el:any) => (addMenuRef = el)" @success="search"></addMenu>
   </div>
 </template>
 
 <script lang="ts" setup>
-  import { ref, reactive } from 'vue';
+  import { reactive, ref, h, compile, Component } from 'vue';
   import { useI18n } from 'vue-i18n';
   import useLoading from '@/hooks/loading';
   import { Pagination } from '@/types/global';
   import { Message, Modal } from '@arco-design/web-vue';
   import axios from 'axios';
-
+  import addMenu from './addMenu.vue';
+  // 函数式组件 https://vuejs.org/guide/extras/render-function.html#functional-components
+  const DynamicIcon = (props: any, context: any) => {
+    return h(compile(`<${props.icon}/>`), context.attrs, context.slots);
+  };
+  DynamicIcon.props = ['icon'];
   const generateFormModel = () => {
     return {
       page: 1,
       pageSize: 10,
       total: 0,
-      mobile: '',
+      content: '',
     };
   };
   const { loading, setLoading } = useLoading(true);
   const { t } = useI18n();
   const renderData = ref([{}]);
   const formModel = ref(generateFormModel());
+  const addMenuRef = ref(addMenu);
   const basePagination: Pagination = {
     current: 1,
     pageSize: 10,
@@ -155,10 +220,16 @@
       },
     });
   };
-  const onSwitchStatus = async (record: any) => {
-    const { status, id } = record;
-    const res = await axios.patch(`/admin/menu`, { status, id });
+  // 修改菜单
+  const onSwitchChange = async (type: string, record: any) => {
+    const { id } = record;
+    const res = await axios.patch(`/admin/menu`, { [type]: record[type], id });
     Message.success('设置成功');
+  };
+  const showModal = (type: string, id?: string) => {
+    // console.log(addMenuRef);
+    // console.log(addMenuRef.value);
+    addMenuRef.value.show({ type, id });
   };
 </script>
 
