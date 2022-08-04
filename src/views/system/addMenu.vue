@@ -74,8 +74,10 @@
   const title = computed(() => {
     return type.value === 'edit' ? '编辑菜单' : '新增菜单';
   });
-
-  interface FormState {
+  interface stringKey {
+    [propName: string]: string | number;
+  }
+  interface FormState extends stringKey {
     id: string;
     pid: string;
     path: string;
