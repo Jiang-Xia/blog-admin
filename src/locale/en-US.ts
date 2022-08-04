@@ -38,12 +38,17 @@ export default {
 
   'menu.server.user': 'Me',
   'menu.server.userSet': 'UserSet',
+  'menu.server.menuSet': 'MenuSet',
 
   'menu.server.link': 'Link',
   'menu.server.linkList': 'LinkList',
 
   'menu.server.msgboard': 'Msgboard',
   'menu.server.msgboardList': 'MsgboardList',
+
+  'menu.server.system': 'System',
+  'menu.server.userManage': 'UserManage',
+  'menu.server.menuManage': 'MenuManage',
   ...localeSettings,
   ...localeMessageBox,
   ...localeLogin,

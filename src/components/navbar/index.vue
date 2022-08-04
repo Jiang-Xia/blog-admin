@@ -145,8 +145,8 @@
             :size="32"
             :style="{ marginRight: '8px', cursor: 'pointer' }"
           >
-            <!-- <img alt="avatar" :src="avatar" /> -->
-            {{ nickname }}
+            <img alt="avatar" src="../../assets/images/common/user.svg" />
+            <!-- <span class="avatar-text">{{ nickname }}</span> -->
           </a-avatar>
           <template #content>
             <a-doption>
@@ -196,7 +196,9 @@
   import { LOCALE_OPTIONS } from '@/locale';
   import useLocale from '@/hooks/locale';
   import useUser from '@/hooks/user';
-  import MessageBox from '../message-box/index.vue';
+  // 项目导入svg路径不对
+  // import avatarImg from '../../assets/images/common/user.svg';
+  // import MessageBox from '../message-box/index.vue';
 
   const appStore = useAppStore();
   const userStore = useUserStore();
@@ -308,6 +310,15 @@
 
     .trigger-btn {
       margin-left: 14px;
+    }
+
+    .avatar-text {
+      font-weight: 600;
+      font-size: 16px;
+      background: linear-gradient(-70deg, #db469f, #2188ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
   }
 </style>

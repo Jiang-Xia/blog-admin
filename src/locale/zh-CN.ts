@@ -44,6 +44,10 @@ export default {
 
   'menu.server.msgboard': '留言板',
   'menu.server.msgboardList': '留言板列表',
+
+  'menu.server.system': '系统管理',
+  'menu.server.userManage': '用户管理',
+  'menu.server.menuManage': '菜单管理',
   ...localeSettings,
   ...localeMessageBox,
   ...localeLogin,

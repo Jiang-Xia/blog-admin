@@ -69,5 +69,6 @@ module.exports = {
     'import/no-extraneous-dependencies': 0,
     // 'semi': 0, // 关闭分号结尾校验
     'import/no-cycle': 0, // 关闭循环导入报错
+    'import/no-unresolved': 0,
   },
 };

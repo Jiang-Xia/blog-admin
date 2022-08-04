@@ -128,7 +128,7 @@
       title: '删除友链',
       content: '确定删除该友链嘛？',
       onOk: async () => {
-        const res = await axios.delete('/link', { data: { id } });
+        const res = await axios.delete('/link', { params: { id } });
         Message.success('删除成功');
         getListHandle();
       },

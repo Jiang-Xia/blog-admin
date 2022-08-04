@@ -12,7 +12,7 @@ export default {
   },
   children: [
     {
-      path: 'set',
+      path: '/userset',
       name: 'UserSet',
       component: () => import('@/views/user/index.vue'),
       meta: {
