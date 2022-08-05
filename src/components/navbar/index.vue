@@ -158,21 +158,21 @@
               </a-space>
             </a-doption>
             <a-doption>
-              <a-space @click="$router.push({ name: 'Info' })">
+              <a-space @click="$router.push({ name: 'UserSet' })">
                 <icon-user />
                 <span>
                   {{ $t('messageBox.userCenter') }}
                 </span>
               </a-space>
             </a-doption>
-            <a-doption>
+            <!-- <a-doption>
               <a-space @click="$router.push({ name: 'Setting' })">
                 <icon-settings />
                 <span>
                   {{ $t('messageBox.userSettings') }}
                 </span>
               </a-space>
-            </a-doption>
+            </a-doption> -->
             <a-doption>
               <a-space @click="handleLogout">
                 <icon-export />

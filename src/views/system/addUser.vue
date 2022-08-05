@@ -11,41 +11,41 @@
       name="custom-validation"
       :model="formState"
       :rules="rules"
-      :label-col-props="{ span: 3, offset: 0 }"
-      :wrapper-col-props="{ span: 20, offset: 0 }"
+      :label-col-props="{ span: 4, offset: 0 }"
+      :wrapper-col-props="{ span: 18, offset: 0 }"
       hide-cancel
       autocomplete="off"
       @submit-success="handleFinish"
       @submit-failed="handleFinishFailed"
     >
-      <a-form-item label="id" name="id" field="id">
+      <a-form-item label="手机号" name="mobile" field="mobile">
         <a-input
-          v-model="formState.id"
+          v-model="formState.mobile"
           :disabled="type === 'edit'"
-          placeholder="id"
+          :max-length="11"
+          placeholder="手机号"
         />
       </a-form-item>
-      <a-form-item label="pid" name="pid" field="pid">
-        <a-input v-model="formState.pid" placeholder="pid" />
+      <a-form-item label="昵称" name="nickname" field="nickname">
+        <a-input v-model="formState.nickname" placeholder="昵称" />
       </a-form-item>
-      <a-form-item label="path" name="path" field="path">
-        <a-input v-model="formState.path" placeholder="path" />
+      <a-form-item
+        label="密码"
+        name="password"
+        field="password"
+        :max-length="16"
+      >
+        <a-input v-model="formState.password" placeholder="密码" />
       </a-form-item>
-      <a-form-item label="name" name="name" field="name">
-        <a-input v-model="formState.name" placeholder="name" />
+      <a-form-item
+        label="确认密码"
+        name="passwordRepeat"
+        :max-length="16"
+        field="passwordRepeat"
+      >
+        <a-input v-model="formState.passwordRepeat" placeholder="确认密码" />
       </a-form-item>
-      <a-form-item label="icon" name="icon" field="icon">
-        <a-input v-model="formState.icon" placeholder="icon" />
-      </a-form-item>
-      <a-form-item label="locale" name="locale" field="locale">
-        <a-input v-model="formState.locale" placeholder="locale" />
-      </a-form-item>
-      <a-form-item label="filePath" name="filePath" field="filePath">
-        <a-input v-model="formState.filePath" placeholder="filePath" />
-      </a-form-item>
-      <a-form-item label="order" name="order" field="order">
-        <a-input-number v-model="formState.order" placeholder="order" />
-      </a-form-item>
+
       <a-form-item :wrapper-col-props="{ span: 13, offset: 7 }">
         <a-button type="primary" html-type="submit">提交</a-button>
         <a-button style="margin-left: 10px" @click="resetForm">重置</a-button>
@@ -72,30 +72,22 @@
   const route = useRoute();
   const type = ref('add');
   const title = computed(() => {
-    return type.value === 'edit' ? '编辑菜单' : '新增菜单';
+    return type.value === 'edit' ? '编辑用户' : '新增用户';
   });
   interface stringKey {
     [propName: string]: string | number;
   }
   interface FormState extends stringKey {
-    id: string;
-    pid: string;
-    path: string;
-    name: string;
-    order: number;
-    icon: string;
-    locale: string;
-    filePath: string;
+    mobile: string;
+    nickname: string;
+    password: string;
+    passwordRepeat: string;
   }
   const defaultForm = {
-    id: '',
-    pid: '',
-    path: '',
-    name: '',
-    order: 1,
-    icon: '',
-    locale: '',
-    filePath: '',
+    mobile: '',
+    nickname: '',
+    password: '',
+    passwordRepeat: '',
   };
 
   const formRef = ref();
@@ -140,14 +132,14 @@
     if (type.value === 'edit') {
       // 编辑
       params.editId = currentId.value;
-      const res = await axios.patch('admin/menu', params);
+      const res = await axios.patch('user/edit', params);
       visible.value = false;
       // console.log({ res });
       Message.success('修改成功！');
       resetForm();
     } else {
       // 新建
-      const res = await axios.post('admin/menu', params);
+      const res = await axios.post('user/register', params);
       visible.value = false;
       Message.success('新建成功！');
       resetForm();
@@ -165,7 +157,7 @@
   // const ArticleInfo = ref({})
   // 文章编辑
   const getArticleInfoHandle = async () => {
-    const res = await axios.get('admin/menu/detail', {
+    const res = await axios.get('user/info', {
       params: { id: currentId.value },
     });
     const keys = Object.keys(defaultForm);

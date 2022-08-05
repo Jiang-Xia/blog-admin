@@ -39,6 +39,20 @@
           </a-form>
         </a-col>
       </a-row>
+
+      <a-row style="margin-bottom: 16px">
+        <a-col :span="16">
+          <a-space>
+            <a-button type="primary" @click="showModal('add')">
+              <template #icon>
+                <icon-plus />
+              </template>
+              {{ '新建' }}
+            </a-button>
+          </a-space>
+        </a-col>
+      </a-row>
+
       <a-table
         :loading="loading"
         row-key="id"
@@ -56,21 +70,22 @@
             </template>
           </a-table-column> -->
           <a-table-column title="角色类型" data-index="role" />
-          <a-table-column title="状态" data-index="status">
+          <a-table-column title="锁定" data-index="status">
             <template #cell="{ record }">
               <!-- :disabled="record.agreed" -->
               <a-switch
                 v-model="record.status"
                 active-color="red"
-                checked-value="active"
-                unchecked-value="locked"
+                checked-value="locked"
+                unchecked-value="active"
+                :disabled="record.role === 'super'"
                 @change="onSwitchStatus(record)"
               >
                 <template #checked-icon>
-                  <icon-check />
+                  <icon-lock />
                 </template>
                 <template #unchecked-icon>
-                  <icon-lock />
+                  <icon-unlock />
                 </template>
               </a-switch>
             </template>
@@ -92,6 +107,7 @@
         </template>
       </a-table>
     </a-card>
+    <add-modal ref="addRef" @success="search"></add-modal>
   </div>
 </template>
 
@@ -102,6 +118,7 @@
   import { Pagination } from '@/types/global';
   import { Message, Modal } from '@arco-design/web-vue';
   import axios from 'axios';
+  import addModal from './addUser.vue';
 
   const generateFormModel = () => {
     return {
@@ -160,6 +177,10 @@
     const { status, id } = record;
     const res = await axios.patch(`/user/status`, { status, id });
     Message.success('设置成功');
+  };
+  const addRef = ref(addModal);
+  const showModal = (type: string, id?: string) => {
+    addRef.value.show({ type, id });
   };
 </script>
 
