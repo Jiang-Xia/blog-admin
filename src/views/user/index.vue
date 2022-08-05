@@ -2,31 +2,53 @@
   import { useUserStore } from '@/store/';
   import { ref, reactive } from 'vue';
   import axios from 'axios';
-  import { Message } from '@arco-design/web-vue';
+  import { Message, Modal } from '@arco-design/web-vue';
+  import useUser from '@/hooks/user';
 
-  const { nickname, mobile, id: uid } = useUserStore();
+  interface stringKey {
+    [propName: string]: string | number;
+  }
+  const { logout } = useUser();
+  const { nickname, mobile, homepage, intro, avatar, id: uid } = useUserStore();
   const visible = ref(false);
   const form = reactive({
     password: '',
     passwordRepeat: '',
     nickname,
     mobile,
+    passwordOld: '',
+    homepage,
+    intro,
+    avatar,
   });
+  const modalForm = ref(Modal);
+
   const handleClick = () => {
     visible.value = true;
   };
   const handleBeforeOk = (done: any) => {
     // prevent close done(false)
-    console.log(form);
+    const { passwordOld, password, passwordRepeat } = form;
     const obj = {
-      password: form.password,
-      passwordRepeat: form.passwordRepeat,
+      passwordOld,
+      password,
+      passwordRepeat,
       id: uid,
     };
-    axios.patch(`/user/password`, obj).then((res) => {
-      console.log(res);
-      done();
-    });
+    axios
+      .patch(`/user/password`, obj)
+      .then(() => {
+        done();
+        Message.success('修改成功,请重新登陆！');
+        // console.log({ logout, dom: modalForm.value });
+        modalForm.value.resetFields();
+        setTimeout(() => {
+          logout();
+        }, 1000);
+      })
+      .catch(() => {
+        done(false);
+      });
   };
   const handleCancel = () => {
     visible.value = false;
@@ -34,24 +56,22 @@
   // 修改除了密码之外的信息
   const handleFinish = async (values: any) => {
     // console.log('values', values)
-    const { password, passwordRepeat } = values;
-    if (password && passwordRepeat) {
-      // 修改了密码
-      const obj = {
-        password,
-        passwordRepeat,
-        id: uid,
-      };
-      axios.patch(`/user/password`, obj).then((res) => {
-        console.log(res);
-      });
-    } else {
-      // 修改除了密码之外的属性
-      const res = await axios.patch('user/edit', {
-        nickname: values.nickname,
-        id: uid,
-      });
-    }
+    const keys: string[] = [
+      'nickname',
+      'mobile',
+      'homepage',
+      'intro',
+      'avatar',
+    ];
+    const obj: stringKey = {};
+    keys.forEach((v: string) => {
+      obj[v] = values[v];
+    });
+    // 修改除了密码之外的属性
+    await axios.patch('user/edit', {
+      ...obj,
+      id: uid,
+    });
     Message.success('修改成功！');
   };
 </script>
@@ -59,11 +79,14 @@
 <template>
   <div class="my-info">
     <div class="center">
-      <a-avatar>{{ form.nickname }}</a-avatar>
+      <a-avatar>
+        <img v-if="form.avatar" :src="form.avatar" />
+        <template v-else>{{ form.nickname }}</template>
+      </a-avatar>
     </div>
     <a-card :style="{ width: '80%' }" title="个人信息">
       <template #extra>
-        <!-- <a-button type="text" @click="handleClick">修改密码</a-button> -->
+        <a-button type="text" @click="handleClick">修改密码</a-button>
       </template>
 
       <a-form :model="form" auto-label-width @submit-success="handleFinish">
@@ -77,13 +100,50 @@
             placeholder="昵称"
           />
         </a-form-item>
+        <a-form-item field="avatar" label="头像">
+          <a-input v-model="form.avatar" placeholder="头像链接" />
+        </a-form-item>
+        <a-form-item field="homepage" label="主页">
+          <a-input v-model="form.homepage" placeholder="个人主页地址" />
+        </a-form-item>
+        <a-form-item field="intro" label="介绍">
+          <a-input
+            v-model="form.intro"
+            placeholder="这个人很懒，什么都没有留下！"
+          />
+        </a-form-item>
+        <a-form-item>
+          <a-button html-type="submit" type="primary">保存信息</a-button>
+        </a-form-item>
+      </a-form>
+    </a-card>
 
-        <a-form-item field="password" label="密码">
+    <a-modal
+      v-model:visible="visible"
+      title="修改密码"
+      @cancel="handleCancel"
+      @before-ok="handleBeforeOk"
+    >
+      <a-form ref="modalForm" :model="form">
+        <a-form-item field="passwordOld" label="旧密码">
+          <a-input-password
+            v-model="form.passwordOld"
+            allow-clear
+            :max-length="16"
+            placeholder="旧密码"
+          >
+            <template #prefix>
+              <icon-lock />
+            </template>
+          </a-input-password>
+        </a-form-item>
+        <a-form-item field="password" label="新密码">
           <a-input-password
             v-model="form.password"
             allow-clear
-            :max-length="11"
-            placeholder="密码"
+            :max-length="16"
+            placeholder="新密码"
+            auto-com
           >
             <template #prefix>
               <icon-lock />
@@ -95,37 +155,15 @@
             v-model="form.passwordRepeat"
             allow-clear
             placeholder="确认密码"
+            :max-length="16"
           >
             <template #prefix>
               <icon-lock />
             </template>
           </a-input-password>
         </a-form-item>
-        <a-form-item>
-          <a-button html-type="submit" type="primary">保存</a-button>
-        </a-form-item>
       </a-form>
-    </a-card>
-
-    <!-- <a-modal
-      v-model:visible="visible"
-      title="修改密码"
-      @cancel="handleCancel"
-      @before-ok="handleBeforeOk"
-    >
-      <a-form :model="form">
-        <a-form-item field="password" label="密码">
-          <a-input
-            v-model="form.password"
-            :max-length="11"
-            placeholder="密码"
-          />
-        </a-form-item>
-        <a-form-item field="passwordRepeat" label="确认密码">
-          <a-input v-model="form.passwordRepeat" placeholder="确认密码" />
-        </a-form-item>
-      </a-form>
-    </a-modal> -->
+    </a-modal>
   </div>
 </template>
 

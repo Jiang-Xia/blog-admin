@@ -13,6 +13,8 @@ interface UserState {
   id: number;
   role: string;
   avatar: string;
+  homepage: string;
+  intro: string;
 }
 /* 
   使用 const userStore = useUserStore(); userStore.id 
@@ -26,6 +28,8 @@ const useUserStore = defineStore('user', {
     id: 0,
     role: '',
     avatar: '',
+    homepage: '',
+    intro: '',
   }),
 
   getters: {

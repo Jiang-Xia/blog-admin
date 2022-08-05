@@ -175,7 +175,9 @@
   import { getArticleInfo, getArticleList, delArticle } from '@/api/article';
   import { Message, Modal } from '@arco-design/web-vue';
   import axios from 'axios';
+  import { useUserStore } from '@/store';
 
+  const { role } = useUserStore();
   const generateFormModel = () => {
     return {
       page: 1,
@@ -202,9 +204,14 @@
   });
   const getArticleListHandle = async (val = 1) => {
     setLoading(true);
+    const onlyMy = role === 'author'; // 作者只返回自身文章
     formModel.value.page = val;
     pagination.current = val;
-    const res = await getArticleList(formModel.value);
+    const params = {
+      onlyMy,
+      ...formModel.value,
+    };
+    const res = await getArticleList(params);
     renderData.value = res.list.map((v: any) => {
       v.category = v.category.label;
       v.tag = v.tags.map((v: any) => v.label).join();

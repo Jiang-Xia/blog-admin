@@ -75,7 +75,7 @@
               />
             </template>
           </a-table-column>
-          <a-table-column title="super" data-index="super">
+          <!-- <a-table-column title="super" data-index="super">
             <template #cell="{ record }">
               <a-switch
                 v-model="record.super"
@@ -84,7 +84,7 @@
                 @change="onSwitchChange('super', record)"
               />
             </template>
-          </a-table-column>
+          </a-table-column> -->
           <a-table-column title="admin" data-index="admin">
             <template #cell="{ record }">
               <a-switch
