@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { LoginData } from '@/api/user';
-import { setToken, clearToken } from '@/utils/auth';
+import { setToken, clearToken, getToken } from '@/utils/auth';
 import { removeRouteListener } from '@/utils/route-listener';
 import { userInfo, userLogin } from '@/api/login';
 // import { UserState } from './types';
@@ -20,11 +20,12 @@ interface UserState {
   使用 const userStore = useUserStore(); userStore.id 
   state中显示声明了才能使用
 */
+
 const useUserStore = defineStore('user', {
   state: (): UserState => ({
     nickname: '',
     mobile: '',
-    token: '',
+    token: getToken(),
     id: 0,
     role: '',
     avatar: '',

@@ -70,5 +70,6 @@ module.exports = {
     // 'semi': 0, // 关闭分号结尾校验
     'import/no-cycle': 0, // 关闭循环导入报错
     'import/no-unresolved': 0,
+    'no-empty': 0,
   },
 };
