@@ -67,9 +67,9 @@
   import 'md-editor-v3/lib/style.css';
   import axios from 'axios';
 
-  const appStore = useAppStore();
-  const router = useRouter();
-  const route = useRoute();
+  // const appStore = useAppStore();
+  // const router = useRouter();
+  // const route = useRoute();
   const type = ref('add');
   const title = computed(() => {
     return type.value === 'edit' ? '编辑菜单' : '新增菜单';
@@ -164,7 +164,7 @@
 
   // const ArticleInfo = ref({})
   // 文章编辑
-  const getArticleInfoHandle = async () => {
+  const getInfoHandle = async () => {
     const res = await axios.get('admin/menu/detail', {
       params: { id: currentId.value },
     });
@@ -178,7 +178,9 @@
     console.log({ type: type.value });
     if (type.value === 'edit') {
       currentId.value = val.id;
-      getArticleInfoHandle();
+      getInfoHandle();
+    } else {
+      resetForm();
     }
     visible.value = true;
   };

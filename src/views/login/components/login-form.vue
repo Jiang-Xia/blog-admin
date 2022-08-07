@@ -73,7 +73,7 @@
 
 <script lang="ts" setup>
   import { ref, reactive } from 'vue';
-  import { useRouter } from 'vue-router';
+  import { useRoute, useRouter } from 'vue-router';
   import { Message } from '@arco-design/web-vue';
   import { ValidatedError } from '@arco-design/web-vue/es/form/interface';
   import { useI18n } from 'vue-i18n';
@@ -87,7 +87,7 @@
   const errorMessage = ref('');
   const { loading, setLoading } = useLoading();
   const userStore = useUserStore();
-
+  const { query } = useRoute();
   const loginConfig = useStorage('login-config', {
     rememberPassword: true,
     username: '', // 演示默认值
@@ -97,7 +97,14 @@
     username: loginConfig.value.username,
     password: loginConfig.value.password,
   });
-
+  const ticket = query.ticket as string;
+  if (ticket) {
+    userStore.ticketLogin(ticket).then(() => {
+      router.push({
+        name: 'ArticleEdit',
+      });
+    });
+  }
   const handleSubmit = async ({
     errors,
     values,

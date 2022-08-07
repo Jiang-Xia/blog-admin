@@ -49,6 +49,9 @@ export default {
   'menu.server.system': 'System',
   'menu.server.userManage': 'UserManage',
   'menu.server.menuManage': 'MenuManage',
+
+  'menu.server.resource': 'Resource',
+  'menu.server.resourceList': 'ResourceList',
   ...localeSettings,
   ...localeMessageBox,
   ...localeLogin,

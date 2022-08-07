@@ -48,6 +48,9 @@ export default {
   'menu.server.system': '系统管理',
   'menu.server.userManage': '用户管理',
   'menu.server.menuManage': '菜单管理',
+
+  'menu.server.resource': '资源管理',
+  'menu.server.resourceList': '资源列表',
   ...localeSettings,
   ...localeMessageBox,
   ...localeLogin,

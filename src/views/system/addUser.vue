@@ -156,7 +156,7 @@
 
   // const ArticleInfo = ref({})
   // 文章编辑
-  const getArticleInfoHandle = async () => {
+  const getInfoHandle = async () => {
     const res = await axios.get('user/info', {
       params: { id: currentId.value },
     });
@@ -170,7 +170,9 @@
     console.log({ type: type.value });
     if (type.value === 'edit') {
       currentId.value = val.id;
-      getArticleInfoHandle();
+      getInfoHandle();
+    } else {
+      resetForm();
     }
     visible.value = true;
   };

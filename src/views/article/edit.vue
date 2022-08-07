@@ -51,21 +51,17 @@
                 v-model="formState.category"
                 style="width: 50%"
                 :options="categoryOptions"
-                placeholder="选择一种分类"
+                placeholder="选择分类"
               >
               </a-select>
             </a-form-item>
 
-            <a-form-item
-              label="标签"
-              name="tags"
-              field="tags"
-              placeholder="选择标签 "
-            >
+            <a-form-item label="标签" name="tags" field="tags">
               <a-select
                 v-model="formState.tags"
                 style="width: 50%"
                 :options="tagsOptions"
+                placeholder="选择标签 "
                 multiple
                 class="tag-select"
               >

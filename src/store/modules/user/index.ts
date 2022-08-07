@@ -76,6 +76,12 @@ const useUserStore = defineStore('user', {
         throw err;
       }
     },
+    // 使用ticket时直接跳转登录步骤
+    async ticketLogin(token: string) {
+      setToken(token);
+      this.$state.token = token;
+      await this.getInfo();
+    },
     logoutCallBack() {
       const appStore = useAppStore();
       this.resetInfo();
