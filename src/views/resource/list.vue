@@ -4,6 +4,8 @@
   import { useUserStore } from '@/store';
   import axios from 'axios';
   import { Message } from '@arco-design/web-vue';
+  import { number } from '@intlify/core-base';
+  import { init } from 'echarts';
   import FileAside from './file-aside.vue';
 
   const fileList = ref([]);
@@ -11,21 +13,24 @@
   const headers = ref({
     Authorization: `Bearer ${token}`,
   });
-  const successHandle = () => {
-    Message.success('上传成功');
-  };
   const imageList = ref<any>([]);
   const totalCount = ref(0);
-  const delHandle = (id: string) => {
-    axios.get('/resources/delete', { params: { id } });
-  };
+  const current = ref(1);
   const searchForm = ref({
     page: 1,
-    pageSize: 40,
-    filename: '',
+    pageSize: 20,
+    originalname: '',
     type: '',
   });
-  const seachHandle = async () => {
+  const seachHandle = async (page?: number) => {
+    if (page) {
+      searchForm.value.page = page;
+      current.value = page;
+    } else {
+      searchForm.value.page = 1;
+      current.value = 1;
+    }
+    // console.log(item);
     const res = await axios.get('/resources/files', {
       params: searchForm.value,
     });
@@ -37,16 +42,34 @@
     });
     totalCount.value = total;
   };
+  const delHandle = async (id: string) => {
+    // axios.delete(`/resources/file/${id}`);
+    const res = await axios.delete(`/resources/file`, { params: { id } });
+    Message.success('删除成功');
+    seachHandle();
+  };
+
   seachHandle();
+  const changePage = (v: number) => {
+    seachHandle(v);
+  };
+  const menuSelect = (item: any) => {
+    searchForm.value.type = item.type;
+    seachHandle();
+  };
+  const successHandle = () => {
+    Message.success('上传成功');
+    seachHandle();
+  };
 </script>
 
 <template>
   <div class="file-manage">
-    <FileAside @menu-select="seachHandle"></FileAside>
+    <FileAside @menu-select="menuSelect"></FileAside>
     <!-- 文件管理 -->
     <div class="file-main">
       <div class="header-tool">
-        <!-- list-type="picture-card" -->
+        <!--accept="image/*, video/mp4, audio/mp3, .zip, .rar"-->
         <a-upload
           :action="baseUrl + '/resources/uploadFile'"
           multiple
@@ -58,9 +81,12 @@
           @success="successHandle"
         />
         <a-input-search
+          v-model="searchForm.originalname"
           :style="{ width: '320px', marginLeft: '40px' }"
           placeholder="输入文件名"
           search-button
+          @search="seachHandle()"
+          @press-enter="seachHandle()"
         >
           <template #button-icon>
             <icon-search />
@@ -68,22 +94,57 @@
         </a-input-search>
       </div>
       <section class="file-content">
-        <div v-for="item in imageList" :key="item.filename" class="image-item">
-          <a-image
-            :src="item.url"
-            description=""
-            width="60"
-            height="60"
-            footer-position="outer"
-          >
-          </a-image>
-          <div class="title overflow-hidden-container">{{
-            item.originalname
-          }}</div>
-        </div>
+        <a-trigger
+          v-for="item in imageList"
+          :key="item.filename"
+          trigger="contextMenu"
+          position="tr"
+          align-point
+        >
+          <div class="image-item">
+            <a-image
+              v-if="item.type.includes('image')"
+              :src="item.url"
+              description=""
+              width="60"
+              height="60"
+              footer-position="outer"
+            >
+            </a-image>
+            <x-icon
+              v-else-if="item.type.includes('video')"
+              icon="icon-shipin"
+            />
+            <x-icon
+              v-else-if="item.type.includes('audio')"
+              icon="icon-yinpin"
+            />
+            <x-icon
+              v-else-if="item.type.includes('text')"
+              icon="icon-wenzhang1"
+            />
+            <x-icon
+              v-else-if="item.type.includes('application')"
+              icon="icon-baocun"
+            />
+            <div class="title overflow-hidden-container">{{
+              item.originalname
+            }}</div>
+          </div>
+          <template #content>
+            <div class="context-menu pointer" @click="delHandle(item.id)">
+              <x-icon icon="icon-qingchu"></x-icon>
+            </div>
+          </template>
+        </a-trigger>
         <a-empty v-if="!imageList.length">空空如也</a-empty>
       </section>
-      <a-pagination :total="totalCount" show-total />
+      <a-pagination
+        :total="totalCount"
+        :current="current"
+        show-total
+        @change="changePage"
+      />
     </div>
   </div>
 </template>
@@ -131,7 +192,6 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
       box-sizing: border-box;
       width: 100px;
       height: 100px;
@@ -146,10 +206,26 @@
       transform: scale(1.03, 1.02);
     }
 
+    .image-item :deep(.x-icon) > svg {
+      width: 60px;
+      height: 60px;
+    }
+
+    .context-menu {
+      width: 300px;
+      height: 100px;
+      background-color: var(--color-fill-1);
+    }
+
     .title {
       padding: 0 10px;
       font-size: 12px;
       text-align: center;
     }
   }
+  // .context-menu {
+  //   background-color: var(--color-fill-1);
+  //   width: 300px;
+  //   height: 100px;
+  // }
 </style>

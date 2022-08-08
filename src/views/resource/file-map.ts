@@ -3,23 +3,23 @@
 export interface fileTypeListItem {
   name: string;
   value: number;
-  menuIcon: string;
+  type: string;
   icon: string;
 }
 
 // 文件分类
 export const fileTypeList: fileTypeListItem[] = [
-  { name: '全部', value: 0, menuIcon: 'menu-file', icon: 'icon-wenjianjia' },
+  { name: '全部', value: 0, type: '', icon: 'icon-wenjianjia' },
   {
     name: '图片',
     value: 1,
-    menuIcon: 'file-image',
+    type: 'image',
     icon: 'icon-tupian',
   },
-  { name: '文档', value: 2, menuIcon: 'file-txt', icon: 'icon-dingdan' },
-  { name: '视频', value: 3, menuIcon: 'file-video', icon: 'icon-shipin' },
-  { name: '音频', value: 4, menuIcon: 'file-music', icon: 'icon-yinpin' },
-  { name: '其他', value: 5, menuIcon: 'file-other', icon: 'icon-yasuoenjian' },
+  { name: '文档', value: 2, type: 'text', icon: 'icon-wenzhang1' },
+  { name: '视频', value: 3, type: 'video', icon: 'icon-shipin' },
+  { name: '音频', value: 4, type: 'audio', icon: 'icon-yinpin' },
+  { name: '其他', value: 4, type: 'application', icon: 'icon-baocun' },
 ];
 
 export interface FileExtendNameIconMap {
