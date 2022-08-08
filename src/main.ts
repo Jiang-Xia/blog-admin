@@ -9,15 +9,13 @@ import directive from './directive';
 import './mock';
 import App from './App.vue';
 import '@arco-design/web-vue/dist/arco.less';
-import '@/assets/style/global.less';
 import '@/api/interceptor';
-import '@/assets/style/atom-one-dark.css';
+import '@/assets/style/index.less';
 
 const app = createApp(App);
 
 app.use(ArcoVue, {});
 app.use(ArcoVueIcon);
-
 app.use(router);
 app.use(store);
 app.use(i18n);

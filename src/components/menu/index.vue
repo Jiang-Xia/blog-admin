@@ -98,8 +98,11 @@
             _route.forEach((element) => {
               // This is demo, modify nodes as needed
               // 直接渲染acro-design的icon组件
+              // const icon = element?.meta?.icon
+              //   ? () => h(compile(`<${element?.meta?.icon}/>`))
+              //   : null;
               const icon = element?.meta?.icon
-                ? () => h(compile(`<${element?.meta?.icon}/>`))
+                ? () => h(compile(`<x-icon icon=${element?.meta?.icon} />`))
                 : null;
               const node =
                 element?.children && element?.children.length !== 0 ? (
@@ -140,6 +143,7 @@
           level-indent={34}
           style="height: 100%"
           onCollapse={setCollapse}
+          accordion
         >
           {renderSubMenu()}
         </a-menu>

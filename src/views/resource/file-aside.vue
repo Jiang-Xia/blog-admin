@@ -17,7 +17,7 @@
           @click="onClickMenuItem(item)"
         >
           <template #icon>
-            <!-- <DynamicIcon :icon="item.menuIcon"></DynamicIcon> -->
+            <x-icon :icon="item.icon"></x-icon>
           </template>
           <span>{{ item.name }}</span>
         </a-menu-item>
