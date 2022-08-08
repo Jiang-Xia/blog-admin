@@ -27,38 +27,19 @@
 </template>
 
 <script setup lang="ts">
-  import { compile, h, ref, watch } from 'vue';
-  import { useRoute, useRouter } from 'vue-router';
+  import { ref } from 'vue';
   import { useWindowSize } from '@vueuse/core';
   import { fileTypeList, type fileTypeListItem } from './file-map';
 
-  const DynamicIcon = (props: any, context: any) => {
-    return h(compile(`<${props.icon}/>`), context.attrs, context.slots);
-  };
-  DynamicIcon.props = ['icon'];
-  const route = useRoute();
-  const router = useRouter();
+  const emits = defineEmits(['menuSelect']);
 
   const { width: windowWidth } = useWindowSize();
 
   const currentKey = ref('0');
 
-  // 监听路由变化
-  watch(
-    () => route.query,
-    () => {
-      if (route.query.fileType) {
-        currentKey.value = route.query.fileType.toString();
-      }
-    },
-    {
-      immediate: true,
-    }
-  );
-
   // 点击事件
   const onClickMenuItem = (item: fileTypeListItem) => {
-    // router.push({ path: '/file', query: { fileType: item.value } });
+    emits('menuSelect', item);
   };
 </script>
 
