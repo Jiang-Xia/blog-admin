@@ -3,13 +3,13 @@
   import { baseUrl } from '@/config';
   import { useUserStore } from '@/store';
   import axios from 'axios';
-  import { Message } from '@arco-design/web-vue';
+  import { Message, Modal, FileItem } from '@arco-design/web-vue';
   import { number } from '@intlify/core-base';
   import { init } from 'echarts';
   import { useClipboard } from '@vueuse/core';
   import FileAside from './file-aside.vue';
 
-  const fileList = ref([]);
+  const fileList: any = ref([]);
   const { token } = useUserStore();
   const headers = ref({
     Authorization: `Bearer ${token}`,
@@ -73,6 +73,26 @@
       delHandle(item.id);
     }
   };
+  const beforeUpload = (file: File) => {
+    // console.log(file);
+    fileList.value.push(file);
+    // console.log(fileList.value);
+    return Promise.resolve(true);
+  };
+  const loading = ref(false);
+  const handleConfirm = async () => {
+    const formData = new FormData();
+    // formData 键名字相同确实不一样的类似 Map
+
+    fileList.value.forEach((v: File) => {
+      formData.append(`fileContents`, v);
+    });
+    // const fileList2: File[] = fileList.value.map((v: FileItem) => v.file);
+    // formData.append(`fileList`, ...fileList2);
+    try {
+      const res = await axios.post('/resources/uploadFile', formData);
+    } catch (error) {}
+  };
 </script>
 
 <template>
@@ -82,16 +102,28 @@
     <div class="file-main">
       <div class="header-tool">
         <!--accept="image/*, video/mp4, audio/mp3, .zip, .rar"-->
-        <a-upload
-          :action="baseUrl + '/resources/uploadFile'"
-          multiple
-          :limit="10"
-          :headers="headers"
-          :show-file-list="false"
-          :default-file-list="fileList"
-          image-preview
-          @success="successHandle"
-        />
+        <!-- :action="baseUrl + '/resources/uploadFile'" -->
+
+        <a-space>
+          <a-badge :count="fileList.length">
+            <a-upload
+              action="/"
+              multiple
+              :limit="10"
+              :headers="headers"
+              :auto-upload="false"
+              :show-file-list="false"
+              :file-list="fileList"
+              image-preview
+              @success="successHandle"
+              @before-upload="beforeUpload"
+              >选择文件</a-upload
+            >
+          </a-badge>
+          <a-button type="primary" :loading="loading" @click="handleConfirm"
+            >确认</a-button
+          >
+        </a-space>
         <a-input-search
           v-model="searchForm.originalname"
           :style="{ width: '320px', marginLeft: '40px' }"
