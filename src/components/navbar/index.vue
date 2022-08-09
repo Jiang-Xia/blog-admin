@@ -145,8 +145,8 @@
             :size="32"
             :style="{ marginRight: '8px', cursor: 'pointer' }"
           >
-            <img alt="avatar" src="../../assets/images/common/user.svg" />
-            <!-- <span class="avatar-text">{{ nickname }}</span> -->
+            <img v-if="avatar" alt="nickname" :src="avatar" />
+            <UserIcon v-else />
           </a-avatar>
           <template #content>
             <a-doption>
@@ -197,7 +197,7 @@
   import useLocale from '@/hooks/locale';
   import useUser from '@/hooks/user';
   // 项目导入svg路径不对
-  // import avatarImg from '../../assets/images/common/user.svg';
+  import UserIcon from '../../assets/images/common/user.svg';
   // import MessageBox from '../message-box/index.vue';
 
   const appStore = useAppStore();
