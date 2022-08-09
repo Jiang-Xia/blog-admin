@@ -63,18 +63,18 @@ axios.interceptors.response.use(
       switch (error.response.status) {
         case 401:
           errorMsg(data.message || '权限不足');
-          // Modal.error({
-          //   title: 'Confirm logout',
-          //   content:
-          //     'You have been logged out, you can cancel to stay on this page, or log in again',
-          //   okText: 'Re-Login',
-          //   async onOk() {
-          //     const userStore = useUserStore();
+          Modal.error({
+            title: 'Confirm logout',
+            content:
+              'You have been logged out, you can cancel to stay on this page, or log in again',
+            okText: 'Re-Login',
+            async onOk() {
+              const userStore = useUserStore();
 
-          //     await userStore.logout();
-          //     window.location.reload();
-          //   },
-          // });
+              await userStore.logout();
+              window.location.reload();
+            },
+          });
           break;
         case 404:
           errorMsg(data.message || '网络请求不存在');

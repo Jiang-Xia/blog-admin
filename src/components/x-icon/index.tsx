@@ -6,6 +6,8 @@ import './index.less';
 
 interface propsState {
   icon: string;
+  height: string;
+  width: string;
 }
 // 加载iconfont 图标字体文件
 const createIconfont = () => {
@@ -20,8 +22,7 @@ createIconfont();
 const createIcon = (props: propsState, context: SetupContext) => {
   const svg = (
     <svg
-      width="1em"
-      height="1em"
+      style={{ width: props.width, height: props.height }}
       fill="currentColor"
       aria-hidden="true"
       focusable="false"
@@ -43,6 +44,14 @@ export default defineComponent({
   name: 'XIcon',
   props: {
     icon: {
+      type: String,
+      default: '',
+    },
+    height: {
+      type: String,
+      default: '',
+    },
+    width: {
       type: String,
       default: '',
     },

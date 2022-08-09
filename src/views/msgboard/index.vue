@@ -34,7 +34,9 @@
           <a-table-column title="评论内容" data-index="comment" />
           <a-table-column title="网址" data-index="address">
             <template #cell="{ record }">
-              <a-link :href="record.address">{{ record.address }}</a-link>
+              <a-link :href="record.address" target="_blank">{{
+                record.address
+              }}</a-link>
             </template>
           </a-table-column>
           <!-- <a-table-column title="状态" data-index="url">

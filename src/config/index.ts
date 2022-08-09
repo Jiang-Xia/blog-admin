@@ -3,11 +3,11 @@ interface configState {
 }
 const config: configState = {
   // 阿里巴巴图标库链接，新添加图标需要重新生成 css 改成js
-  iconfonrUrl: '//at.alicdn.com/t/c/font_3574965_gggt2d4ow.js',
+  iconfonrUrl: '//at.alicdn.com/t/c/font_3574965_o70f5vyjhe.js',
 };
 
 let url: string;
-let url2: string;
+// let url2: string;
 const mode = import.meta.env.MODE;
 // x-api 后端服务
 if (mode === 'production') {

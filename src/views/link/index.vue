@@ -34,7 +34,9 @@
           <a-table-column title="描述" data-index="desp" />
           <a-table-column title="网址" data-index="url">
             <template #cell="{ record }">
-              <a-link :href="record.url">{{ record.url }}</a-link>
+              <a-link :href="record.url" target="_blank">{{
+                record.url
+              }}</a-link>
             </template>
           </a-table-column>
           <a-table-column title="状态" data-index="url">

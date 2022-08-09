@@ -6,6 +6,7 @@
   import { Message } from '@arco-design/web-vue';
   import { number } from '@intlify/core-base';
   import { init } from 'echarts';
+  import { useClipboard } from '@vueuse/core';
   import FileAside from './file-aside.vue';
 
   const fileList = ref([]);
@@ -61,6 +62,17 @@
     Message.success('上传成功');
     seachHandle();
   };
+  const { copy } = useClipboard();
+  const dropdownSelect = async (v: string, item: any) => {
+    console.log(v);
+    if (v === '1') {
+      await copy(item.url);
+      Message.success('复制成功');
+    } else if (v === '2') {
+    } else if (v === '3') {
+      delHandle(item.id);
+    }
+  };
 </script>
 
 <template>
@@ -94,12 +106,12 @@
         </a-input-search>
       </div>
       <section class="file-content">
-        <a-trigger
+        <a-dropdown
           v-for="item in imageList"
           :key="item.filename"
           trigger="contextMenu"
-          position="tr"
           align-point
+          @select="(v:any)=>{dropdownSelect(v,item)}"
         >
           <div class="image-item">
             <a-image
@@ -132,11 +144,20 @@
             }}</div>
           </div>
           <template #content>
-            <div class="context-menu pointer" @click="delHandle(item.id)">
-              <x-icon icon="icon-qingchu"></x-icon>
-            </div>
+            <a-doption value="1">
+              <template #icon>
+                <x-icon icon="icon-lianjie1" />
+              </template>
+              复制链接
+            </a-doption>
+            <!-- <a-doption value="2">
+              <template #icon><x-icon icon="icon-bianji1" /></template> 重命名
+            </a-doption> -->
+            <a-doption value="3">
+              <template #icon><x-icon icon="icon-qingchu" /></template> 删除
+            </a-doption>
           </template>
-        </a-trigger>
+        </a-dropdown>
         <a-empty v-if="!imageList.length">空空如也</a-empty>
       </section>
       <a-pagination
@@ -196,6 +217,7 @@
       width: 100px;
       height: 100px;
       cursor: pointer;
+      transition: all 1s ease-in;
     }
 
     .image-item:hover {
@@ -203,18 +225,7 @@
     }
 
     .image-item:hover .arco-image {
-      transform: scale(1.03, 1.02);
-    }
-
-    .image-item :deep(.x-icon) > svg {
-      width: 60px;
-      height: 60px;
-    }
-
-    .context-menu {
-      width: 300px;
-      height: 100px;
-      background-color: var(--color-fill-1);
+      transform: scale(1.05);
     }
 
     .title {
@@ -223,9 +234,4 @@
       text-align: center;
     }
   }
-  // .context-menu {
-  //   background-color: var(--color-fill-1);
-  //   width: 300px;
-  //   height: 100px;
-  // }
 </style>
