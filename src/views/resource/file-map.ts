@@ -19,7 +19,7 @@ export const fileTypeList: fileTypeListItem[] = [
   { name: '文档', value: 2, type: 'text', icon: 'icon-wenzhang1' },
   { name: '视频', value: 3, type: 'video', icon: 'icon-shipin' },
   { name: '音频', value: 4, type: 'audio', icon: 'icon-yinpin' },
-  { name: '其他', value: 4, type: 'application', icon: 'icon-baocun' },
+  { name: '其他', value: 5, type: 'application', icon: 'icon-baocun' },
 ];
 
 export interface FileExtendNameIconMap {
