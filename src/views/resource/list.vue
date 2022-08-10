@@ -58,9 +58,13 @@
     searchForm.value.type = item.type;
     seachHandle();
   };
-  const successHandle = () => {
-    Message.success('上传成功');
-    seachHandle();
+  const successHandle = (file: FileItem) => {
+    // fileList.value.splice(fileList.value.indexOf(file), 1);
+    console.log(fileList.value.length);
+    if (!fileList.value.length) {
+      Message.success('上传成功');
+      seachHandle();
+    }
   };
   const { copy } = useClipboard();
   const dropdownSelect = async (v: string, item: any) => {
@@ -73,13 +77,6 @@
       delHandle(item.id);
     }
   };
-  const beforeUpload = (file: File) => {
-    // console.log(file);
-    fileList.value.push(file);
-    // console.log(fileList.value);
-    return Promise.resolve(true);
-  };
-  const loading = ref(false);
   const handleConfirm = async () => {
     const formData = new FormData();
     // formData 键名字相同确实不一样的类似 Map
@@ -87,27 +84,49 @@
     fileList.value.forEach((v: File) => {
       formData.append(`fileContents`, v);
     });
-    // const fileList2: File[] = fileList.value.map((v: FileItem) => v.file);
-    // formData.append(`fileList`, ...fileList2);
     try {
-      const res = await axios.post('/resources/uploadFile', formData);
+      const res = await axios.post('/resources/uploadFile', formData, {
+        onUploadProgress: (progressEvent: ProgressEvent) => {
+          const complete = `${
+            (progressEvent.loaded / progressEvent.total) * 100
+          }%`;
+          console.log(`上传 ${complete}`);
+        },
+      });
+      fileList.value = [];
+      Message.success('上传成功');
+      seachHandle();
     } catch (error) {}
+  };
+  const beforeUpload = (file: File) => {
+    // console.log(file);
+    fileList.value.push(file);
+    // console.log(fileList.value);
+    return Promise.resolve(true);
+  };
+
+  const transferVisible = ref(false);
+  const handleOk = () => {
+    transferVisible.value = false;
+  };
+  const handleCancel = () => {
+    transferVisible.value = false;
   };
 </script>
 
 <template>
-  <div class="file-manage">
+  <div id="file-manage" class="file-manage">
     <FileAside @menu-select="menuSelect"></FileAside>
     <!-- 文件管理 -->
     <div class="file-main">
       <div class="header-tool">
         <!--accept="image/*, video/mp4, audio/mp3, .zip, .rar"-->
         <!-- :action="baseUrl + '/resources/uploadFile'" -->
-
         <a-space>
           <a-badge :count="fileList.length">
             <a-upload
-              action="/"
+              :action="baseUrl + '/resources/uploadFile'"
+              name="fileContents"
               multiple
               :limit="10"
               :headers="headers"
@@ -117,12 +136,17 @@
               image-preview
               @success="successHandle"
               @before-upload="beforeUpload"
-              >选择文件</a-upload
-            >
+            />
           </a-badge>
-          <a-button type="primary" :loading="loading" @click="handleConfirm"
-            >确认</a-button
-          >
+          <a-button type="primary" @click="handleConfirm">确认</a-button>
+          <a-badge :count="fileList.length">
+            <a-button
+              type="primary"
+              @click="transferVisible = !transferVisible"
+            >
+              <icon-swap style="transform: rotate(90deg)" />
+            </a-button>
+          </a-badge>
         </a-space>
         <a-input-search
           v-model="searchForm.originalname"
@@ -137,7 +161,7 @@
           </template>
         </a-input-search>
       </div>
-      <section class="file-content">
+      <section v-show="!transferVisible" class="file-content">
         <a-dropdown
           v-for="item in imageList"
           :key="item.filename"
@@ -192,7 +216,14 @@
         </a-dropdown>
         <a-empty v-if="!imageList.length">空空如也</a-empty>
       </section>
+      <!-- 传输列表 -->
+      <section v-show="transferVisible" class="file-content">
+        <p v-for="item in fileList" :key="item.name + item.size">{{
+          item.name
+        }}</p>
+      </section>
       <a-pagination
+        v-show="!transferVisible"
         :total="totalCount"
         :current="current"
         show-total
@@ -225,7 +256,7 @@
     .header-tool {
       display: flex;
       align-items: center;
-      min-height: 44px;
+      min-height: 50px;
       margin-bottom: 12px;
       border-bottom: 1px dashed var(--color-border-3);
     }
@@ -258,6 +289,11 @@
 
     .image-item:hover .arco-image {
       transform: scale(1.05);
+    }
+
+    .image-item :deep(.x-icon) > svg {
+      width: 60px;
+      height: 60px;
     }
 
     .title {

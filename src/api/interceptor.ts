@@ -57,7 +57,7 @@ axios.interceptors.response.use(
     return Promise.reject(new Error(res.message || 'Error'));
   },
   (error) => {
-    console.log('error: ', error.response);
+    console.error('error: ', error);
     const data = error.response && error.response.data;
     if (error.response) {
       switch (error.response.status) {
