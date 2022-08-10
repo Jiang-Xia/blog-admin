@@ -4,11 +4,9 @@
   import { useUserStore } from '@/store';
   import axios from 'axios';
   import { Message, Modal, FileItem } from '@arco-design/web-vue';
-  import { number } from '@intlify/core-base';
-  import { init } from 'echarts';
   import { useClipboard } from '@vueuse/core';
   import FileAside from './file-aside.vue';
-
+  /* 文件上传web是无法实现刷新续传的 */
   const fileList: any = ref([]);
   const { token } = useUserStore();
   const headers = ref({
@@ -58,14 +56,6 @@
     searchForm.value.type = item.type;
     seachHandle();
   };
-  const successHandle = (file: FileItem) => {
-    // fileList.value.splice(fileList.value.indexOf(file), 1);
-    console.log(fileList.value.length);
-    if (!fileList.value.length) {
-      Message.success('上传成功');
-      seachHandle();
-    }
-  };
   const { copy } = useClipboard();
   const dropdownSelect = async (v: string, item: any) => {
     console.log(v);
@@ -77,40 +67,22 @@
       delHandle(item.id);
     }
   };
-  const handleConfirm = async () => {
-    const formData = new FormData();
-    // formData 键名字相同确实不一样的类似 Map
 
-    fileList.value.forEach((v: File) => {
-      formData.append(`fileContents`, v);
+  const beforeRemove = async (file: FileItem) => {
+    const { id = '' } = file.response.data[0];
+    const bool: boolean = await axios.delete(`/resources/file`, {
+      params: { id },
     });
-    try {
-      const res = await axios.post('/resources/uploadFile', formData, {
-        onUploadProgress: (progressEvent: ProgressEvent) => {
-          const complete = `${
-            (progressEvent.loaded / progressEvent.total) * 100
-          }%`;
-          console.log(`上传 ${complete}`);
-        },
-      });
-      fileList.value = [];
-      Message.success('上传成功');
-      seachHandle();
-    } catch (error) {}
+    if (bool) {
+      return Promise.resolve(true);
+    }
+    return Promise.resolve(false);
   };
-  const beforeUpload = (file: File) => {
-    // console.log(file);
-    fileList.value.push(file);
-    // console.log(fileList.value);
-    return Promise.resolve(true);
-  };
-
-  const transferVisible = ref(false);
+  const showVisible = ref(false);
   const handleOk = () => {
-    transferVisible.value = false;
-  };
-  const handleCancel = () => {
-    transferVisible.value = false;
+    showVisible.value = false;
+    fileList.value = [];
+    seachHandle();
   };
 </script>
 
@@ -120,33 +92,10 @@
     <!-- 文件管理 -->
     <div class="file-main">
       <div class="header-tool">
-        <!--accept="image/*, video/mp4, audio/mp3, .zip, .rar"-->
-        <!-- :action="baseUrl + '/resources/uploadFile'" -->
         <a-space>
-          <a-badge :count="fileList.length">
-            <a-upload
-              :action="baseUrl + '/resources/uploadFile'"
-              name="fileContents"
-              multiple
-              :limit="10"
-              :headers="headers"
-              :auto-upload="false"
-              :show-file-list="false"
-              :file-list="fileList"
-              image-preview
-              @success="successHandle"
-              @before-upload="beforeUpload"
-            />
-          </a-badge>
-          <a-button type="primary" @click="handleConfirm">确认</a-button>
-          <a-badge :count="fileList.length">
-            <a-button
-              type="primary"
-              @click="transferVisible = !transferVisible"
-            >
-              <icon-swap style="transform: rotate(90deg)" />
-            </a-button>
-          </a-badge>
+          <a-button type="primary" @click="showVisible = !showVisible"
+            >上传</a-button
+          >
         </a-space>
         <a-input-search
           v-model="searchForm.originalname"
@@ -161,7 +110,7 @@
           </template>
         </a-input-search>
       </div>
-      <section v-show="!transferVisible" class="file-content">
+      <section class="file-content">
         <a-dropdown
           v-for="item in imageList"
           :key="item.filename"
@@ -216,20 +165,38 @@
         </a-dropdown>
         <a-empty v-if="!imageList.length">空空如也</a-empty>
       </section>
-      <!-- 传输列表 -->
-      <section v-show="transferVisible" class="file-content">
-        <p v-for="item in fileList" :key="item.name + item.size">{{
-          item.name
-        }}</p>
-      </section>
       <a-pagination
-        v-show="!transferVisible"
         :total="totalCount"
         :current="current"
         show-total
         @change="changePage"
       />
     </div>
+    <a-modal
+      v-model:visible="showVisible"
+      hide-cancel
+      ok-text="完成"
+      modal-class="upload-modal"
+      @ok="handleOk"
+      @cancel="handleOk"
+    >
+      <template #title> 上传文件 </template>
+      <div class="upload-container">
+        <a-upload
+          :action="baseUrl + '/resources/uploadFile'"
+          name="fileContents"
+          multiple
+          :limit="10"
+          draggable
+          :headers="headers"
+          :auto-upload="true"
+          :show-file-list="true"
+          :file-list="fileList"
+          image-preview
+          @before-remove="beforeRemove"
+        />
+      </div>
+    </a-modal>
   </div>
 </template>
 
@@ -300,6 +267,15 @@
       padding: 0 10px;
       font-size: 12px;
       text-align: center;
+    }
+  }
+
+  .upload-modal {
+    min-height: 70vh;
+
+    .upload-container {
+      height: 60vh;
+      overflow: auto;
     }
   }
 </style>

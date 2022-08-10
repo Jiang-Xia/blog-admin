@@ -165,32 +165,34 @@ a:hover {
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
-  background: transparent;
+  // background: transparent;
 }
 
 /* 滚动槽 */
 ::-webkit-scrollbar-track {
   // background: transparent;
-  background: var(--main-bgc);
+  background: var(--color-bg-1);
   border-radius: 0;
 }
 
 /* 滚动条滑块 */
 ::-webkit-scrollbar-thumb {
-  background-color: transparent;
+  // background-color: rgba(0, 0, 0, 0.3)
+  background-color: var(--color-border-3);
+  // background-color: transparent;
   border-radius: 0;
   border-radius: 0.5rem;
   transition: all 0.2s;
 }
 
 :hover::-webkit-scrollbar-thumb {
-  background-color: var(--scrollbar-bgc);
+  // background-color: var(--color-bg-5);
 }
 
 ::-webkit-scrollbar-button,
 ::-webkit-scrollbar-corner {
   // background: transparent;
-  background: var(--main-bgc);
+  background: var(--color-bg-1);
 }
 
 // ::-webkit-scrollbar {
