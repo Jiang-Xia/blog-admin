@@ -1,5 +1,5 @@
 <template>
-  <div class="login-form-wrapper">
+  <div v-show="!ticket" class="login-form-wrapper">
     <div class="login-form-title">{{ $t('login.form.title') }}</div>
     <div class="login-form-sub-title">{{ $t('login.form.subtitle') }}</div>
     <div class="login-form-error-msg">{{ errorMessage }}</div>
@@ -69,6 +69,7 @@
       </a-space>
     </a-form>
   </div>
+  <a-spin v-if="ticket" dot />
 </template>
 
 <script lang="ts" setup>
@@ -97,12 +98,14 @@
     username: loginConfig.value.username,
     password: loginConfig.value.password,
   });
-  const ticket = query.ticket as string;
-  if (ticket) {
-    userStore.ticketLogin(ticket).then(() => {
-      router.push({
-        name: 'ArticleEdit',
-      });
+  const ticket = ref(query.ticket as string);
+  if (ticket.value) {
+    userStore.ticketLogin(ticket.value).then(() => {
+      setTimeout(() => {
+        router.push({
+          name: 'ArticleEdit',
+        });
+      }, 800);
     });
   }
   const handleSubmit = async ({

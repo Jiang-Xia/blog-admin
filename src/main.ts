@@ -11,6 +11,7 @@ import App from './App.vue';
 import '@arco-design/web-vue/dist/arco.less';
 import '@/api/interceptor';
 import '@/assets/style/index.less';
+import 'md-editor-v3/lib/style.css';
 
 const app = createApp(App);
 

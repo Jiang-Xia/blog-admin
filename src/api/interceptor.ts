@@ -64,15 +64,13 @@ axios.interceptors.response.use(
         case 401:
           errorMsg(data.message || '权限不足');
           Modal.error({
-            title: 'Confirm logout',
-            content:
-              'You have been logged out, you can cancel to stay on this page, or log in again',
-            okText: 'Re-Login',
+            title: '确认退出',
+            content: '您的登录超时了，您可以重新登录。',
+            okText: '去登录',
             async onOk() {
               const userStore = useUserStore();
-
               await userStore.logout();
-              window.location.reload();
+              // window.location.reload();
             },
           });
           break;

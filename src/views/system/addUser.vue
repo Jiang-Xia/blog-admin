@@ -64,7 +64,6 @@
   import { ValidatedError } from '@arco-design/web-vue/es/form/interface';
   // import { computed, onBeforeUnmount, onMounted } from 'vue'
   import { useAppStore } from '@/store';
-  import 'md-editor-v3/lib/style.css';
   import axios from 'axios';
 
   const appStore = useAppStore();

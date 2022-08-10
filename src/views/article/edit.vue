@@ -100,7 +100,6 @@
   import MdEditor from 'md-editor-v3';
   import { useAppStore } from '@/store';
   import { categoryOptions, tagsOptions } from './common';
-  import 'md-editor-v3/lib/style.css';
 
   const appStore = useAppStore();
   const router = useRouter();
