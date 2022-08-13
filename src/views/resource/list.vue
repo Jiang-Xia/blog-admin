@@ -17,7 +17,7 @@
   const current = ref(1);
   const searchForm = ref({
     page: 1,
-    pageSize: 20,
+    pageSize: 30,
     originalname: '',
     type: '',
   });
@@ -168,6 +168,7 @@
       <a-pagination
         :total="totalCount"
         :current="current"
+        :page-size="searchForm.pageSize"
         show-total
         @change="changePage"
       />
@@ -215,7 +216,7 @@
     flex-direction: column;
     min-height: 50vh;
     // max-height: 80vh;
-    padding: 0 12px 12px 12px;
+    padding: 0 12px 12px;
     overflow: auto;
     background: var(--color-bg-1);
     border-radius: 12px;
