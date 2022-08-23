@@ -3,7 +3,13 @@
   import { baseUrl } from '@/config';
   import { useUserStore } from '@/store';
   import axios from 'axios';
-  import { Message, Modal, FileItem, Input } from '@arco-design/web-vue';
+  import {
+    Message,
+    Modal,
+    FileItem,
+    Input,
+    Select,
+  } from '@arco-design/web-vue';
   import { useClipboard } from '@vueuse/core';
   import FileAside from './file-aside.vue';
   /* 文件上传web是无法实现刷新续传的 */
@@ -47,7 +53,42 @@
     Message.success('删除成功');
     seachHandle();
   };
+  // 移动文件
+  const targetPid = ref('');
+  const moveHandle = async (id: string) => {
+    const res = await axios.get('/resources/files', {
+      params: { pageSize: 100 },
+    });
 
+    const [list, total] = res.data;
+
+    Modal.confirm({
+      title: '新建文件夹',
+      content: () =>
+        h(Select, {
+          onChange: (value) => {
+            targetPid.value = value as string;
+          },
+          placeholder: '请选择文件夹',
+          options: list
+            .filter((v: any) => v.isFolder)
+            .map((v: any) => {
+              return {
+                value: v.id,
+                label: v.filename,
+              };
+            }),
+        }),
+      async onOk() {
+        await axios.patch(`/resources/file`, {
+          id,
+          pid: targetPid.value,
+        });
+        Message.success('移动完成');
+        seachHandle();
+      },
+    });
+  };
   seachHandle();
   const changePage = (v: number) => {
     seachHandle(v);
@@ -65,6 +106,8 @@
     } else if (v === '2') {
     } else if (v === '3') {
       delHandle(item.id);
+    } else if (v === '4') {
+      moveHandle(item.id);
     }
   };
 
@@ -97,8 +140,8 @@
           },
           placeholder: '请输入文件夹名',
         }),
-      onOk() {
-        axios.post('/resources/folder', { name: folderName.value });
+      async onOk() {
+        await axios.post('/resources/folder', { name: folderName.value });
         Message.success('新建完成');
         seachHandle();
       },
@@ -166,12 +209,13 @@
               v-else-if="item.type.includes('application')"
               icon="icon-baocun"
             />
+            <x-icon v-else-if="item.isFolder" icon="icon-wenjianjia" />
             <div class="title overflow-hidden-container">{{
               item.originalname
             }}</div>
           </div>
           <template #content>
-            <a-doption value="1">
+            <a-doption v-if="!item.isFolder" value="1">
               <template #icon>
                 <x-icon icon="icon-lianjie1" />
               </template>
@@ -180,6 +224,12 @@
             <!-- <a-doption value="2">
               <template #icon><x-icon icon="icon-bianji1" /></template> 重命名
             </a-doption> -->
+            <a-doption v-if="!item.isFolder" value="4">
+              <template #icon>
+                <x-icon icon="icon-yidongwenjian" />
+              </template>
+              移动到
+            </a-doption>
             <a-doption value="3">
               <template #icon><x-icon icon="icon-qingchu" /></template> 删除
             </a-doption>
