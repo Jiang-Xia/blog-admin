@@ -1,9 +1,9 @@
 <script setup lang="ts">
-  import { reactive, ref } from 'vue';
+  import { compile, h, reactive, ref } from 'vue';
   import { baseUrl } from '@/config';
   import { useUserStore } from '@/store';
   import axios from 'axios';
-  import { Message, Modal, FileItem } from '@arco-design/web-vue';
+  import { Message, Modal, FileItem, Input } from '@arco-design/web-vue';
   import { useClipboard } from '@vueuse/core';
   import FileAside from './file-aside.vue';
   /* 文件上传web是无法实现刷新续传的 */
@@ -84,6 +84,26 @@
     fileList.value = [];
     seachHandle();
   };
+
+  const folderName = ref('');
+  // 新建文件夹
+  const addFolder = () => {
+    Modal.confirm({
+      title: '新建文件夹',
+      content: () =>
+        h(Input, {
+          onChange: (value) => {
+            folderName.value = value;
+          },
+          placeholder: '请输入文件夹名',
+        }),
+      onOk() {
+        axios.post('/resources/folder', { name: folderName.value });
+        Message.success('新建完成');
+        seachHandle();
+      },
+    });
+  };
 </script>
 
 <template>
@@ -96,19 +116,21 @@
           <a-button type="primary" @click="showVisible = !showVisible"
             >上传</a-button
           >
+          <a-input-search
+            v-model="searchForm.originalname"
+            :style="{ width: '320px', marginLeft: '40px' }"
+            placeholder="输入文件名搜索"
+            search-button
+            @search="seachHandle()"
+            @press-enter="seachHandle()"
+          >
+            <template #button-icon>
+              <icon-search />
+            </template>
+          </a-input-search>
+
+          <a-button type="primary" @click="addFolder">新建文件夹</a-button>
         </a-space>
-        <a-input-search
-          v-model="searchForm.originalname"
-          :style="{ width: '320px', marginLeft: '40px' }"
-          placeholder="输入文件名"
-          search-button
-          @search="seachHandle()"
-          @press-enter="seachHandle()"
-        >
-          <template #button-icon>
-            <icon-search />
-          </template>
-        </a-input-search>
       </div>
       <section class="file-content">
         <a-dropdown
