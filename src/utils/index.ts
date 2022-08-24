@@ -1,4 +1,5 @@
 import dayjs from 'dayjs';
+import { useStorage } from '@vueuse/core';
 
 type TargetContext = '_self' | '_parent' | '_blank' | '_top';
 
@@ -34,3 +35,5 @@ export const formateDate = (date: Date | string) => {
   date = new Date(date);
   return dayjs(date).format('YYYY-MM-DD');
 };
+
+export const xAdminStore = useStorage('x-admin-store', { folderId: '' });

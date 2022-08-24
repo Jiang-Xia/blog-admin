@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { compile, h, reactive, ref } from 'vue';
+  import { h, ref } from 'vue';
   import { baseUrl } from '@/config';
   import { useUserStore } from '@/store';
   import axios from 'axios';
@@ -11,7 +11,12 @@
     Select,
   } from '@arco-design/web-vue';
   import { useClipboard } from '@vueuse/core';
+  import { xAdminStore } from '@/utils';
+  import useLoading from '@/hooks/loading';
   import FileAside from './file-aside.vue';
+
+  const { loading, setLoading } = useLoading();
+
   /* 文件上传web是无法实现刷新续传的 */
   const fileList: any = ref([]);
   const { token } = useUserStore();
@@ -28,6 +33,7 @@
     type: '',
   });
   const seachHandle = async (page?: number) => {
+    setLoading(true);
     if (page) {
       searchForm.value.page = page;
       current.value = page;
@@ -37,7 +43,10 @@
     }
     // console.log(item);
     const res = await axios.get('/resources/files', {
-      params: searchForm.value,
+      params: {
+        ...searchForm.value,
+        pid: xAdminStore.value.folderId || '0',
+      },
     });
     const [list, total] = res.data;
     imageList.value = list.map((v: any) => {
@@ -46,6 +55,9 @@
       return v;
     });
     totalCount.value = total;
+    setTimeout(() => {
+      setLoading(false);
+    }, 300);
   };
   const delHandle = async (id: string) => {
     // axios.delete(`/resources/file/${id}`);
@@ -147,6 +159,24 @@
       },
     });
   };
+
+  const currentFolder = ref('');
+
+  // 点击文件夹
+  const clickFolder = (item: any) => {
+    if (!item.isFolder) {
+      return;
+    }
+    currentFolder.value = item.filename;
+    xAdminStore.value.folderId = item.id;
+    seachHandle();
+  };
+  const clearFolderId = () => {
+    currentFolder.value = '';
+    xAdminStore.value.folderId = '';
+    seachHandle();
+  };
+  clearFolderId();
 </script>
 
 <template>
@@ -156,6 +186,16 @@
     <div class="file-main">
       <div class="header-tool">
         <a-space>
+          <a-breadcrumb>
+            <a-breadcrumb-item>
+              <a-button type="text" @click="clearFolderId">{{
+                !xAdminStore.folderId ? '全部文件' : '返回根目录'
+              }}</a-button>
+            </a-breadcrumb-item>
+            <a-breadcrumb-item>{{ currentFolder }}</a-breadcrumb-item>
+          </a-breadcrumb>
+        </a-space>
+        <a-space>
           <a-button type="primary" @click="showVisible = !showVisible"
             >上传</a-button
           >
@@ -164,8 +204,10 @@
             :style="{ width: '320px', marginLeft: '40px' }"
             placeholder="输入文件名搜索"
             search-button
+            allow-clear
             @search="seachHandle()"
             @press-enter="seachHandle()"
+            @clear="seachHandle()"
           >
             <template #button-icon>
               <icon-search />
@@ -176,12 +218,14 @@
         </a-space>
       </div>
       <section class="file-content">
+        <a-spin v-show="loading"> </a-spin>
         <a-dropdown
           v-for="item in imageList"
           :key="item.filename"
           trigger="contextMenu"
           align-point
           @select="(v:any)=>{dropdownSelect(v,item)}"
+          @click="clickFolder(item)"
         >
           <div class="image-item">
             <a-image
@@ -237,6 +281,7 @@
         </a-dropdown>
         <a-empty v-if="!imageList.length">空空如也</a-empty>
       </section>
+
       <a-pagination
         :total="totalCount"
         :current="current"
@@ -245,6 +290,7 @@
         @change="changePage"
       />
     </div>
+
     <a-modal
       v-model:visible="showVisible"
       hide-cancel
@@ -258,6 +304,7 @@
         <a-upload
           :action="baseUrl + '/resources/uploadFile'"
           name="fileContents"
+          :data="{ pid: xAdminStore.folderId }"
           multiple
           :limit="10"
           draggable
@@ -296,6 +343,7 @@
     .header-tool {
       display: flex;
       align-items: center;
+      justify-content: space-between;
       min-height: 50px;
       margin-bottom: 12px;
       border-bottom: 1px dashed var(--color-border-3);
