@@ -1,6 +1,6 @@
 /* eslint-disable */
+const cache: any = {};
 function jsonp(url: string, callback: any) {
-  const cache: any = {};
   if (!url) {
     return;
   }
@@ -9,7 +9,7 @@ function jsonp(url: string, callback: any) {
   const r2 = Math.floor(Math.random() * 10);
   const r3 = Math.floor(Math.random() * 10);
   const name = `getJSONP${a[r1]}${a[r2]}${a[r3]}`;
-  const cbname = `$.${name}`; // 作为jsonp函数的属性
+  const cbname = `cache.${name}`; // 作为jsonp函数的属性
   if (url.indexOf('?') === -1) {
     url += `?jsonp=${cbname}`;
   } else {
@@ -30,6 +30,7 @@ function jsonp(url: string, callback: any) {
     }
   };
   script.src = url;
+  console.log(script.src);
   document.getElementsByTagName('head')[0].appendChild(script);
 }
 export default jsonp;

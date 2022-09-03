@@ -40,7 +40,7 @@ const siteList = {
   ],
 };
 const siteAll =
-  'https://openapi.baidu.com/rest/2.0/tongji/report/getData?access_token=121.48d1b5d54412b7a696758874f747cc82.Y_uiMh3R2AHxYbdJtv77Oz9Jyr3TkukXShXSfb-.JeNm5g&site_id=18269632&start_date=20220404&end_date=20220903&metrics=&method=overview%2FgetTimeTrendRpt';
+  'http://openapi.baidu.com/rest/2.0/tongji/report/getData?access_token=121.48d1b5d54412b7a696758874f747cc82.Y_uiMh3R2AHxYbdJtv77Oz9Jyr3TkukXShXSfb-.JeNm5g&site_id=18269632&start_date=20220404&end_date=20220903&metrics=&method=overview%2FgetTimeTrendRpt';
 const access_token =
   '121.48d1b5d54412b7a696758874f747cc82.Y_uiMh3R2AHxYbdJtv77Oz9Jyr3TkukXShXSfb-.JeNm5g';
 const refresh_token =

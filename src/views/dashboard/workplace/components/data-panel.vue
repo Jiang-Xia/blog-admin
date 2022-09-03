@@ -103,13 +103,16 @@
 </template>
 
 <script lang="ts" setup>
-  import jsonp from '@/utils/jsonp';
-  import request from '@/utils/request';
+  import axios from 'axios';
   import config from '../bdapi';
 
-  request(config.siteAll).then((res) => {
-    console.log(res);
-  });
+  // axios(config.siteAll, {
+  //   headers: {
+  //     'content-type': 'application/json; charset=UTF-8',
+  //   },
+  // }).then((res: any) => {
+  //   console.log({ res });
+  // });
   // const res = axios.get(config.base_url, {
   // params: {
   //   ...config,
