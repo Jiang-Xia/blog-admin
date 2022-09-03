@@ -1,5 +1,4 @@
-// import request from '@/utils/request';
-import request from 'axios';
+import request from '@/api/request';
 
 export const getArticleList = async (data: any) => {
   const res = await request({

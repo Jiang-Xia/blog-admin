@@ -2,7 +2,8 @@
   import { h, ref } from 'vue';
   import { baseUrl } from '@/config';
   import { useUserStore } from '@/store';
-  import axios from 'axios';
+  import request from '@/api/request';
+
   import {
     Message,
     Modal,
@@ -42,7 +43,7 @@
       current.value = 1;
     }
     // console.log(item);
-    const res = await axios.get('/resources/files', {
+    const res = await request.get('/resources/files', {
       params: {
         ...searchForm.value,
         pid: xAdminStore.value.folderId || '0',
@@ -60,15 +61,15 @@
     }, 300);
   };
   const delHandle = async (id: string) => {
-    // axios.delete(`/resources/file/${id}`);
-    const res = await axios.delete(`/resources/file`, { params: { id } });
+    // request.delete(`/resources/file/${id}`);
+    const res = await request.delete(`/resources/file`, { params: { id } });
     Message.success('删除成功');
     seachHandle();
   };
   // 移动文件
   const targetPid = ref('');
   const moveHandle = async (id: string) => {
-    const res = await axios.get('/resources/files', {
+    const res = await request.get('/resources/files', {
       params: { pageSize: 100 },
     });
 
@@ -92,7 +93,7 @@
             }),
         }),
       async onOk() {
-        await axios.patch(`/resources/file`, {
+        await request.patch(`/resources/file`, {
           id,
           pid: targetPid.value,
         });
@@ -125,7 +126,7 @@
 
   const beforeRemove = async (file: FileItem) => {
     const { id = '' } = file.response.data[0];
-    const bool: boolean = await axios.delete(`/resources/file`, {
+    const bool: boolean = await request.delete(`/resources/file`, {
       params: { id },
     });
     if (bool) {
@@ -153,7 +154,7 @@
           placeholder: '请输入文件夹名',
         }),
       async onOk() {
-        await axios.post('/resources/folder', { name: folderName.value });
+        await request.post('/resources/folder', { name: folderName.value });
         Message.success('新建完成');
         seachHandle();
       },

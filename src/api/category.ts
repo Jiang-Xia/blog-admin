@@ -1,4 +1,5 @@
-import request from 'axios';
+// import request from 'axios';
+import request from '@/api/request';
 
 export const getCategoryById = async (id: number) => {
   const res = await request({

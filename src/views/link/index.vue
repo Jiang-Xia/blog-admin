@@ -81,7 +81,7 @@
   import useLoading from '@/hooks/loading';
   import { Pagination } from '@/types/global';
   import { Message, Modal } from '@arco-design/web-vue';
-  import axios from 'axios';
+  import request from '@/api/request';
 
   const generateFormModel = () => {
     return {
@@ -109,7 +109,7 @@
   });
   const getListHandle = async (val = 1) => {
     setLoading(true);
-    const res = await axios.get('/link');
+    const res = await request.get('/link');
     renderData.value = res.data;
     pagination.total = res.data.length;
     setLoading(false);
@@ -130,7 +130,7 @@
       title: '删除友链',
       content: '确定删除该友链嘛？',
       onOk: async () => {
-        const res = await axios.delete('/link', { params: { id } });
+        const res = await request.delete('/link', { params: { id } });
         Message.success('删除成功');
         getListHandle();
       },
@@ -138,7 +138,7 @@
   };
   const onSwitchChange = async (record: any) => {
     const { agreed, id } = record;
-    const res = await axios.patch(`/link`, { agreed, id });
+    const res = await request.patch(`/link`, { agreed, id });
     Message.success('设置成功');
   };
 </script>

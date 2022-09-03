@@ -71,5 +71,6 @@ module.exports = {
     'import/no-cycle': 0, // 关闭循环导入报错
     'import/no-unresolved': 0,
     'no-empty': 0,
+    // 'camelCase':'warn'
   },
 };

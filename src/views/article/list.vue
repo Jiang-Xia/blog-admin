@@ -174,7 +174,7 @@
   import { Pagination } from '@/types/global';
   import { getArticleInfo, getArticleList, delArticle } from '@/api/article';
   import { Message, Modal } from '@arco-design/web-vue';
-  import axios from 'axios';
+  import request from '@/api/request';
   import { useUserStore } from '@/store';
 
   const { role } = useUserStore();
@@ -246,13 +246,13 @@
   // 文章禁用
   const onSwitchChange = async (record: any) => {
     const { isDelete, id } = record;
-    const res = await axios.patch(`/article/disabled`, { isDelete, id });
+    const res = await request.patch(`/article/disabled`, { isDelete, id });
     Message.success('设置成功');
   };
   // 文章置顶
   const onSwitchTopping = async (record: any) => {
     const { topping, id } = record;
-    const res = await axios.patch(`/article/topping`, { topping, id });
+    const res = await request.patch(`/article/topping`, { topping, id });
     Message.success('设置成功');
   };
 </script>

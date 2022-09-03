@@ -1,5 +1,5 @@
 import { App, ComponentPublicInstance } from 'vue';
-import axios from 'axios';
+import request from '@/api/request';
 
 export default function handleError(Vue: App, baseUrl: string) {
   if (!baseUrl) {
@@ -11,7 +11,7 @@ export default function handleError(Vue: App, baseUrl: string) {
     info: string
   ) => {
     // send error info
-    axios.post(`${baseUrl}/report-error`, {
+    request.post(`${baseUrl}/report-error`, {
       err,
       instance,
       info,

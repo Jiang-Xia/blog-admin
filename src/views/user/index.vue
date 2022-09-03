@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import { useUserStore } from '@/store/';
   import { ref, reactive } from 'vue';
-  import axios from 'axios';
+  import request from '@/api/request';
   import { Message, Modal } from '@arco-design/web-vue';
   import useUser from '@/hooks/user';
 
@@ -35,7 +35,7 @@
       passwordRepeat,
       id: uid,
     };
-    axios
+    request
       .patch(`/user/password`, obj)
       .then(() => {
         done();
@@ -68,7 +68,7 @@
       obj[v] = values[v];
     });
     // 修改除了密码之外的属性
-    await axios.patch('user/edit', {
+    await request.patch('user/edit', {
       ...obj,
       id: uid,
     });
@@ -176,7 +176,7 @@
     // min-height: 100vh;
     min-width: 40%;
     margin: 20px auto 0;
-    padding: 10px 20px 40px 20px;
+    padding: 10px 20px 40px;
     background-color: #fff;
     border-radius: 8px;
 

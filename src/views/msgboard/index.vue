@@ -80,7 +80,7 @@
   import useLoading from '@/hooks/loading';
   import { Pagination } from '@/types/global';
   import { Message, Modal } from '@arco-design/web-vue';
-  import axios from 'axios';
+  import request from '@/api/request';
 
   const generateFormModel = () => {
     return {
@@ -108,7 +108,7 @@
   });
   const getListHandle = async (val = 1) => {
     setLoading(true);
-    const res = await axios.get('/msgboard');
+    const res = await request.get('/msgboard');
     renderData.value = res.data;
     pagination.total = res.data.length;
     setLoading(false);
@@ -128,7 +128,7 @@
       title: '删除留言',
       content: '确定删除该留言嘛？',
       onOk: async () => {
-        const res = await axios.post('/msgboard/delete', [id]);
+        const res = await request.post('/msgboard/delete', [id]);
         Message.success('删除成功');
         getListHandle();
       },
@@ -136,7 +136,7 @@
   };
   const onSwitchChange = async (record: any) => {
     const { agreed, id } = record;
-    const res = await axios.patch(`/msgboard`, { agreed, id });
+    const res = await request.patch(`/msgboard`, { agreed, id });
     Message.success('设置成功');
   };
 </script>

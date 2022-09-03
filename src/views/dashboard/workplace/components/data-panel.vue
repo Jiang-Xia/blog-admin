@@ -12,7 +12,7 @@
           />
         </a-avatar>
         <a-statistic
-          :title="$t('workplace.onlineContent')"
+          title="总访问量"
           :value="373.5"
           :precision="1"
           :value-from="0"
@@ -20,7 +20,7 @@
           show-group-separator
         >
           <template #suffix>
-            W+ <span class="unit">{{ $t('workplace.pecs') }}</span>
+            <span class="unit">次</span>
           </template>
         </a-statistic>
       </a-space>
@@ -37,7 +37,7 @@
           />
         </a-avatar>
         <a-statistic
-          :title="$t('workplace.putIn')"
+          title="昨日访问量"
           :value="368"
           :value-from="0"
           animation
@@ -61,7 +61,7 @@
           />
         </a-avatar>
         <a-statistic
-          :title="$t('workplace.newDay')"
+          title="今日访问量"
           :value="8874"
           :value-from="0"
           animation
@@ -86,7 +86,7 @@
           />
         </a-avatar>
         <a-statistic
-          :title="$t('workplace.newFromYesterday')"
+          title="较昨日新增"
           :value="2.8"
           :precision="1"
           :value-from="0"
@@ -102,30 +102,52 @@
   </a-grid>
 </template>
 
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+  import jsonp from '@/utils/jsonp';
+  import request from '@/utils/request';
+  import config from '../bdapi';
+
+  request(config.siteAll).then((res) => {
+    console.log(res);
+  });
+  // const res = axios.get(config.base_url, {
+  // params: {
+  //   ...config,
+  //   start_date: 20220404,
+  //   end_date: 20220903,
+  //   metrics: '',
+  //   method: 'overview/getTimeTrendRpt',
+  // },
+  // });
+</script>
 
 <style lang="less" scoped>
   .arco-grid.panel {
     margin-bottom: 0;
-    padding: 16px 20px 0 20px;
+    padding: 16px 20px 0;
   }
+
   .panel-col {
     padding-left: 43px;
     border-right: 1px solid rgb(var(--gray-2));
   }
+
   .col-avatar {
     margin-right: 12px;
     background-color: var(--color-fill-2);
   }
+
   .up-icon {
     color: rgb(var(--red-6));
   }
+
   .unit {
     margin-left: 8px;
     color: rgb(var(--gray-8));
     font-size: 12px;
   }
+
   :deep(.panel-border) {
-    margin: 4px 0 0 0;
+    margin: 4px 0 0;
   }
 </style>

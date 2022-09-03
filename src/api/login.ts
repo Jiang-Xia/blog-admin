@@ -7,7 +7,7 @@
  * @FilePath: \blog-admin\src\api\login.ts
  */
 // import request from '@/utils/request';
-import request from 'axios';
+import request from '@/api/request';
 
 export const registerUser = async (data: any) => {
   const res = await request({

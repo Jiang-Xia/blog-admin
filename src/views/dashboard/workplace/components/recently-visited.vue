@@ -7,12 +7,18 @@
   >
     <div style="margin-bottom: -1rem">
       <a-row :gutter="8">
-        <a-col v-for="link in links" :key="link.text" :span="8" class="wrapper">
+        <a-col
+          v-for="link in links"
+          :key="link.text"
+          :span="8"
+          class="wrapper"
+          @click="$router.push(link.url)"
+        >
           <div class="icon">
             <component :is="link.icon" />
           </div>
           <a-typography-paragraph class="text">
-            {{ $t(link.text) }}
+            {{ link.text }}
           </a-typography-paragraph>
         </a-col>
       </a-row>
@@ -22,18 +28,7 @@
 
 <script lang="ts" setup>
   const links = [
-    {
-      text: 'workplace.contentManagement',
-      icon: 'icon-storage',
-    },
-    {
-      text: 'workplace.contentStatistical',
-      icon: 'icon-file',
-    },
-    {
-      text: 'workplace.advanced',
-      icon: 'icon-settings',
-    },
+    { text: '文章编辑.', icon: 'icon-storage', url: '/article/edit' },
   ];
 </script>
 

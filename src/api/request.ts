@@ -14,13 +14,14 @@ export interface HttpResponse<T = unknown> {
 function errorMsg(msg: string) {
   Message.error(msg);
 }
+const request = axios.create({});
 // 这是baseUrl使用 环境模式中写的变量  或者也可以使用config index中配置地址
 if (import.meta.env.VITE_API_BASE_URL) {
-  // axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL;
-  axios.defaults.baseURL = baseUrl; // 不用重启vite
+  // request.defaults.baseURL = import.meta.env.VITE_API_BASE_URL;
+  request.defaults.baseURL = baseUrl; // 不用重启vite
 }
 
-axios.interceptors.request.use(
+request.interceptors.request.use(
   (config: AxiosRequestConfig) => {
     // let each request carry token
     // this example using the JWT token
@@ -42,7 +43,7 @@ axios.interceptors.request.use(
   }
 );
 // add response interceptors
-axios.interceptors.response.use(
+request.interceptors.response.use(
   (response: AxiosResponse<HttpResponse>) => {
     const res = response.data;
     const { status } = response; // http自带状态码
@@ -88,3 +89,5 @@ axios.interceptors.response.use(
     return Promise.reject(data);
   }
 );
+
+export default request;

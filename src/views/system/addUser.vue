@@ -57,14 +57,14 @@
 
 <script lang="ts" setup>
   import { computed, ref, reactive } from 'vue';
-  import useLoading from '@/hooks/loading';
-  import { Pagination } from '@/types/global';
+  // import useLoading from '@/hooks/loading';
+  // import { Pagination } from '@/types/global';
   import { Message, Modal } from '@arco-design/web-vue';
   import { useRoute, useRouter } from 'vue-router';
-  import { ValidatedError } from '@arco-design/web-vue/es/form/interface';
+  // import { ValidatedError } from '@arco-design/web-vue/es/form/interface';
   // import { computed, onBeforeUnmount, onMounted } from 'vue'
   import { useAppStore } from '@/store';
-  import axios from 'axios';
+  import request from '@/api/request';
 
   const appStore = useAppStore();
   const router = useRouter();
@@ -131,14 +131,14 @@
     if (type.value === 'edit') {
       // 编辑
       params.editId = currentId.value;
-      const res = await axios.patch('user/edit', params);
+      const res = await request.patch('user/edit', params);
       visible.value = false;
       // console.log({ res });
       Message.success('修改成功！');
       resetForm();
     } else {
       // 新建
-      const res = await axios.post('user/register', params);
+      const res = await request.post('user/register', params);
       visible.value = false;
       Message.success('新建成功！');
       resetForm();
@@ -156,7 +156,7 @@
   // const ArticleInfo = ref({})
   // 文章编辑
   const getInfoHandle = async () => {
-    const res = await axios.get('user/info', {
+    const res = await request.get('user/info', {
       params: { id: currentId.value },
     });
     const keys = Object.keys(defaultForm);

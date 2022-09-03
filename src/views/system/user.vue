@@ -117,7 +117,7 @@
   import useLoading from '@/hooks/loading';
   import { Pagination } from '@/types/global';
   import { Message, Modal } from '@arco-design/web-vue';
-  import axios from 'axios';
+  import request from '@/api/request';
   import addModal from './addUser.vue';
 
   const generateFormModel = () => {
@@ -143,7 +143,7 @@
     setLoading(true);
     formModel.value.page = val;
     pagination.current = val;
-    const res = await axios
+    const res = await request
       .post('/user/list', formModel.value)
       .then((res) => res.data);
     // console.log(res);
@@ -167,7 +167,7 @@
       title: '删除用户',
       content: '确定删除该用户嘛？',
       onOk: async () => {
-        const res = await axios.delete('/user', { params: { id } });
+        const res = await request.delete('/user', { params: { id } });
         Message.success('删除成功');
         getTableListHandle();
       },
@@ -175,7 +175,7 @@
   };
   const onSwitchStatus = async (record: any) => {
     const { status, id } = record;
-    const res = await axios.patch(`/user/status`, { status, id });
+    const res = await request.patch(`/user/status`, { status, id });
     Message.success('设置成功');
   };
   const addRef = ref(addModal);

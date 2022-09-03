@@ -160,7 +160,7 @@
   import useLoading from '@/hooks/loading';
   import { Pagination } from '@/types/global';
   import { Message, Modal } from '@arco-design/web-vue';
-  import axios from 'axios';
+  import request from '@/api/request';
   import addMenu from './addMenu.vue';
   // 函数式组件 https://vuejs.org/guide/extras/render-function.html#functional-components
   const DynamicIcon = (props: any, context: any) => {
@@ -191,7 +191,7 @@
     setLoading(true);
     formModel.value.page = val;
     pagination.current = val;
-    const res = await axios
+    const res = await request
       .get('/admin/menu', { params: { role: 'super' } })
       .then((res) => res.data);
     // console.log(res);
@@ -214,7 +214,7 @@
       title: '删除用户',
       content: '确定删除该用户嘛？',
       onOk: async () => {
-        const res = await axios.delete('/admin/menu', { params: { id } });
+        const res = await request.delete('/admin/menu', { params: { id } });
         Message.success('删除成功');
         getTableListHandle();
       },
@@ -223,7 +223,10 @@
   // 修改菜单
   const onSwitchChange = async (type: string, record: any) => {
     const { id } = record;
-    const res = await axios.patch(`/admin/menu`, { [type]: record[type], id });
+    const res = await request.patch(`/admin/menu`, {
+      [type]: record[type],
+      id,
+    });
     Message.success('设置成功');
   };
   const showModal = (type: string, id?: string) => {
