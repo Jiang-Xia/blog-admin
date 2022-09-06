@@ -1,15 +1,19 @@
 <template>
-  <a-spin :loading="loading" style="width: 100%">
+  <a-spin style="width: 100%">
     <a-card
       class="general-card"
       :header-style="{ paddingBottom: 0 }"
       :body-style="{
         paddingTop: '20px',
       }"
-      :title="$t('workplace.contentData')"
+      title="近14天访问量"
     >
       <template #extra>
-        <a-link>{{ $t('workplace.viewMore') }}</a-link>
+        <a-link
+          href="https://tongji.baidu.com/main/overview/10000484096/overview/index?siteId=18269632"
+          target="_blank"
+          >查看更多</a-link
+        >
       </template>
       <Chart height="289px" :option="chartOption" />
     </a-card>
@@ -17,14 +21,21 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref } from 'vue';
+  import { computed, ref } from 'vue';
   import { graphic } from 'echarts';
   import useLoading from '@/hooks/loading';
   import { queryContentData, ContentDataRecord } from '@/api/dashboard';
   import useChartOption from '@/hooks/chart-option';
   import { ToolTipFormatterParams } from '@/types/echarts';
   import { AnyObject } from '@/types/global';
+  import dayjs from 'dayjs';
 
+  const props = defineProps({
+    chartData: {
+      type: Object,
+      default: () => ({}),
+    },
+  });
   function graphicFactory(side: AnyObject) {
     return {
       type: 'text',
@@ -38,7 +49,8 @@
       },
     };
   }
-  const { loading, setLoading } = useLoading(true);
+
+  // const { loading, setLoading } = useLoading(true);
   const xAxis = ref<string[]>([]);
   const chartsData = ref<number[]>([]);
   const graphicElements = ref([
@@ -48,7 +60,7 @@
   const { chartOption } = useChartOption(() => {
     return {
       grid: {
-        left: '2.6%',
+        left: '4%',
         right: '0',
         top: '10',
         bottom: '30',
@@ -56,13 +68,13 @@
       xAxis: {
         type: 'category',
         offset: 2,
-        data: xAxis.value,
+        data: props.chartData.xAxis,
         boundaryGap: false,
         axisLabel: {
           color: '#4E5969',
           formatter(value: number, idx: number) {
             if (idx === 0) return '';
-            if (idx === xAxis.value.length - 1) return '';
+            if (idx === props.chartData.xAxis.length - 1) return '';
             return `${value}`;
           },
         },
@@ -76,7 +88,7 @@
           show: true,
           interval: (idx: number) => {
             if (idx === 0) return false;
-            if (idx === xAxis.value.length - 1) return false;
+            if (idx === props.chartData.xAxis.length - 1) return false;
             return true;
           },
           lineStyle: {
@@ -99,7 +111,7 @@
         axisLabel: {
           formatter(value: any, idx: number) {
             if (idx === 0) return value;
-            return `${value}k`;
+            return `${value}`;
           },
         },
         splitLine: {
@@ -116,8 +128,8 @@
           const [firstElement] = params as ToolTipFormatterParams[];
           return `<div>
             <p class="tooltip-title">${firstElement.axisValueLabel}</p>
-            <div class="content-panel"><span>总内容量</span><span class="tooltip-value">${(
-              Number(firstElement.value) * 10000
+            <div class="content-panel"><span>访问量</span><span class="tooltip-value">${Number(
+              firstElement.value
             ).toLocaleString()}</span></div>
           </div>`;
         },
@@ -128,7 +140,7 @@
       },
       series: [
         {
-          data: chartsData.value,
+          data: props.chartData.sData,
           type: 'line',
           smooth: true,
           // symbol: 'circle',
@@ -174,27 +186,27 @@
       ],
     };
   });
-  const fetchData = async () => {
-    setLoading(true);
-    try {
-      const { data: chartData } = await queryContentData();
-      chartData.forEach((el: ContentDataRecord, idx: number) => {
-        xAxis.value.push(el.x);
-        chartsData.value.push(el.y);
-        if (idx === 0) {
-          graphicElements.value[0].style.text = el.x;
-        }
-        if (idx === chartData.length - 1) {
-          graphicElements.value[1].style.text = el.x;
-        }
-      });
-    } catch (err) {
-      // you can report use errorHandler or other
-    } finally {
-      setLoading(false);
-    }
-  };
-  fetchData();
+  // const fetchData = async () => {
+  //   setLoading(true);
+  //   try {
+  //     const { data: chartData } = await queryContentData();
+  //     chartData.forEach((el: ContentDataRecord, idx: number) => {
+  //       xAxis.value.push(el.x);
+  //       chartsData.value.push(el.y);
+  //       if (idx === 0) {
+  //         graphicElements.value[0].style.text = el.x;
+  //       }
+  //       if (idx === chartData.length - 1) {
+  //         graphicElements.value[1].style.text = el.x;
+  //       }
+  //     });
+  //   } catch (err) {
+  //     // you can report use errorHandler or other
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+  // fetchData();
 </script>
 
 <style scoped lang="less"></style>

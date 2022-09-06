@@ -11,10 +11,10 @@
             src="//p3-armor.byteimg.com/tos-cn-i-49unhts6dw/288b89194e657603ff40db39e8072640.svg~tplv-49unhts6dw-image.image"
           />
         </a-avatar>
+        <!-- :precision="1" -->
         <a-statistic
-          title="总访问量"
-          :value="373.5"
-          :precision="1"
+          title="近90天总访问量"
+          :value="countObj.allCount"
           :value-from="0"
           animation
           show-group-separator
@@ -38,13 +38,13 @@
         </a-avatar>
         <a-statistic
           title="昨日访问量"
-          :value="368"
+          :value="countObj.yesterdayCount"
           :value-from="0"
           animation
           show-group-separator
         >
           <template #suffix>
-            <span class="unit">{{ $t('workplace.pecs') }}</span>
+            <span class="unit">次</span>
           </template>
         </a-statistic>
       </a-space>
@@ -62,13 +62,13 @@
         </a-avatar>
         <a-statistic
           title="今日访问量"
-          :value="8874"
+          :value="countObj.todayCount"
           :value-from="0"
           animation
           show-group-separator
         >
           <template #suffix>
-            <span class="unit">{{ $t('workplace.pecs') }}</span>
+            <span class="unit">次</span>
           </template>
         </a-statistic>
       </a-space>
@@ -87,12 +87,17 @@
         </a-avatar>
         <a-statistic
           title="较昨日新增"
-          :value="2.8"
+          :value="countObj.compareYesterday"
           :precision="1"
           :value-from="0"
           animation
         >
-          <template #suffix> % <icon-caret-up class="up-icon" /> </template>
+          <template #suffix>
+            %
+            <icon-caret-up
+              :class="countObj.compareYesterday < 0 ? 'down-icon' : 'up-icon'"
+            />
+          </template>
         </a-statistic>
       </a-space>
     </a-grid-item>
@@ -103,25 +108,12 @@
 </template>
 
 <script lang="ts" setup>
-  import axios from 'axios';
-  import config from '../bdapi';
-
-  // axios(config.siteAll, {
-  //   headers: {
-  //     'content-type': 'application/json; charset=UTF-8',
-  //   },
-  // }).then((res: any) => {
-  //   console.log({ res });
-  // });
-  // const res = axios.get(config.base_url, {
-  // params: {
-  //   ...config,
-  //   start_date: 20220404,
-  //   end_date: 20220903,
-  //   metrics: '',
-  //   method: 'overview/getTimeTrendRpt',
-  // },
-  // });
+  defineProps({
+    countObj: {
+      type: Object,
+      default: () => ({}),
+    },
+  });
 </script>
 
 <style lang="less" scoped>
@@ -142,6 +134,11 @@
 
   .up-icon {
     color: rgb(var(--red-6));
+  }
+
+  .down-icon {
+    color: rgb(var(--green-6));
+    transform: rotate(180deg);
   }
 
   .unit {
