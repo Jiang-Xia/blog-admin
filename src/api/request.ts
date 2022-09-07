@@ -71,7 +71,7 @@ request.interceptors.response.use(
             async onOk() {
               const userStore = useUserStore();
               await userStore.logout();
-              // window.location.reload();
+              window.location.href = '/';
             },
           });
           break;
