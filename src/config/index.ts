@@ -14,9 +14,9 @@ if (mode === 'production') {
   // baseUrl = 'http://42.192.145.236:5000'
   url = 'https://jiang-xia.top/x-api/blog-server';
 } else {
-  url = 'http://localhost:5000';
+  // url = 'http://localhost:5000';
   // url = 'http://42.192.145.236:5000'
-  // url = 'https://jiang-xia.top/x-api/blog-server';
+  url = 'https://jiang-xia.top/x-api/blog-server';
 }
 export const baseUrl: string = url;
 // export const fileUrl: string = url2;
