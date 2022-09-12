@@ -82,19 +82,44 @@
         @page-change="onPageChange"
       >
         <template #columns>
-          <a-table-column title="标题" data-index="title" />
+          <a-table-column title="标题" data-index="title">
+            <template #cell="{ record }">
+              <a-popover title="">
+                <span>{{ record.title }}</span>
+                <template #content>
+                  <a-link
+                    :href="'https://jiang-xia.top/detail/' + record.id"
+                    target="_blank"
+                    icon
+                    >{{ record.title }}</a-link
+                  >
+                </template>
+              </a-popover>
+            </template>
+          </a-table-column>
           <a-table-column title="描述" data-index="description" />
+          <a-table-column title="封面" data-index="category">
+            <template #cell="{ record }">
+              <a-popover title="">
+                <a-image width="40" height="40" :src="record.cover" />
+                <template #content>
+                  <a-image width="200" height="200" :src="record.cover" />
+                </template>
+              </a-popover>
+            </template>
+          </a-table-column>
           <a-table-column title="分类" data-index="category">
             <template #cell="{ record }">
-              <!-- <span :style="{ color: record.category['color'] }">
-                {{ record.category['label'] }}
-              </span> -->
-              {{ record.category }}
+              <span :style="{ color: record.category?.color }">
+                {{ record.category?.label }}
+              </span>
             </template>
           </a-table-column>
           <a-table-column title="标签" data-index="tag">
             <template #cell="{ record }">
-              {{ record.tag }}
+              <span :style="{ color: record.tagColor }">
+                {{ record.tag }}
+              </span>
             </template>
           </a-table-column>
           <a-table-column title="查看" data-index="views" />
@@ -213,8 +238,9 @@
     };
     const res = await getArticleList(params);
     renderData.value = res.list.map((v: any) => {
-      v.category = v.category.label;
+      // v.category = v.category.label;
       v.tag = v.tags.map((v: any) => v.label).join();
+      v.tagColor = v.tags[0]?.color;
       // console.log(v.category);
       return v;
     });

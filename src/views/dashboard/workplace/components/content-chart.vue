@@ -6,7 +6,7 @@
       :body-style="{
         paddingTop: '20px',
       }"
-      title="近14天访问量"
+      title="近14天网站访问量"
     >
       <template #extra>
         <a-link

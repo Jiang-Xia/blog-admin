@@ -29,7 +29,7 @@
   const current = ref(1);
   const searchForm = ref({
     page: 1,
-    pageSize: 30,
+    pageSize: 20,
     originalname: '',
     type: '',
   });
@@ -70,7 +70,7 @@
   const targetPid = ref('');
   const moveHandle = async (id: string) => {
     const res = await request.get('/resources/files', {
-      params: { pageSize: 100 },
+      params: { pageSize: searchForm.value.pageSize },
     });
 
     const [list, total] = res.data;
@@ -236,7 +236,14 @@
               width="60"
               height="60"
               footer-position="outer"
+              show-loader
             >
+              <template #loader>
+                <img
+                  src="@/assets/images/gif/animation_200_l7ykdvii.gif"
+                  style="width: 50px; height: 50px"
+                />
+              </template>
             </a-image>
             <x-icon
               v-else-if="item.type.includes('video')"
