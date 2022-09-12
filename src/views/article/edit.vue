@@ -216,7 +216,7 @@
 
 <script lang="ts">
   export default {
-    name: 'SearchTable',
+    name: 'ArticleEdit',
   };
 </script>
 
@@ -229,7 +229,7 @@
       width: 80%;
       min-width: 40vh;
       max-width: 1600px;
-      margin: 0 auto 0;
+      margin: 0 auto;
       background-color: var(--color-menu-light-bg);
       border-radius: var(--border-radius-small);
       @media screen and (max-width: 768px) {
