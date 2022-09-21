@@ -48,7 +48,7 @@
           <a-checkbox
             checked="rememberPassword"
             :model-value="loginConfig.rememberPassword"
-            @change="(setRememberPassword as any)"
+            @change="setRememberPassword as any"
           >
             {{ $t('login.form.rememberPassword') }}
           </a-checkbox>
@@ -182,16 +182,16 @@
     }
 
     .login-btn {
-      background: rgba(93, 84, 240, 0.5);
+      background: rgb(93 84 240 / 50%);
       background: linear-gradient(
         left,
-        rgba(0, 168, 255, 0.5),
-        rgba(185, 0, 255, 0.5)
+        rgb(0 168 255 / 50%),
+        rgb(185 0 255 / 50%)
       );
-      background: -webkit-linear-gradient(
+      background: linear-gradient(
           left,
-          rgba(0, 168, 255, 0.5),
-          rgba(185, 0, 255, 0.5)
+          rgb(0 168 255 / 50%),
+          rgb(185 0 255 / 50%)
         )
         no-repeat;
       border-radius: 5px;

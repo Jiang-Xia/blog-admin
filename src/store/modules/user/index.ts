@@ -4,6 +4,7 @@ import { setToken, clearToken, getToken } from '@/utils/auth';
 import { removeRouteListener } from '@/utils/route-listener';
 import { userInfo, userLogin } from '@/api/login';
 // import { UserState } from './types';
+import { rsaEncrypt } from '@/utils/crypto';
 import useAppStore from '../app';
 
 interface UserState {
@@ -65,7 +66,7 @@ const useUserStore = defineStore('user', {
       try {
         const res = await userLogin({
           mobile: loginForm.username,
-          password: loginForm.password,
+          password: rsaEncrypt(loginForm.password),
           admin: true,
         });
         const user = res.info.user as UserState;
