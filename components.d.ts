@@ -42,6 +42,7 @@ declare module '@vue/runtime-core' {
     AMenuItem: typeof import('@arco-design/web-vue')['MenuItem'];
     AModal: typeof import('@arco-design/web-vue')['Modal'];
     APagination: typeof import('@arco-design/web-vue')['Pagination'];
+    APopover: typeof import('@arco-design/web-vue')['Popover'];
     ARadio: typeof import('@arco-design/web-vue')['Radio'];
     ARadioGroup: typeof import('@arco-design/web-vue')['RadioGroup'];
     AResult: typeof import('@arco-design/web-vue')['Result'];

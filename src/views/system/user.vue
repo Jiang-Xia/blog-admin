@@ -101,6 +101,15 @@
                 >
                   <icon-delete />
                 </a-button>
+                <a-button
+                  size="mini"
+                  type="primary"
+                  :disabled="record.role === 'super'"
+                  @click="resetHandle(record)"
+                >
+                  重置密码
+                  <icon-refresh />
+                </a-button>
               </a-space>
             </template>
           </a-table-column>
@@ -181,6 +190,14 @@
   const addRef = ref(addModal);
   const showModal = (type: string, id?: string) => {
     addRef.value.show({ type, id });
+  };
+  const resetHandle = async (record: any) => {
+    const { mobile, nickname } = record;
+    const res: any = await request.post(`/user/resetPassword`, {
+      mobile,
+      nickname,
+    });
+    Message.success(res.message);
   };
 </script>
 
