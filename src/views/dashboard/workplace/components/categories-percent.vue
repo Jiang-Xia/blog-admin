@@ -7,9 +7,7 @@
         padding: '20px',
       }"
     >
-      <template #title>
-        {{ $t('workplace.categoriesPercent') }}
-      </template>
+      <template #title> 主要分类内容占比 </template>
       <Chart height="310px" :option="chartOption" />
     </a-card>
   </a-spin>
@@ -18,15 +16,48 @@
 <script lang="ts" setup>
   import useLoading from '@/hooks/loading';
   import useChartOption from '@/hooks/chart-option';
+  import { ref, computed } from 'vue';
+  import { ListState } from '@/types/global';
+  import { getAllCategory } from '@/api/category';
 
-  const { loading } = useLoading();
+  const categoryOptions = ref<ListState[]>();
+  const { loading, setLoading } = useLoading();
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const options = await getAllCategory({ isDelete: true });
+      categoryOptions.value = options.slice(0, 5);
+    } catch (err) {
+      // you can report use errorHandler or other
+    } finally {
+      setLoading(false);
+    }
+  };
+  fetchData();
+  const categoryData = computed(() =>
+    categoryOptions.value?.map((v) => v.value)
+  );
+  const seriesData: any = computed(() =>
+    categoryOptions.value?.map((v: any) => {
+      return {
+        value: [v.articleCount],
+        name: v.value,
+      };
+    })
+  );
+  const count: any = computed(() =>
+    categoryOptions.value?.reduce((sum: number, cur: any) => {
+      sum += cur.articleCount;
+      return sum;
+    }, 0)
+  );
   const { chartOption } = useChartOption((isDark) => {
     // echarts support https://echarts.apache.org/zh/theme-builder.html
     // It's not used here
     return {
       legend: {
         left: 'center',
-        data: ['纯文本', '图文类', '视频类'],
+        data: categoryData.value,
         bottom: 0,
         icon: 'circle',
         itemWidth: 8,
@@ -48,7 +79,7 @@
             left: 'center',
             top: '40%',
             style: {
-              text: '内容量',
+              text: '文章数',
               textAlign: 'center',
               fill: isDark ? '#ffffffb3' : '#4E5969',
               fontSize: 14,
@@ -59,7 +90,7 @@
             left: 'center',
             top: '50%',
             style: {
-              text: '928,531',
+              text: count.value,
               textAlign: 'center',
               fill: isDark ? '#ffffffb3' : '#1D2129',
               fontSize: 16,
@@ -82,29 +113,7 @@
             borderColor: isDark ? '#232324' : '#fff',
             borderWidth: 1,
           },
-          data: [
-            {
-              value: [148564],
-              name: '纯文本',
-              itemStyle: {
-                color: isDark ? '#3D72F6' : '#249EFF',
-              },
-            },
-            {
-              value: [334271],
-              name: '图文类',
-              itemStyle: {
-                color: isDark ? '#A079DC' : '#313CA9',
-              },
-            },
-            {
-              value: [445694],
-              name: '视频类',
-              itemStyle: {
-                color: isDark ? '#6CAAF5' : '#21CCFF',
-              },
-            },
-          ],
+          data: seriesData.value,
         },
       ],
     };

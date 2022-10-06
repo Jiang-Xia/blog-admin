@@ -8,10 +8,11 @@ export const getCategoryById = async (id: number) => {
   });
   return res.data;
 };
-export const getAllCategory = async () => {
+export const getAllCategory = async (params?: any) => {
   const res = await request({
     url: '/category',
     method: 'get',
+    params,
   });
   return res.data;
 };
