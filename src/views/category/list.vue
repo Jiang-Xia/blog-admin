@@ -11,7 +11,7 @@
             label-align="left"
           >
             <a-row :gutter="16">
-              <a-col :span="8">
+              <a-col :span="12">
                 <a-form-item label="分类名">
                   <a-input
                     v-model="formModel.title"
@@ -140,7 +140,7 @@
   const formModel = ref(generateFormModel());
   const basePagination: Pagination = {
     current: 1,
-    pageSize: 20,
+    pageSize: 999,
   };
   const pagination = reactive({
     ...basePagination,

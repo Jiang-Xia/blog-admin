@@ -11,7 +11,7 @@
             label-align="left"
           >
             <a-row :gutter="16">
-              <a-col :span="10">
+              <a-col :span="12">
                 <a-form-item label="手机号">
                   <a-input
                     v-model="formModel.mobile"
@@ -62,13 +62,15 @@
         @page-change="onPageChange"
       >
         <template #columns>
-          <a-table-column title="手机号" data-index="mobile" />
-          <a-table-column title="昵称" data-index="nickname" />
-          <!-- <a-table-column title="标签" data-index="tag">
+          <a-table-column title="手机号" data-index="mobile" align="center" />
+          <a-table-column title="头像" data-index="url" align="center">
             <template #cell="{ record }">
-              {{ record.tag }}
+              <a-avatar>
+                <img :alt="record.avatar" :src="record.avatar" />
+              </a-avatar>
             </template>
-          </a-table-column> -->
+          </a-table-column>
+          <a-table-column title="昵称" data-index="nickname" />
           <a-table-column title="角色类型" data-index="role" />
           <a-table-column title="锁定" data-index="status">
             <template #cell="{ record }">
