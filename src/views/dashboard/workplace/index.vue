@@ -22,7 +22,7 @@
     <div class="right-side">
       <a-grid :cols="24" :row-gap="16">
         <a-grid-item :span="24">
-          <div class="panel moduler-wrap">
+          <div class="panel moduler-wrap quick-operation-visited">
             <QuickOperation />
             <RecentlyVisited />
           </div>
@@ -31,7 +31,7 @@
           <Carousel />
         </a-grid-item>
         <a-grid-item class="panel" :span="24">
-          <Announcement />
+          <Announcement class="recently-article" />
         </a-grid-item>
         <a-grid-item class="panel" :span="24">
           <Docs />
@@ -44,7 +44,9 @@
 <script lang="ts" setup>
   import dayjs from 'dayjs';
   import request from '@/api/request';
-  import { reactive, ref } from 'vue';
+  import { onMounted, reactive, ref } from 'vue';
+  // @ts-ignore
+  import guidance from '@/utils/guidance';
   import Banner from './components/banner.vue';
   import DataPanel from './components/data-panel.vue';
   import ContentChart from './components/content-chart.vue';
@@ -111,6 +113,7 @@
       loadedData.value = true;
       console.log(loadedData.value);
     });
+  onMounted(guidance);
 </script>
 
 <script lang="ts">

@@ -9,7 +9,7 @@
 
 ## 简介
 
-Blog Admin  是一个基于 Vue3、Vite、TypeScript、Arco Design UI 的个人博客前台，它使用了最新的前端技术栈，用于个人博客创建和浏览自身文章。
+Blog Admin  是一个基于 Vue3、Vite、TypeScript、Arco Design UI 的个人博客后台管理，它使用了最新的前端技术栈，用于个人博客创建和浏览自身文章，以及对博客各项资源的创建和管理。
 
 ## 主要技术和依赖
 
