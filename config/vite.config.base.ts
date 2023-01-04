@@ -3,9 +3,38 @@ import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import vueJsx from '@vitejs/plugin-vue-jsx';
 import svgLoader from 'vite-svg-loader';
+import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
-  plugins: [vue(), vueJsx(), svgLoader({ svgoConfig: {} })],
+  plugins: [
+    vue(),
+    vueJsx(),
+    svgLoader({ svgoConfig: {} }),
+    VitePWA({
+      registerType: 'autoUpdate',
+      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
+      manifest: {
+        icons: [
+          {
+            src: 'logo.png',
+            sizes: '192x192',
+            type: 'image/png',
+          },
+          {
+            src: 'logo.png',
+            sizes: '512x512',
+            type: 'image/png',
+          },
+          {
+            src: 'logo.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'any maskable',
+          },
+        ],
+      },
+    }),
+  ],
   resolve: {
     alias: [
       {
