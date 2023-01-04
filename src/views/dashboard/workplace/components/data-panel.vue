@@ -13,7 +13,7 @@
         </a-avatar>
         <!-- :precision="1" -->
         <a-statistic
-          title="近一年总访问量"
+          title="近90天总访问量"
           :value="countObj.allCount"
           :value-from="0"
           animation
