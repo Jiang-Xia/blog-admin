@@ -5,6 +5,7 @@
   </a-config-provider>
 </template>
 
+<!-- 2 -->
 <script lang="ts" setup>
   import { computed } from 'vue';
   import enUS from '@arco-design/web-vue/es/locale/lang/en-us';
