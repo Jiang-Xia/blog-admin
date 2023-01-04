@@ -73,7 +73,7 @@
         url: '/rest/2.0/tongji/report/getData',
         site_id: 18269632,
         start_date: dayjs(
-          new Date().getTime() - 24 * 60 * 60 * 1000 * 90
+          new Date().getTime() - 24 * 60 * 60 * 1000 * 365
         ).format('YYYYMMDD'),
         end_date: dayjs().format('YYYYMMDD'),
         metrics: 'pv_count,visitor_count,ip_count',
