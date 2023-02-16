@@ -17,8 +17,7 @@ function errorMsg(msg: string) {
 const request = axios.create({});
 // 这是baseUrl使用 环境模式中写的变量  或者也可以使用config index中配置地址
 if (import.meta.env.VITE_API_BASE_URL) {
-  // request.defaults.baseURL = import.meta.env.VITE_API_BASE_URL;
-  request.defaults.baseURL = baseUrl; // 不用重启vite
+  request.defaults.baseURL = import.meta.env.VITE_API_BASE_URL;
 }
 
 request.interceptors.request.use(
