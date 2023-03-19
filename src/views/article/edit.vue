@@ -67,11 +67,12 @@
               >
               </a-select>
             </a-form-item>
-            <a-form-item label="内容" name="contentHtml" field="contentHtml">
+            <a-form-item label="内容" name="content" field="content">
               <md-editor
-                v-model="formState.contentHtml"
+                v-model="formState.content"
                 class="x-md-editor"
                 :theme="theme"
+                @on-html-changed="onHtmlChanged"
               />
             </a-form-item>
 
@@ -112,7 +113,7 @@
   interface FormState {
     title: string;
     description: string;
-    // content: string;
+    content: string;
     contentHtml: string;
     category: string;
     cover: string;
@@ -121,8 +122,8 @@
   const defaultForm = {
     title: '',
     description: '',
-    // content: '',
-    contentHtml: '**哈喽！有什么灵感的话赶紧写下来吧~**',
+    content: '**哈喽！有什么灵感的话赶紧写下来吧~**',
+    contentHtml: '',
     category: '',
     cover: '',
     tags: [],
@@ -156,13 +157,14 @@
     tags: [{ required: true, message: '请选择标签！', trigger: 'change' }],
     cover: [{ required: true, message: '封面为必填！', trigger: 'blur' }],
     contentHtml: [{ required: true, trigger: 'change' }],
+    content: [{ required: true, trigger: 'change' }],
   };
   // 提交成功
   const handleFinish = async (values: any) => {
     // console.log('values', values)
     const params = {
       ...values,
-      // content: formState.content,
+      content: formState.content,
       contentHtml: formState.contentHtml,
       id: 0,
       // cover: formState.cover
@@ -197,8 +199,7 @@
     res = res.info;
     formState.title = res.title;
     formState.description = res.description;
-    // formState.content = res.content;
-    formState.contentHtml = res.contentHtml;
+    formState.content = res.content;
     formState.category = res.category.id;
     formState.cover = res.cover;
     formState.tags = res.tags.map((v: any) => v.id);
@@ -212,6 +213,9 @@
     if (appStore.theme === 'dark') return 'dark';
     return 'light';
   });
+  const onHtmlChanged = (html: string) => {
+    formState.contentHtml = html;
+  };
 </script>
 
 <script lang="ts">
