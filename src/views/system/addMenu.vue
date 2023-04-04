@@ -118,16 +118,7 @@
     }
     Promise.resolve();
   };
-  const rules = {
-    // title: [{ required: true, validator: checkTitle, trigger: 'blur' }],
-    // description: [
-    //   { required: true, validator: checkDescription, trigger: 'blur' },
-    // ],
-    // category: [{ required: true, message: '请选择分类！', trigger: 'change' }],
-    // tags: [{ required: true, message: '请选择标签！', trigger: 'change' }],
-    // cover: [{ required: true, message: '封面为必填！', trigger: 'blur' }],
-    // contentHtml: [{ required: true, trigger: 'change' }],
-  };
+  const rules = {};
   // 提交成功
   const handleFinish = async (values: any) => {
     // console.log('values', values)
