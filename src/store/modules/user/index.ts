@@ -66,6 +66,7 @@ const useUserStore = defineStore('user', {
       try {
         const res = await userLogin({
           mobile: loginForm.username,
+          authCode: loginForm.authCode,
           password: rsaEncrypt(loginForm.password),
           admin: true,
         });

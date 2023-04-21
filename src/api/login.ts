@@ -23,6 +23,7 @@ export const userLogin = async (data: any) => {
     url: '/user/login',
     method: 'post',
     data,
+    withCredentials: true,
   });
   return res.data;
 };
@@ -30,6 +31,14 @@ export const userLogin = async (data: any) => {
 export const userInfo = async () => {
   const res = await request({
     url: '/user/info',
+    method: 'get',
+  });
+  return res.data;
+};
+
+export const getAuthCode = async () => {
+  const res = await request({
+    url: '/user/authCode',
     method: 'get',
   });
   return res.data;

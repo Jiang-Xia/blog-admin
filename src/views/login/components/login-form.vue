@@ -43,6 +43,28 @@
           </template>
         </a-input-password>
       </a-form-item>
+      <a-form-item
+        field="authCode"
+        :rules="[{ required: true, message: '验证码必填' }]"
+        :validate-trigger="['change', 'blur']"
+        hide-label
+      >
+        <a-input
+          v-model="userInfo.authCode"
+          placeholder="请输入验证码"
+          :max-length="11"
+        >
+          <template #suffix>
+            <a-image
+              height="30"
+              :src="authCodeUrl"
+              style="margin-right: -12px"
+              :preview="false"
+              @click="changeAuthCodeUrl"
+            />
+          </template>
+        </a-input>
+      </a-form-item>
       <a-space :size="16" direction="vertical">
         <div class="login-form-password-actions">
           <a-checkbox
@@ -82,6 +104,7 @@
   import { useUserStore } from '@/store';
   import useLoading from '@/hooks/loading';
   import type { LoginData } from '@/api/user';
+  import { getAuthCode } from '@/api/login';
 
   const router = useRouter();
   const { t } = useI18n();
@@ -97,7 +120,9 @@
   const userInfo = reactive({
     username: loginConfig.value.username,
     password: loginConfig.value.password,
+    authCode: '',
   });
+  getAuthCode();
   const ticket = ref(query.ticket as string);
   if (ticket.value) {
     userStore.ticketLogin(ticket.value).then(() => {
@@ -142,6 +167,13 @@
   };
   const setRememberPassword = (value: boolean) => {
     loginConfig.value.rememberPassword = value;
+  };
+
+  // 验证码
+  const baseUrl = `${import.meta.env.VITE_API_BASE_URL}/user/authCode`;
+  const authCodeUrl = ref(baseUrl);
+  const changeAuthCodeUrl = () => {
+    authCodeUrl.value = `${baseUrl}?t=${new Date().getTime()}`;
   };
 </script>
 
