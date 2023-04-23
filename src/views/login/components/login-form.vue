@@ -52,7 +52,7 @@
         <a-input
           v-model="userInfo.authCode"
           placeholder="请输入验证码"
-          :max-length="11"
+          :max-length="6"
         >
           <template #suffix>
             <a-image
@@ -104,7 +104,6 @@
   import { useUserStore } from '@/store';
   import useLoading from '@/hooks/loading';
   import type { LoginData } from '@/api/user';
-  import { getAuthCode } from '@/api/login';
 
   const router = useRouter();
   const { t } = useI18n();
@@ -122,7 +121,6 @@
     password: loginConfig.value.password,
     authCode: '',
   });
-  getAuthCode();
   const ticket = ref(query.ticket as string);
   if (ticket.value) {
     userStore.ticketLogin(ticket.value).then(() => {
@@ -170,11 +168,11 @@
   };
 
   // 验证码
-  const baseUrl = `${import.meta.env.VITE_API_BASE_URL}/user/authCode`;
-  const authCodeUrl = ref(baseUrl);
+  const authCodeUrl = ref('');
   const changeAuthCodeUrl = () => {
-    authCodeUrl.value = `${baseUrl}?t=${new Date().getTime()}`;
+    authCodeUrl.value = `/blog-api/user/authCode?t=${new Date().getTime()}`;
   };
+  changeAuthCodeUrl();
 </script>
 
 <style lang="less" scoped>

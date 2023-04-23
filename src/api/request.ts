@@ -14,10 +14,12 @@ function errorMsg(msg: string) {
   Message.error(msg);
 }
 const request = axios.create();
+// 设置代理需配置不能为全网址
+request.defaults.baseURL = '/blog-api';
 // 这是baseUrl使用 环境模式中写的变量  或者也可以使用config index中配置地址
-if (import.meta.env.VITE_API_BASE_URL) {
-  request.defaults.baseURL = import.meta.env.VITE_API_BASE_URL;
-}
+// if (import.meta.env.VITE_API_BASE_URL) {
+//   request.defaults.baseURL = import.meta.env.VITE_API_BASE_URL;
+// }
 
 request.interceptors.request.use(
   (config: AxiosRequestConfig) => {
@@ -33,7 +35,7 @@ request.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
       // console.log('token2: ', config.headers.Authorization);
     }
-    config.withCredentials = true;
+    config.withCredentials = false;
     return config;
   },
   (error) => {
