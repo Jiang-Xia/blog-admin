@@ -16,10 +16,10 @@ export default defineConfig(({ mode }) => {
         port: 9856,
         // 设置代理就没有浏览器不携带cookie问题了
         proxy: {
-          '/blog-api': {
+          '/x-blog': {
             target: env.VITE_API_BASE_URL,
             changeOrigin: true,
-            rewrite: (path: string) => path.replace(/^\/blog-api/, ''),
+            rewrite: (path: string) => path.replace(/^\/x-blog/, ''),
           },
         },
       },

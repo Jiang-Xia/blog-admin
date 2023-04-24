@@ -9,15 +9,13 @@ const config: configState = {
 let url: string;
 // let url2: string;
 const mode = import.meta.env.MODE;
+const metaEnv = import.meta.env;
+console.log({ 当前环境变量: metaEnv });
 // x-api 后端服务
 if (mode === 'production') {
-  // baseUrl = 'http://42.192.145.236:5000'
-  url = 'https://jiang-xia.top/x-blog/api/v1';
+  url = metaEnv.VITE_API_BASE_URL;
 } else {
-  url = 'http://localhost:5000/api/v1';
-  // url = 'http://42.192.145.236:5000/api/v1'
-  // url = 'https://jiang-xia.top/x-blog/api/v1';
+  url = metaEnv.VITE_PREFIX_PATH;
 }
 export const baseUrl: string = url;
-// export const fileUrl: string = url2;
 export default config;

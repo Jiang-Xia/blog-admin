@@ -104,6 +104,7 @@
   import { useUserStore } from '@/store';
   import useLoading from '@/hooks/loading';
   import type { LoginData } from '@/api/user';
+  import { baseUrl } from '@/config';
 
   const router = useRouter();
   const { t } = useI18n();
@@ -170,7 +171,7 @@
   // 验证码
   const authCodeUrl = ref('');
   const changeAuthCodeUrl = () => {
-    authCodeUrl.value = `/blog-api/user/authCode?t=${new Date().getTime()}`;
+    authCodeUrl.value = `${baseUrl}/user/authCode?t=${new Date().getTime()}`;
   };
   changeAuthCodeUrl();
 </script>
