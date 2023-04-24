@@ -4,6 +4,7 @@ import baseConfig from './vite.config.base';
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
+  const prefixPath = env.VITE_PREFIX_PATH;
   // 合并返回新配置
   return mergeConfig(
     {
@@ -16,10 +17,11 @@ export default defineConfig(({ mode }) => {
         port: 9856,
         // 设置代理就没有浏览器不携带cookie问题了
         proxy: {
-          '/x-blog': {
+          [prefixPath]: {
             target: env.VITE_API_BASE_URL,
             changeOrigin: true,
-            rewrite: (path: string) => path.replace(/^\/x-blog/, ''),
+            rewrite: (path: string) =>
+              path.replace(new RegExp(`^${prefixPath}`), ''),
           },
         },
       },

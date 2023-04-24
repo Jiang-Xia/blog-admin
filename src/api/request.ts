@@ -31,7 +31,6 @@ request.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
       // console.log('token2: ', config.headers.Authorization);
     }
-    config.withCredentials = false;
     return config;
   },
   (error) => {
