@@ -6,7 +6,6 @@
   "author": "jiang-xia",
   "license": "MIT",
   "scripts": {
-    
     "dev:debug": "vite --debug --config ./config/vite.config.dev.ts",
     "dev": "vite --config ./config/vite.config.dev.ts",
     "build": "vue-tsc --noEmit && vite build --config ./config/vite.config.prod.ts",
@@ -32,10 +31,10 @@
     ]
   },
   "dependencies": {
-    "@arco-design/web-vue": "^2.35.1",
+    "@arco-design/web-vue": "^2.45.3",
     "@types/mockjs": "^1.0.6",
-    "@vueuse/core": "^9.1.1",
-    "arco-design-pro-vue": "^2.5.10",
+    "@vueuse/core": "^10.1.2",
+    "arco-design-pro-vue": "^2.7.2",
     "axios": "^0.27.2",
     "crypto-js": "^4.1.1",
     "dayjs": "^1.11.5",
@@ -46,13 +45,13 @@
     "md-editor-v3": "^2.2.1",
     "mitt": "^3.0.0",
     "nprogress": "^0.2.0",
-    "pinia": "^2.0.20",
+    "pinia": "^2.0.35",
     "query-string": "^7.1.1",
-    "vue": "^3.2.37",
-    "vue-echarts": "^6.2.3",
+    "vue": "^3.2.47",
+    "vue-echarts": "^6.5.5",
     "vue-i18n": "^9.2.2",
-    "vue-router": "^4.1.4",
-    "vue-shepherd": "^2.0.1",
+    "vue-router": "^4.1.6",
+    "vue-shepherd": "^3.0.0",
     "wangeditor": "^4.7.15"
   },
   "devDependencies": {
@@ -63,8 +62,8 @@
     "@types/nprogress": "^0.2.0",
     "@typescript-eslint/eslint-plugin": "^5.34.0",
     "@typescript-eslint/parser": "^5.34.0",
-    "@vitejs/plugin-vue": "^3.0.3",
-    "@vitejs/plugin-vue-jsx": "^2.0.0",
+    "@vitejs/plugin-vue": "^4.2.1",
+    "@vitejs/plugin-vue-jsx": "^3.0.1",
     "@vue/babel-plugin-jsx": "^1.1.1",
     "consola": "^2.15.3",
     "cross-env": "^7.0.3",
@@ -88,15 +87,15 @@
     "stylelint-config-standard": "^28.0.0",
     "stylelint-order": "^5.0.0",
     "typescript": "^4.7.4",
-    "unplugin-vue-components": "^0.22.4",
-    "vite": "^3.0.9",
+    "unplugin-vue-components": "^0.24.1",
+    "vite": "^4.3.4",
     "vite-plugin-compression": "^0.5.1",
     "vite-plugin-eslint": "^1.8.1",
     "vite-plugin-imagemin": "^0.6.1",
-    "vite-plugin-pwa": "^0.14.1",
+    "vite-plugin-pwa": "^0.14.7",
     "vite-plugin-style-import": "2.0.0",
-    "vite-svg-loader": "^3.4.0",
-    "vue-tsc": "^0.40.1"
+    "vite-svg-loader": "^4.0.0",
+    "vue-tsc": "^1.6.4"
   },
   "engines": {
     "node": ">=14.0.0"

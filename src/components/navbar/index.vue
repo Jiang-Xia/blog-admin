@@ -233,16 +233,16 @@
   const setVisible = () => {
     appStore.updateSettings({ globalSettings: true });
   };
-  const refBtn = ref();
+  // const refBtn = ref();
   const triggerBtn = ref();
-  const setPopoverVisible = () => {
-    const event = new MouseEvent('click', {
-      view: window,
-      bubbles: true,
-      cancelable: true,
-    });
-    refBtn.value.dispatchEvent(event);
-  };
+  // const setPopoverVisible = () => {
+  //   const event = new MouseEvent('click', {
+  //     view: window,
+  //     bubbles: true,
+  //     cancelable: true,
+  //   });
+  //   refBtn.value.dispatchEvent(event);
+  // };
   const handleLogout = () => {
     logout();
   };
@@ -316,7 +316,7 @@
       font-weight: 600;
       font-size: 16px;
       background: linear-gradient(-70deg, #db469f, #2188ff);
-      -webkit-background-clip: text;
+      background-clip: text;
       background-clip: text;
       -webkit-text-fill-color: transparent;
     }
