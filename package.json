@@ -13,6 +13,7 @@
     "preview": "npm run build && vite preview --host",
     "type:check": "vue-tsc --noEmit --skipLibCheck",
     "lint-staged": "npx lint-staged",
+    "lint": "eslint --fix --ext .ts,.js,tsx,.vue .",
     "prepare": "husky install"
   },
   "lint-staged": {

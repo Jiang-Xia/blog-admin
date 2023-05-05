@@ -258,7 +258,7 @@
     const res = await userStore.switchRoles();
     Message.success(res as string);
   };
-  const toggleDrawerMenu = inject('toggleDrawerMenu');
+  const toggleDrawerMenu: any = inject('toggleDrawerMenu');
 </script>
 
 <style scoped lang="less">
