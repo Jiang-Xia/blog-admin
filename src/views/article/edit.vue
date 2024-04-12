@@ -243,8 +243,15 @@
   }
 
   .x-md-editor {
+    min-width: 500px;
     // background-color: var(--color-bg-2);
     // border-color: var(--color-bg-2);
     border-radius: 4px;
+
+    .md-toolbar-wrapper {
+      .md-toolbar {
+        flex-wrap: nowrap;
+      }
+    }
   }
 </style>
