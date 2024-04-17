@@ -73,6 +73,7 @@
                 class="x-md-editor"
                 :theme="theme"
                 @on-html-changed="onHtmlChanged"
+                @on-upload-img="onUploadImg"
               />
             </a-form-item>
 
@@ -92,8 +93,9 @@
 <script lang="ts" setup>
   import { computed, ref, reactive } from 'vue';
   import useLoading from '@/hooks/loading';
-  import { Pagination } from '@/types/global';
+  import { staticUrl } from '@/config';
   import { getArticleInfo, createArticle, editArticle } from '@/api/article';
+  import request from '@/api/request';
   import { Message, Modal } from '@arco-design/web-vue';
   import { useRoute, useRouter } from 'vue-router';
   import { ValidatedError } from '@arco-design/web-vue/es/form/interface';
@@ -213,8 +215,38 @@
     if (appStore.theme === 'dark') return 'dark';
     return 'light';
   });
-  const onHtmlChanged = (html: string) => {
+  const onHtmlChanged = (html: any) => {
     formState.contentHtml = html;
+  };
+  const { loading } = useLoading();
+  // 上传图片功能
+  const onUploadImg = async (files: any, callback: any) => {
+    loading.value = true;
+    const res = await Promise.all(
+      files.map((file: any) => {
+        return new Promise((rev, rej) => {
+          const form = new FormData();
+          form.append('fileContents', file);
+          form.append('data', 'd5561c87-f189-4dc1-a28d-ba862a50f01f');
+          request({
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+            url: '/resources/uploadFile',
+            method: 'post',
+            data: form,
+          })
+            .then((res) => rev(res))
+            .catch((error) => rej(error));
+        });
+      })
+    );
+    loading.value = false;
+    callback(
+      res.map((item) => {
+        return staticUrl + item.data[0].url;
+      })
+    );
   };
 </script>
 

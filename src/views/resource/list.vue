@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import { h, ref } from 'vue';
-  import { baseUrl } from '@/config';
+  import { baseUrl, staticUrl } from '@/config';
   import { useUserStore } from '@/store';
   import request from '@/api/request';
 
@@ -52,7 +52,7 @@
     const [list, total] = res.data;
     imageList.value = list.map((v: any) => {
       v.visible = false;
-      v.url = baseUrl + v.url;
+      v.url = staticUrl + v.url;
       return v;
     });
     totalCount.value = total;

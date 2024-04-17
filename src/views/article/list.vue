@@ -16,6 +16,7 @@
                   <a-input
                     v-model="formModel.title"
                     placeholder="请输入关键字"
+                    @press-enter="search()"
                   />
                 </a-form-item>
               </a-col>
@@ -24,6 +25,7 @@
                   <a-input
                     v-model="formModel.description"
                     placeholder="请输入描述"
+                    @press-enter="search()"
                   />
                 </a-form-item>
               </a-col>
@@ -32,6 +34,7 @@
                   <a-input
                     v-model="formModel.content"
                     placeholder="请输入文章内容"
+                    @press-enter="search()"
                   />
                 </a-form-item>
               </a-col>
