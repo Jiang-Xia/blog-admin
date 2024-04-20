@@ -9,11 +9,11 @@
       <template #extra>
         <a-link @click="$router.push('/category/list')">查看更多</a-link>
       </template>
-      <a-space direction="vertical" :size="10" fill>
+      <a-space direction="vertical" fill>
         <a-radio-group
           v-model:model-value="type"
           type="button"
-          @change="typeChange as any"
+          @change="typeChange"
         >
           <a-radio
             v-for="(item, index) in categoryOptions"
@@ -83,7 +83,7 @@
       setLoading(false);
     }
   };
-  const typeChange = (contentType: string) => {
+  const typeChange:any = (contentType: string) => {
     fetchData(contentType);
   };
   fetchData();
@@ -101,7 +101,13 @@
       margin-bottom: 0;
     }
   }
-
+  :deep(.a-radio-group){
+		// width: 100%;
+    // overflow-x: auto;s
+    // .a-radio{
+    //   min-width: 100px;
+    // }
+  }
   .increases-cell {
     display: flex;
     align-items: center;
