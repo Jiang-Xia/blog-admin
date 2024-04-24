@@ -76,18 +76,19 @@
         :data="renderData"
         :bordered="false"
         @page-change="onPageChange"
+        stripe
       >
         <template #columns>
-          <a-table-column title="昵称" data-index="name" />
-          <a-table-column title="头像" data-index="avatar" align="center">
+          <a-table-column title="昵称" data-index="name"  align="center" :width="100"/>
+          <a-table-column title="头像" data-index="avatar" align="center" :width="100">
             <template #cell="{ record }">
               <a-avatar>
                 <img :alt="record.title" :src="record.avatar" />
               </a-avatar>
             </template>
           </a-table-column>
-          <a-table-column title="评论内容" data-index="comment" />
-          <a-table-column title="网址" data-index="address">
+          <a-table-column title="评论内容" data-index="comment" :width="460" tooltip ellipsis />
+          <a-table-column title="网址" data-index="address" :width="200" tooltip>
             <template #cell="{ record }">
               <a-link :href="record.address" target="_blank">{{
                 record.address
@@ -109,7 +110,7 @@
               </a-switch>
             </template>
           </a-table-column> -->
-          <a-table-column title="操作" data-index="operations">
+          <a-table-column title="操作" data-index="operations" :width="100" fixed="right">
             <template #cell="{ record }">
               <a-space :size="8">
                 <a-button

@@ -85,7 +85,7 @@
         @page-change="onPageChange"
       >
         <template #columns>
-          <a-table-column title="标题" data-index="title">
+          <a-table-column title="标题" data-index="title" :width="260" ellipsis>
             <template #cell="{ record }">
               <a-popover title="">
                 <span>{{ record.title }}</span>
@@ -100,8 +100,8 @@
               </a-popover>
             </template>
           </a-table-column>
-          <a-table-column title="描述" data-index="description" />
-          <a-table-column title="封面" data-index="category">
+          <a-table-column title="描述" data-index="description" :width="140" ellipsis tooltip />
+          <a-table-column title="封面" data-index="category" :width="100">
             <template #cell="{ record }">
               <a-popover title="">
                 <a-image width="40" height="40" :src="record.cover" />
@@ -111,24 +111,25 @@
               </a-popover>
             </template>
           </a-table-column>
-          <a-table-column title="分类" data-index="category">
+          <a-table-column title="分类" data-index="category" :width="120">
             <template #cell="{ record }">
               <span :style="{ color: record.category?.color }">
                 {{ record.category?.label }}
               </span>
             </template>
           </a-table-column>
-          <a-table-column title="标签" data-index="tag">
+          <a-table-column title="标签" data-index="tag" :width="120">
             <template #cell="{ record }">
               <span :style="{ color: record.tagColor }">
                 {{ record.tag }}
               </span>
             </template>
           </a-table-column>
-          <a-table-column title="查看" data-index="views" />
-          <a-table-column title="点赞" data-index="likes" />
-          <a-table-column title="评论" data-index="commentCount" />
-          <a-table-column title="置顶" data-index="url">
+          <a-table-column title="查看" data-index="views" :width="80"/>
+          <a-table-column title="点赞" data-index="likes" :width="80"/>
+          <a-table-column title="评论" data-index="commentCount" :width="80"/>
+          <a-table-column title="更新时间" data-index="uTime" :width="200"/>
+          <a-table-column title="置顶" :width="60" fixed="right">
             <template #cell="{ record }">
               <!-- :disabled="record.agreed" -->
               <a-switch
@@ -145,7 +146,7 @@
               </a-switch>
             </template>
           </a-table-column>
-          <a-table-column title="禁用" data-index="url">
+          <a-table-column title="禁用" :width="60" fixed="right">
             <template #cell="{ record }">
               <!-- :disabled="record.agreed" -->
               <a-switch
@@ -162,8 +163,7 @@
               </a-switch>
             </template>
           </a-table-column>
-          <a-table-column title="更新时间" data-index="uTime" />
-          <a-table-column title="操作" data-index="operations">
+          <a-table-column title="操作" data-index="operations" :width="120" fixed="right">
             <template #cell="{ record }">
               <a-space :size="8">
                 <a-button
