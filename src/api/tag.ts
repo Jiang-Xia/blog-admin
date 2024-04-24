@@ -7,10 +7,11 @@ export const getTagById = async (id: number) => {
   });
   return res.data;
 };
-export const getAllTag = async () => {
+export const getAllTag = async (params: any) => {
   const res = await request({
     url: '/tag',
     method: 'get',
+    params,
   });
   return res.data;
 };

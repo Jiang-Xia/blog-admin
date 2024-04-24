@@ -100,26 +100,27 @@
           </a-table-column>
         </template>
       </a-table>
-      <CreateModal v-model:value="visibale" type="标签" @ok="ceateOkHandle" />
+      <CreateModal
+        v-model:value="visibale"
+        type="标签"
+        @ok="
+          ({ name, type }) => {
+            ceateOkHandle({ name, type, cb: search });
+          }
+        "
+      />
     </a-card>
   </div>
 </template>
 
 <script lang="ts" setup>
-  import { computed, ref, reactive, watch } from 'vue';
-  import { useI18n } from 'vue-i18n';
-  import useLoading from '@/hooks/loading';
+  import { ref, reactive } from 'vue';
   import { Pagination } from '@/types/global';
   import { Message, Modal } from '@arco-design/web-vue';
-  import api from '@/api/index';
   import { formateDate } from '@/utils';
+  import { useTableNoPageList } from '@/hooks/data';
   import CreateModal from '../category/create-modal.vue';
-  import {
-    getOptions,
-    ceateOkHandle,
-    tagsOptions,
-    delCategoryTag,
-  } from '../article/common';
+  import { ceateOkHandle, delCategoryTag } from '../article/common';
 
   const generateFormModel = () => {
     return {
@@ -135,9 +136,6 @@
     };
   };
 
-  const { loading, setLoading } = useLoading(true);
-  const { t } = useI18n();
-  const renderData = ref([]);
   const formModel = ref(generateFormModel());
   const basePagination: Pagination = {
     current: 1,
@@ -147,23 +145,25 @@
     ...basePagination,
   });
   const visibale = ref(false);
-  watch(
-    () => tagsOptions.value, // 需写到value
-    () => {
-      renderData.value = tagsOptions.value;
-      setLoading(false);
-    }
-  );
+
+  const {
+    action,
+    loading,
+    list: renderData,
+    loadMore,
+  } = useTableNoPageList('/tag', formModel.value);
   const search = () => {
-    getOptions('标签');
+    action.value = formModel.value;
+    loadMore();
   };
   const onPageChange = (current: number) => {
-    getOptions('标签');
+    search();
   };
-  getOptions('标签');
   const reset = () => {
     formModel.value = generateFormModel();
+    search();
   };
+
   const addHandle = () => {
     visibale.value = true;
   };
@@ -174,7 +174,7 @@
       onOk: async () => {
         const res = await delCategoryTag('标签', id);
         Message.success('删除成功');
-        getOptions('标签');
+        search();
       },
     });
   };

@@ -5,27 +5,6 @@ import { Message } from '@arco-design/web-vue';
 // import { getToken } from '@/utils/auth';
 import { useUserStore } from '@/store';
 
-// 分类
-const categoryOptions = ref([]);
-// 标签
-const tagsOptions = ref([]);
-const getOptions = async (type: string) => {
-  if (type === '分类') {
-    const res = await api.getAllCategory();
-    categoryOptions.value = res.map((v: any) => {
-      v.value = v.id;
-      return v;
-    });
-    // console.log(res)
-  } else {
-    const res = await api.getAllTag();
-    tagsOptions.value = res.map((v: any) => {
-      v.value = v.id;
-      v.checked = false;
-      return v;
-    });
-  }
-};
 const colors: string[] = [
   '#4ea397',
   '#22c3aa',
@@ -50,7 +29,7 @@ const getRandomClor = () => {
   const index = Math.floor(Math.random() * colors.length);
   return colors[index];
 };
-export { categoryOptions, tagsOptions, getOptions, colors, getRandomClor };
+export { colors, getRandomClor };
 
 export const updateViews = async (
   id: LocationQueryValue | LocationQueryValue[]
@@ -90,8 +69,8 @@ export const updateLikesHandle = async (item: any) => {
 };
 
 // 新建分类和标签
-type C = { name: string; type: string };
-export const ceateOkHandle = async ({ name, type }: C) => {
+type C = { name: string; type: string; cb: () => void };
+export const ceateOkHandle = async ({ name, type, cb }: C) => {
   // console.log(userStore.createTime);
   const obj = {
     label: name,
@@ -101,11 +80,11 @@ export const ceateOkHandle = async ({ name, type }: C) => {
   if (type === '分类') {
     await api.createCategory(obj);
     Message.success('添加成功！');
-    getOptions(type);
+    cb();
   } else {
     await api.createTag(obj);
-    getOptions(type);
     Message.success('添加成功！');
+    cb();
   }
 };
 
@@ -119,6 +98,3 @@ export const delCategoryTag = async (type: string, id: string) => {
   const res = await api.delTag(id);
   return res;
 };
-
-getOptions('标签');
-getOptions('分类');

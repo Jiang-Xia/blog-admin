@@ -2,16 +2,71 @@
   <div class="container">
     <!-- <Breadcrumb :items="['menu.list', 'menu.list.searchTable']" /> -->
     <a-card class="general-card" title="留言板查询">
-      <a-row style="margin-bottom: 16px">
-        <a-col :span="16">
-          <!-- <a-space>
-            <a-button type="primary">
+      <a-row align="center">
+        <a-col :flex="1">
+          <a-form
+            :model="formModel"
+            :label-col-props="{ span: 6 }"
+            :wrapper-col-props="{ span: 18 }"
+            label-align="left"
+          >
+            <a-row :gutter="16">
+              <a-col :span="12">
+                <a-form-item label="评论内容">
+                  <a-input
+                    v-model="formModel.comment"
+                    placeholder="请输入评论内容"
+                    @press-enter="search()"
+                  />
+                </a-form-item>
+              </a-col>
+              <a-col :span="12">
+                <a-form-item label="回复内容">
+                  <a-input
+                    v-model="formModel.respondent"
+                    placeholder="请输入回复内容"
+                    @press-enter="search()"
+                  />
+                </a-form-item>
+              </a-col>
+            </a-row>
+            <a-row :gutter="16">
+              <a-col :span="12">
+                <a-form-item label="邮箱">
+                  <a-input
+                    v-model="formModel.eamil"
+                    placeholder="请输入邮箱"
+                    @press-enter="search()"
+                  />
+                </a-form-item>
+              </a-col>
+              <a-col :span="12">
+                <a-form-item label="昵称">
+                  <a-input
+                    v-model="formModel.name"
+                    placeholder="请输入昵称"
+                    @press-enter="search()"
+                  />
+                </a-form-item>
+              </a-col>
+            </a-row>
+          </a-form>
+        </a-col>
+        <a-col :span="5" style="text-align: right">
+          <a-space :size="8">
+            <a-button type="primary" @click="search">
               <template #icon>
-                <icon-plus />
+                <icon-search />
               </template>
-              {{ '新建' }}
+              {{ '搜索' }}
             </a-button>
-          </a-space> -->
+            <a-button @click="reset">
+              <template #icon>
+                <icon-refresh />
+              </template>
+              {{ '重置' }}
+            </a-button>
+          </a-space>
         </a-col>
       </a-row>
       <a-table
@@ -81,47 +136,34 @@
   import { Pagination } from '@/types/global';
   import { Message, Modal } from '@arco-design/web-vue';
   import request from '@/api/request';
+  import { useTableList } from '@/hooks/data';
 
   const generateFormModel = () => {
     return {
-      page: 1,
-      category: '',
-      tags: [],
-      pageSize: 20,
-      total: 0,
-      title: '',
-      description: '',
-      content: '',
-      uid: 1,
+      name: '',
+      comment: '',
+      eamil: '',
+      respondent: '',
     };
   };
-  const { loading, setLoading } = useLoading(true);
-  const { t } = useI18n();
-  const renderData = ref([]);
   const formModel = ref(generateFormModel());
-  const basePagination: Pagination = {
-    current: 1,
-    pageSize: 20,
-  };
-  const pagination = reactive({
-    ...basePagination,
-  });
-  const getListHandle = async (val = 1) => {
-    setLoading(true);
-    const res = await request.get('/msgboard');
-    renderData.value = res.data;
-    pagination.total = res.data.length;
-    setLoading(false);
-  };
+  const {
+    pagination,
+    action,
+    loading,
+    list: renderData,
+    loadMore,
+  } = useTableList('/msgboard', formModel.value);
   const search = () => {
-    getListHandle();
+    action.value = formModel.value;
+    loadMore();
   };
   const onPageChange = (current: number) => {
-    getListHandle();
+    search();
   };
-  getListHandle();
   const reset = () => {
     formModel.value = generateFormModel();
+    search();
   };
   const delHandle = async (id: number) => {
     Modal.confirm({
@@ -130,7 +172,7 @@
       onOk: async () => {
         const res = await request.post('/msgboard/delete', [id]);
         Message.success('删除成功');
-        getListHandle();
+        search();
       },
     });
   };
