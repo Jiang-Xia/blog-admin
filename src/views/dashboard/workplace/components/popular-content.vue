@@ -83,7 +83,7 @@
       setLoading(false);
     }
   };
-  const typeChange:any = (contentType: string) => {
+  const typeChange: any = (contentType: string) => {
     fetchData(contentType);
   };
   fetchData();
@@ -101,13 +101,15 @@
       margin-bottom: 0;
     }
   }
-  :deep(.a-radio-group){
-		// width: 100%;
-    // overflow-x: auto;s
-    // .a-radio{
-    //   min-width: 100px;
-    // }
+
+  :deep(.arco-radio-group-button) {
+    width: 100%;
+
+    .arco-radio-button {
+      margin: auto;
+    }
   }
+
   .increases-cell {
     display: flex;
     align-items: center;

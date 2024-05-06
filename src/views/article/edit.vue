@@ -51,6 +51,7 @@
                 v-model="formState.category"
                 style="width: 50%"
                 :options="categoryOptions"
+                value-key="id"
                 placeholder="选择分类"
               >
               </a-select>
@@ -62,6 +63,7 @@
                 style="width: 50%"
                 :options="tagsOptions"
                 placeholder="选择标签 "
+                value-key="id"
                 multiple
                 class="tag-select"
               >
@@ -102,7 +104,7 @@
   // import { computed, onBeforeUnmount, onMounted } from 'vue'
   import MdEditor from 'md-editor-v3';
   import { useAppStore } from '@/store';
-  import { categoryOptions, tagsOptions } from './common';
+  import { useTableNoPageList } from '@/hooks/data';
 
   const appStore = useAppStore();
   const router = useRouter();
@@ -130,7 +132,9 @@
     cover: '',
     tags: [],
   };
-
+  // 分类和标签
+  const { list: categoryOptions } = useTableNoPageList('/category', {});
+  const { list: tagsOptions } = useTableNoPageList('/tag', {});
   const formRef = ref();
   const formState: FormState = reactive({ ...defaultForm });
   // 自定义异步校验
@@ -205,6 +209,7 @@
     formState.category = res.category.id;
     formState.cover = res.cover;
     formState.tags = res.tags.map((v: any) => v.id);
+    console.log(formState);
   };
   if (type === 'edit') {
     getArticleInfoHandle();
