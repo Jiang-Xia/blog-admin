@@ -51,8 +51,8 @@
                 v-model="formState.category"
                 style="width: 50%"
                 :options="categoryOptions"
-                value-key="id"
                 placeholder="选择分类"
+                :field-names="{ value: 'id', label: 'label' }"
               >
               </a-select>
             </a-form-item>
@@ -63,7 +63,7 @@
                 style="width: 50%"
                 :options="tagsOptions"
                 placeholder="选择标签 "
-                value-key="id"
+                :field-names="{ value: 'id', label: 'label' }"
                 multiple
                 class="tag-select"
               >
