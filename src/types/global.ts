@@ -39,3 +39,10 @@ export interface ListState {
   id: string;
   value: string;
 }
+
+// 扩展App实例类型，以包含全局对象
+declare module '@vue/runtime-core' {
+  export interface ComponentCustomProperties {
+    $dayjs: any;
+  }
+}

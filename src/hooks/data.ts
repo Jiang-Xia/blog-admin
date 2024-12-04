@@ -3,7 +3,12 @@ import { ref } from 'vue';
 
 import useLoading from '@/hooks/loading';
 // 分页表格列表
-export const useTableList = (url: string, data: any, method = 'get') => {
+export const useTableList = (
+  url: string,
+  data: any,
+  method = 'get',
+  immediate = true
+) => {
   const list = ref([]);
   const total = ref(0);
   const { loading, setLoading } = useLoading(true);
@@ -24,7 +29,9 @@ export const useTableList = (url: string, data: any, method = 'get') => {
     res.data.pagination.current = res.data.pagination.page;
     pagination.value = res.data.pagination;
   };
-  loadMore();
+  if (immediate) {
+    loadMore();
+  }
   const refreshFun = () => {
     loadMore();
   };

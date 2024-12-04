@@ -51,6 +51,10 @@ export default {
 
   'menu.server.resource': '资源管理',
   'menu.server.resourceList': '资源列表',
+
+  'menu.server.comment': '评论管理',
+  'menu.server.commentList': '评论列表',
+
   ...localeSettings,
   ...localeMessageBox,
   ...localeLogin,

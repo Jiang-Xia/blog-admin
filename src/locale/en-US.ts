@@ -52,6 +52,10 @@ export default {
 
   'menu.server.resource': 'Resource',
   'menu.server.resourceList': 'ResourceList',
+
+  'menu.server.comment': 'Comment',
+  'menu.server.commentList': 'CommentList',
+
   ...localeSettings,
   ...localeMessageBox,
   ...localeLogin,
