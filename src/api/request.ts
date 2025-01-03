@@ -3,6 +3,36 @@ import { Message, Modal } from '@arco-design/web-vue';
 import { useUserStore } from '@/store';
 import { getToken } from '@/utils/auth';
 import { baseUrl } from '@/config';
+import { aesEncrypt, aesDecrypt } from '@/utils/crypto';
+
+const openEncrypt = import.meta.env.VITE_NUXT_OPEN_ENCRYPT === 'true';
+// 加密请求 body
+const encryptMsg = (body: any, url: string) => {
+  const bool = url.includes('encrypt');
+  if (bool && body) {
+    // console.log('encryptMsg-body====>', JSON.stringify(body));
+    body = aesEncrypt(JSON.stringify(body));
+    // console.log('encryptMsg-body====>', body)
+    // console.log('encryptMsg-body====>', { content: body, })
+    return {
+      content: body,
+    };
+  }
+  return body;
+};
+
+// 解密响应 body
+const decryptMsg = (body: any, url: string) => {
+  const bool = url.includes('encrypt');
+  if (bool && body) {
+    body = aesDecrypt(body.content);
+    body = JSON.parse(body);
+    // console.log('decryptMsg-body', body);
+    return body;
+  }
+  return body;
+};
+
 // 自定义请求和相应拦截器
 export interface HttpResponse<T = unknown> {
   status: number;
@@ -16,7 +46,9 @@ function errorMsg(msg: string) {
 const request = axios.create();
 // 设置代理需配置不能为全网址
 request.defaults.baseURL = baseUrl;
-
+if (openEncrypt) {
+  request.defaults.baseURL = `${baseUrl}/encrypt`;
+}
 request.interceptors.request.use(
   (config: AxiosRequestConfig) => {
     // let each request carry token
@@ -31,6 +63,7 @@ request.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
       // console.log('token2: ', config.headers.Authorization);
     }
+    config.data = encryptMsg(config.data, config.baseURL as string);
     return config;
   },
   (error) => {
@@ -41,7 +74,7 @@ request.interceptors.request.use(
 // add response interceptors
 request.interceptors.response.use(
   (response: AxiosResponse<HttpResponse>) => {
-    const res = response.data;
+    const res = decryptMsg(response.data, response.config.baseURL as string);
     const { status } = response; // http自带状态码
     // if the custom code is not 20000, it is judged as an error.
     if ((status >= 200 && status < 300) || status === 304) {
