@@ -1,5 +1,3 @@
-import { S } from 'mockjs';
-
 interface configState {
   iconfonrUrl: string;
 }
