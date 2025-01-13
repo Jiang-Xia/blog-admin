@@ -46,19 +46,25 @@ Blog Admin  是一个基于 Vue3、Vite、TypeScript、Arco Design UI 的个人�
 - 安装依赖
 
 ```bash
-yarn
+npm install
 ```
 
 - 运行
 
 ```bash
-yarn dev
+npm run dev
 ```
 
 - 打包
 
 ```bash
-yarn build
+npm run build
+```
+
+- 代码格式化
+
+```bash
+npm run lint
 ```
 
 ## 开源作者
