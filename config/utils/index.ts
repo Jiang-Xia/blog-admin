@@ -3,7 +3,7 @@
  * 是否生成打包报告
  */
 export default {};
-
+const REPORT = false;
 export function isReportMode(): boolean {
-  return process.env.REPORT === 'true';
+  return REPORT;
 }

@@ -4,18 +4,18 @@ import configCompressPlugin from './plugin/compress';
 import configVisualizerPlugin from './plugin/visualizer';
 import configArcoResolverPlugin from './plugin/arcoResolver';
 import configStyleImportPlugin from './plugin/styleImport';
-import configImageminPlugin from './plugin/imagemin';
+// import configImageminPlugin from './plugin/imagemin';
 
 const images = ['png', 'jpeg', 'svg'];
 export default mergeConfig(
   {
     mode: 'production',
     plugins: [
-      // configCompressPlugin('gzip'),
-      // configVisualizerPlugin(),
+      configCompressPlugin('gzip'),
+      configVisualizerPlugin(),
       configArcoResolverPlugin(),
       configStyleImportPlugin(),
-      configImageminPlugin(),
+      // configImageminPlugin(),
     ],
     build: {
       rollupOptions: {
