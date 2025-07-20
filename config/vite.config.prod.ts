@@ -10,6 +10,7 @@ const images = ['png', 'jpeg', 'svg'];
 export default mergeConfig(
   {
     mode: 'production',
+    base: './',
     plugins: [
       configCompressPlugin('gzip'),
       configVisualizerPlugin(),
