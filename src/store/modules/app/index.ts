@@ -4,7 +4,7 @@ import type { NotificationReturn } from '@arco-design/web-vue/es/notification/in
 import type { RouteRecordNormalized } from 'vue-router';
 import defaultSettings from '@/config/settings.json';
 import { getMenuList } from '@/api/user';
-import { AppState } from './types';
+import type { AppState } from './types';
 import useUserStore from '../user';
 // import useTabBarStore from '../tab-bar';
 
@@ -26,7 +26,7 @@ const useAppStore = defineStore('app', {
   actions: {
     // Update app settings
     updateSettings(partial: Partial<AppState>) {
-      // @ts-ignore-next-line
+      // @ts-expect-error-next-line
       this.$patch(partial);
     },
 
@@ -67,7 +67,6 @@ const useAppStore = defineStore('app', {
           closable: true,
         });
       } catch (error) {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         notifyInstance = Notification.error({
           id: 'menuNotice',
           content: 'error',

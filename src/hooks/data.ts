@@ -3,19 +3,15 @@ import { ref } from 'vue';
 
 import useLoading from '@/hooks/loading';
 // 分页表格列表
-export const useTableList = (
-  url: string,
-  data: any,
-  method = 'get',
-  immediate = true
-) => {
+type KeyValue = Record<string, unknown>;
+export const useTableList = (url: string, data: KeyValue, method = 'get', immediate = true) => {
   const list = ref([]);
   const total = ref(0);
   const { loading, setLoading } = useLoading(true);
   // 请求参数
   const action = ref(data);
   // 分页
-  const pagination = ref({});
+  const pagination = ref<Record<string, unknown>>({});
   const loadMore = async () => {
     const res = await request({
       url,
@@ -47,7 +43,7 @@ export const useTableList = (
 };
 
 // 不分页表格列表
-export const useTableNoPageList = (url: string, data: any, method = 'get') => {
+export const useTableNoPageList = (url: string, data: KeyValue, method = 'get') => {
   const list = ref([]);
   const total = ref(0);
   const { loading, setLoading } = useLoading(true);

@@ -2,15 +2,8 @@
   <div class="navbar">
     <div class="left-side">
       <a-space>
-        <img
-          alt="logo"
-          src="../../assets/images/logos/custom2.png"
-          style="height: 50px"
-        />
-        <a-typography-title
-          :style="{ margin: 0, fontSize: '18px' }"
-          :heading="5"
-        >
+        <img alt="logo" src="../../assets/images/logos/custom2.png" style="height: 50px" />
+        <a-typography-title :style="{ margin: 0, fontSize: '18px' }" :heading="5">
           Blog Admin
         </a-typography-title>
         <icon-menu-fold
@@ -32,12 +25,7 @@
       </li>
       <li>
         <a-tooltip :content="$t('settings.language')">
-          <a-button
-            class="nav-btn"
-            type="outline"
-            :shape="'circle'"
-            @click="setDropDownVisible"
-          >
+          <a-button class="nav-btn" type="outline" :shape="'circle'" @click="setDropDownVisible">
             <template #icon>
               <icon-language />
             </template>
@@ -46,11 +34,7 @@
         <a-dropdown trigger="click" @select="changeLocale as any">
           <div ref="triggerBtn" class="trigger-btn"></div>
           <template #content>
-            <a-doption
-              v-for="item in locales"
-              :key="item.value"
-              :value="item.value"
-            >
+            <a-doption v-for="item in locales" :key="item.value" :value="item.value">
               {{ item.label }}
             </a-doption>
           </template>
@@ -64,12 +48,7 @@
               : $t('settings.navbar.theme.toLight')
           "
         >
-          <a-button
-            class="nav-btn"
-            type="outline"
-            :shape="'circle'"
-            @click="handleToggleTheme"
-          >
+          <a-button class="nav-btn" type="outline" :shape="'circle'" @click="handleToggleTheme">
             <template #icon>
               <icon-moon-fill v-if="theme === 'dark'" />
               <icon-sun-fill v-else />
@@ -107,17 +86,10 @@
       <li>
         <a-tooltip
           :content="
-            isFullscreen
-              ? $t('settings.navbar.screen.toExit')
-              : $t('settings.navbar.screen.toFull')
+            isFullscreen ? $t('settings.navbar.screen.toExit') : $t('settings.navbar.screen.toFull')
           "
         >
-          <a-button
-            class="nav-btn"
-            type="outline"
-            :shape="'circle'"
-            @click="toggleFullScreen"
-          >
+          <a-button class="nav-btn" type="outline" :shape="'circle'" @click="toggleFullScreen">
             <template #icon>
               <icon-fullscreen-exit v-if="isFullscreen" />
               <icon-fullscreen v-else />
@@ -127,12 +99,7 @@
       </li>
       <li>
         <a-tooltip :content="$t('settings.title')">
-          <a-button
-            class="nav-btn"
-            type="outline"
-            :shape="'circle'"
-            @click="setVisible"
-          >
+          <a-button class="nav-btn" type="outline" :shape="'circle'" @click="setVisible">
             <template #icon>
               <icon-settings />
             </template>
@@ -141,10 +108,7 @@
       </li>
       <li>
         <a-dropdown trigger="click">
-          <a-avatar
-            :size="32"
-            :style="{ marginRight: '8px', cursor: 'pointer' }"
-          >
+          <a-avatar :size="32" :style="{ marginRight: '8px', cursor: 'pointer' }">
             <img v-if="avatar" alt="nickname" :src="avatar" />
             <UserIcon v-else />
           </a-avatar>
@@ -258,7 +222,7 @@
     const res = await userStore.switchRoles();
     Message.success(res as string);
   };
-  const toggleDrawerMenu: any = inject('toggleDrawerMenu');
+  const toggleDrawerMenu = inject<() => void>('toggleDrawerMenu');
 </script>
 
 <style scoped lang="less">

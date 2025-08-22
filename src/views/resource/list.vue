@@ -4,13 +4,7 @@
   import { useUserStore } from '@/store';
   import request from '@/api/request';
 
-  import {
-    Message,
-    Modal,
-    FileItem,
-    Input,
-    Select,
-  } from '@arco-design/web-vue';
+  import { Message, Modal, FileItem, Input, Select } from '@arco-design/web-vue';
   import { useClipboard } from '@vueuse/core';
   import { xAdminStore } from '@/utils';
   import useLoading from '@/hooks/loading';
@@ -197,9 +191,7 @@
           </a-breadcrumb>
         </a-space>
         <a-space>
-          <a-button type="primary" @click="showVisible = !showVisible"
-            >上传</a-button
-          >
+          <a-button type="primary" @click="showVisible = !showVisible">上传</a-button>
           <a-input-search
             v-model="searchForm.originalname"
             :style="{ width: '320px', marginLeft: '40px' }"
@@ -225,7 +217,11 @@
           :key="item.filename"
           trigger="contextMenu"
           align-point
-          @select="(v:any)=>{dropdownSelect(v,item)}"
+          @select="
+            (v: any) => {
+              dropdownSelect(v, item);
+            }
+          "
           @click="clickFolder(item)"
         >
           <div class="image-item">
@@ -245,26 +241,12 @@
                 />
               </template>
             </a-image>
-            <x-icon
-              v-else-if="item.type.includes('video')"
-              icon="icon-shipin"
-            />
-            <x-icon
-              v-else-if="item.type.includes('audio')"
-              icon="icon-yinpin"
-            />
-            <x-icon
-              v-else-if="item.type.includes('text')"
-              icon="icon-wenzhang1"
-            />
-            <x-icon
-              v-else-if="item.type.includes('application')"
-              icon="icon-baocun"
-            />
+            <x-icon v-else-if="item.type.includes('video')" icon="icon-shipin" />
+            <x-icon v-else-if="item.type.includes('audio')" icon="icon-yinpin" />
+            <x-icon v-else-if="item.type.includes('text')" icon="icon-wenzhang1" />
+            <x-icon v-else-if="item.type.includes('application')" icon="icon-baocun" />
             <x-icon v-else-if="item.isFolder" icon="icon-wenjianjia" />
-            <div class="title overflow-hidden-container">{{
-              item.originalname
-            }}</div>
+            <div class="title overflow-hidden-container">{{ item.originalname }}</div>
           </div>
           <template #content>
             <a-doption v-if="!item.isFolder" value="1">

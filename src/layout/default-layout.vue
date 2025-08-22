@@ -49,7 +49,7 @@
   import { useRouter, useRoute } from 'vue-router';
   import { useAppStore, useUserStore } from '@/store';
   import NavBar from '@/components/navbar/index.vue';
-  import Menu from '@/components/menu/index.vue';
+  import Menu from '@/components/menu';
   import Footer from '@/components/footer/index.vue';
   import TabBar from '@/components/tab-bar/index.vue';
   import usePermission from '@/hooks/permission';
@@ -83,9 +83,7 @@
   });
   const paddingStyle = computed(() => {
     const paddingLeft =
-      renderMenu.value && !hideMenu.value
-        ? { paddingLeft: `${menuWidth.value}px` }
-        : {};
+      renderMenu.value && !hideMenu.value ? { paddingLeft: `${menuWidth.value}px` } : {};
     const paddingTop = navbar.value ? { paddingTop: navbarHeight } : {};
     return { ...paddingLeft, ...paddingTop };
   });
@@ -95,9 +93,8 @@
   watch(
     () => userStore.role,
     (roleValue) => {
-      if (roleValue && !permission.accessRouter(route))
-        router.push({ name: 'notFound' });
-    }
+      if (roleValue && !permission.accessRouter(route)) router.push({ name: 'notFound' });
+    },
   );
   const drawerVisible = ref(false);
   const drawerCancel = () => {

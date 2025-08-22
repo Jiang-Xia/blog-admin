@@ -1,4 +1,5 @@
 import request from '@/api/request';
+type KeyValue = Record<string, unknown>;
 
 export const getTagById = async (id: number) => {
   const res = await request({
@@ -7,7 +8,7 @@ export const getTagById = async (id: number) => {
   });
   return res.data;
 };
-export const getAllTag = async (params: any) => {
+export const getAllTag = async (params: KeyValue) => {
   const res = await request({
     url: '/tag',
     method: 'get',
@@ -15,7 +16,7 @@ export const getAllTag = async (params: any) => {
   });
   return res.data;
 };
-export const createTag = async (data: any) => {
+export const createTag = async (data: KeyValue) => {
   const res = await request({
     url: '/tag',
     method: 'post',
@@ -23,7 +24,7 @@ export const createTag = async (data: any) => {
   });
   return res.data;
 };
-export const updateTag = async (data: any) => {
+export const updateTag = async (data: KeyValue) => {
   const res = await request({
     url: '/tag',
     method: 'patch',

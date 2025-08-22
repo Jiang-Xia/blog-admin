@@ -1,4 +1,4 @@
-import { defineComponent, h, SetupContext } from 'vue';
+import { defineComponent, h, type SetupContext } from 'vue';
 import config from '@/config';
 import './index.less';
 // 本地引入 阿里云图标库不能更新url了

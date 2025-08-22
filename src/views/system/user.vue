@@ -13,10 +13,7 @@
             <a-row :gutter="16">
               <a-col :span="12">
                 <a-form-item label="手机号">
-                  <a-input
-                    v-model="formModel.mobile"
-                    placeholder="请输入手机号"
-                  />
+                  <a-input v-model="formModel.mobile" placeholder="请输入手机号" />
                 </a-form-item>
               </a-col>
               <a-col :span="5" style="text-align: right">
@@ -95,12 +92,7 @@
           <a-table-column title="操作" data-index="operations">
             <template #cell="{ record }">
               <a-space :size="8">
-                <a-button
-                  size="mini"
-                  type="primary"
-                  status="danger"
-                  @click="delHandle(record.id)"
-                >
+                <a-button size="mini" type="primary" status="danger" @click="delHandle(record.id)">
                   <icon-delete />
                 </a-button>
                 <a-button
@@ -154,9 +146,7 @@
     setLoading(true);
     formModel.value.page = val;
     pagination.current = val;
-    const res = await request
-      .post('/user/list', formModel.value)
-      .then((res) => res.data);
+    const res = await request.post('/user/list', formModel.value).then((res) => res.data);
     // console.log(res);
     renderData.value = res.list;
     pagination.total = res.pagination.total;

@@ -54,90 +54,41 @@
         @page-change="onPageChange"
       >
         <template #columns>
-          <a-table-column
-            title="昵称"
-            data-index="userInfo.nickname"
-            align="center"
-            :width="140"
-          >
+          <a-table-column title="昵称" data-index="userInfo.nickname" align="center" :width="140">
             <template #cell="{ record }">
               {{ record.userInfo.nickname }}
             </template>
           </a-table-column>
-          <a-table-column
-            title="头像"
-            data-index="avatar"
-            align="center"
-            :width="100"
-          >
+          <a-table-column title="头像" data-index="avatar" align="center" :width="100">
             <template #cell="{ record }">
               <a-avatar>
                 <img :alt="record.title" :src="record.userInfo.avatar" />
               </a-avatar>
             </template>
           </a-table-column>
-          <a-table-column
-            title="@昵称"
-            data-index="userInfo.nickname"
-            align="center"
-            :width="140"
-          >
+          <a-table-column title="@昵称" data-index="userInfo.nickname" align="center" :width="140">
             <template #cell="{ record }">
-              <span v-if="record.tUserInfo"
-                >@{{ record.tUserInfo.nickname }}</span
-              >
+              <span v-if="record.tUserInfo">@{{ record.tUserInfo.nickname }}</span>
             </template>
           </a-table-column>
-          <a-table-column
-            title="@头像"
-            data-index="avatar"
-            align="center"
-            :width="100"
-          >
+          <a-table-column title="@头像" data-index="avatar" align="center" :width="100">
             <template #cell="{ record }">
               <a-avatar v-if="record.tUserInfo">
                 <img :alt="record.title" :src="record.tUserInfo.avatar" />
               </a-avatar>
             </template>
           </a-table-column>
-          <a-table-column
-            title="评论内容"
-            data-index="content"
-            :width="460"
-            tooltip
-            ellipsis
-          />
-          <a-table-column
-            title="回复数"
-            data-index="allReplyCount"
-            :width="160"
-            tooltip
-            ellipsis
-          />
-          <a-table-column
-            title="评论时间"
-            data-index="updateTime"
-            :width="200"
-            tooltip
-          >
+          <a-table-column title="评论内容" data-index="content" :width="460" tooltip ellipsis />
+          <a-table-column title="回复数" data-index="allReplyCount" :width="160" tooltip ellipsis />
+          <a-table-column title="评论时间" data-index="updateTime" :width="200" tooltip>
             <template #cell="{ record }">
               {{ $dayjs(record.updateTime).format('YYYY-MM-DD HH:mm:ss') }}
             </template>
           </a-table-column>
-          <a-table-column
-            title="操作"
-            data-index="operations"
-            :width="100"
-            fixed="right"
-          >
+          <a-table-column title="操作" data-index="operations" :width="100" fixed="right">
             <template #cell="{ record }">
               <a-space :size="8">
-                <a-button
-                  size="mini"
-                  type="primary"
-                  status="danger"
-                  @click="delHandle(record)"
-                >
+                <a-button size="mini" type="primary" status="danger" @click="delHandle(record)">
                   <icon-delete />
                 </a-button>
               </a-space>

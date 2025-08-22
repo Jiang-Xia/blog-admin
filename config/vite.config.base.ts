@@ -3,13 +3,20 @@ import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import vueJsx from '@vitejs/plugin-vue-jsx';
 import svgLoader from 'vite-svg-loader';
-// import { VitePWA } from 'vite-plugin-pwa';
+import { ArcoResolver } from 'unplugin-vue-components/resolvers';
+import configArcoResolverPlugin from './plugin/arcoResolver';
+import AutoImport from 'unplugin-auto-import/vite';
 
 export default defineConfig({
   plugins: [
     vue(),
     vueJsx(),
     svgLoader({ svgoConfig: {} }),
+    AutoImport({
+      resolvers: [ArcoResolver()],
+    }),
+    configArcoResolverPlugin(),
+
     // VitePWA({
     //   registerType: 'autoUpdate',
     //   includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
@@ -46,6 +53,10 @@ export default defineConfig({
         replacement: resolve(__dirname, '../src/assets'),
       },
       {
+        find: 'dayjs',
+        replacement: 'dayjs/esm',
+      },
+      {
         find: 'vue-i18n',
         replacement: 'vue-i18n/dist/vue-i18n.cjs.js', // Resolve the i18n warning issue
       },
@@ -63,9 +74,7 @@ export default defineConfig({
     preprocessorOptions: {
       less: {
         modifyVars: {
-          hack: `true; @import (reference) "${resolve(
-            'src/assets/style/breakpoint.less'
-          )}";`,
+          hack: `true; @import (reference) "${resolve('src/assets/style/breakpoint.less')}";`,
           // 'arcoblue-6': '#00ADB5',
         },
         javascriptEnabled: true,

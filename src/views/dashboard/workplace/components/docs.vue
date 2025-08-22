@@ -8,19 +8,13 @@
   >
     <a-row>
       <a-col :span="12">
-        <a-link href="https://gitee.com/jiang-xia/blog-home-nuxt">
-          博客前端项目
-        </a-link>
+        <a-link href="https://gitee.com/jiang-xia/blog-home-nuxt"> 博客前端项目 </a-link>
       </a-col>
       <a-col :span="12">
-        <a-link href="https://gitee.com/jiang-xia/blog-admin">
-          博客后台管理
-        </a-link>
+        <a-link href="https://gitee.com/jiang-xia/blog-admin"> 博客后台管理 </a-link>
       </a-col>
       <a-col :span="18">
-        <a-link href="https://gitee.com/jiang-xia/blog-server">
-          博客服务端项目
-        </a-link>
+        <a-link href="https://gitee.com/jiang-xia/blog-server"> 博客服务端项目 </a-link>
       </a-col>
     </a-row>
   </a-card>

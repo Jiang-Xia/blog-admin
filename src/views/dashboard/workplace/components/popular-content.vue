@@ -10,16 +10,8 @@
         <a-link @click="$router.push('/category/list')">查看更多</a-link>
       </template>
       <a-space direction="vertical" fill>
-        <a-radio-group
-          v-model:model-value="type"
-          type="button"
-          @change="typeChange"
-        >
-          <a-radio
-            v-for="(item, index) in categoryOptions"
-            :key="index"
-            :value="item.id"
-          >
+        <a-radio-group v-model:model-value="type" type="button" @change="typeChange">
+          <a-radio v-for="(item, index) in categoryOptions" :key="index" :value="item.id">
             {{ item.value }}
           </a-radio>
         </a-radio-group>

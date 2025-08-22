@@ -49,11 +49,7 @@
         :validate-trigger="['change', 'blur']"
         hide-label
       >
-        <a-input
-          v-model="userInfo.authCode"
-          placeholder="请输入验证码"
-          :max-length="6"
-        >
+        <a-input v-model="userInfo.authCode" placeholder="请输入验证码" :max-length="6">
           <template #suffix>
             <a-image
               height="30"
@@ -76,13 +72,7 @@
           </a-checkbox>
           <a-link>{{ $t('login.form.forgetPassword') }}</a-link>
         </div>
-        <a-button
-          type="primary"
-          html-type="submit"
-          long
-          :loading="loading"
-          class="login-btn"
-        >
+        <a-button type="primary" html-type="submit" long :loading="loading" class="login-btn">
           {{ $t('login.form.login') }}
         </a-button>
         <a-button type="text" long class="login-form-register-btn">
@@ -98,7 +88,7 @@
   import { ref, reactive } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
   import { Message } from '@arco-design/web-vue';
-  import { ValidatedError } from '@arco-design/web-vue/es/form/interface';
+  import type { ValidatedError } from '@arco-design/web-vue/es/form/interface';
   import { useI18n } from 'vue-i18n';
   import { useStorage } from '@vueuse/core';
   import { useUserStore } from '@/store';
@@ -144,6 +134,7 @@
       try {
         await userStore.login(values as LoginData);
         const { redirect, ...othersQuery } = router.currentRoute.value.query;
+        // console.log('--------->', redirect, othersQuery)
         router.push({
           name: (redirect as string) || 'Workplace',
           query: {
@@ -214,17 +205,8 @@
 
     .login-btn {
       background: rgb(93 84 240 / 50%);
-      background: linear-gradient(
-        left,
-        rgb(0 168 255 / 50%),
-        rgb(185 0 255 / 50%)
-      );
-      background: linear-gradient(
-          left,
-          rgb(0 168 255 / 50%),
-          rgb(185 0 255 / 50%)
-        )
-        no-repeat;
+      background: linear-gradient(left, rgb(0 168 255 / 50%), rgb(185 0 255 / 50%));
+      background: linear-gradient(left, rgb(0 168 255 / 50%), rgb(185 0 255 / 50%)) no-repeat;
       border-radius: 5px;
     }
   }

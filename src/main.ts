@@ -7,6 +7,7 @@ import router from './router';
 import store from './store';
 import i18n from './locale';
 import directive from './directive';
+
 // import './mock';
 import App from './App.vue';
 import '@arco-design/web-vue/dist/arco.less';
@@ -15,7 +16,7 @@ import 'md-editor-v3/lib/style.css';
 
 const app = createApp(App);
 
-app.use(ArcoVue, {});
+app.use(ArcoVue, { componentPrefix: 'a' });
 app.use(ArcoVueIcon);
 app.use(router);
 app.use(store);

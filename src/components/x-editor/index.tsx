@@ -17,7 +17,7 @@ export default defineComponent({
     },
   },
   setup(props, { emit }) {
-    let myEditor: any;
+    let myEditor: InstanceType<typeof E> | null = null;
     const languageType = [
       'JavaScript',
       'TypeScript',
@@ -88,9 +88,7 @@ export default defineComponent({
       myEditor.destroy();
       myEditor = null;
     });
-    return () => (
-      <div class={`x-editor-wrap ${props.customClass}`} id={id}></div>
-    );
+    return () => <div class={`x-editor-wrap ${props.customClass}`} id={id}></div>;
   },
 });
 

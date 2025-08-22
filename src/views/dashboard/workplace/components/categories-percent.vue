@@ -34,22 +34,20 @@
     }
   };
   fetchData();
-  const categoryData = computed(() =>
-    categoryOptions.value?.map((v) => v.value)
-  );
+  const categoryData = computed(() => categoryOptions.value?.map((v) => v.value));
   const seriesData: any = computed(() =>
     categoryOptions.value?.map((v: any) => {
       return {
         value: [v.articleCount],
         name: v.value,
       };
-    })
+    }),
   );
   const count: any = computed(() =>
     categoryOptions.value?.reduce((sum: number, cur: any) => {
       sum += cur.articleCount;
       return sum;
-    }, 0)
+    }, 0),
   );
   const { chartOption } = useChartOption((isDark) => {
     // echarts support https://echarts.apache.org/zh/theme-builder.html

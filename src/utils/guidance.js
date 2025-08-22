@@ -1,4 +1,3 @@
-// @ts-ignore
 import { useShepherd } from 'vue-shepherd';
 import 'shepherd.js/dist/css/shepherd.css';
 

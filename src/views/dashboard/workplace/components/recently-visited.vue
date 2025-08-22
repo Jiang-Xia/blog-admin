@@ -27,9 +27,7 @@
 </template>
 
 <script lang="ts" setup>
-  const links = [
-    { text: '文章编辑.', icon: 'icon-storage', url: '/article/edit' },
-  ];
+  const links = [{ text: '文章编辑.', icon: 'icon-storage', url: '/article/edit' }];
 </script>
 
 <style lang="less" scoped>

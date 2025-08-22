@@ -19,18 +19,9 @@
             @submit-failed="handleFinishFailed"
           >
             <a-form-item label="标题" name="title" field="title">
-              <a-input
-                v-model="formState.title"
-                autocomplete="off"
-                placeholder="标题"
-              />
+              <a-input v-model="formState.title" autocomplete="off" placeholder="标题" />
             </a-form-item>
-            <a-form-item
-              label="描述"
-              name="description"
-              field="description"
-              placeholder="描述"
-            >
+            <a-form-item label="描述" name="description" field="description" placeholder="描述">
               <a-textarea
                 v-model="formState.description"
                 placeholder="描述"
@@ -81,9 +72,7 @@
 
             <a-form-item :wrapper-col-props="{ span: 13, offset: 7 }">
               <a-button type="primary" html-type="submit">提交</a-button>
-              <a-button style="margin-left: 10px" @click="resetForm"
-                >重置</a-button
-              >
+              <a-button style="margin-left: 10px" @click="resetForm">重置</a-button>
             </a-form-item>
           </a-form>
         </div>
@@ -100,9 +89,9 @@
   import request from '@/api/request';
   import { Message, Modal } from '@arco-design/web-vue';
   import { useRoute, useRouter } from 'vue-router';
-  import { ValidatedError } from '@arco-design/web-vue/es/form/interface';
+  import type { ValidatedError } from '@arco-design/web-vue/es/form/interface';
   // import { computed, onBeforeUnmount, onMounted } from 'vue'
-  import MdEditor from 'md-editor-v3';
+  import { MdEditor } from 'md-editor-v3';
   import { useAppStore } from '@/store';
   import { useTableNoPageList } from '@/hooks/data';
 
@@ -145,10 +134,7 @@
     }
     Promise.resolve();
   };
-  const checkDescription = async (
-    value: string,
-    cb: (error?: string) => void
-  ) => {
+  const checkDescription = async (value: string, cb: (error?: string) => void) => {
     if (!value) {
       cb('请输入描述！');
     }
@@ -156,9 +142,7 @@
   };
   const rules = {
     title: [{ required: true, validator: checkTitle, trigger: 'blur' }],
-    description: [
-      { required: true, validator: checkDescription, trigger: 'blur' },
-    ],
+    description: [{ required: true, validator: checkDescription, trigger: 'blur' }],
     category: [{ required: true, message: '请选择分类！', trigger: 'change' }],
     tags: [{ required: true, message: '请选择标签！', trigger: 'change' }],
     cover: [{ required: true, message: '封面为必填！', trigger: 'blur' }],
@@ -166,7 +150,7 @@
     content: [{ required: true, trigger: 'change' }],
   };
   // 提交成功
-  const handleFinish = async (values: any) => {
+  const handleFinish = async (values: Partial<FormState>) => {
     // console.log('values', values)
     const params = {
       ...values,
@@ -190,7 +174,7 @@
     router.push('/article/list');
   };
   // 提交失败
-  const handleFinishFailed = (errors: any) => {
+  const handleFinishFailed = (errors: Record<string, ValidatedError>) => {
     console.log(errors);
   };
   const resetForm = () => {
@@ -201,14 +185,21 @@
   // 文章编辑
   const getArticleInfoHandle = async () => {
     const { query } = route;
-    let res = await getArticleInfo(query);
-    res = res.info;
-    formState.title = res.title;
-    formState.description = res.description;
-    formState.content = res.content;
-    formState.category = res.category.id;
-    formState.cover = res.cover;
-    formState.tags = res.tags.map((v: any) => v.id);
+    const res = await getArticleInfo(query);
+    const info: {
+      title: string;
+      description: string;
+      content: string;
+      category: { id: string };
+      cover: string;
+      tags: Array<{ id: number }>;
+    } = res.info as any;
+    formState.title = info.title;
+    formState.description = info.description;
+    formState.content = info.content;
+    formState.category = info.category.id;
+    formState.cover = info.cover;
+    formState.tags = info.tags.map((v) => v.id);
     console.log(formState);
   };
   if (type === 'edit') {
@@ -220,15 +211,15 @@
     if (appStore.theme === 'dark') return 'dark';
     return 'light';
   });
-  const onHtmlChanged = (html: any) => {
+  const onHtmlChanged = (html: string) => {
     formState.contentHtml = html;
   };
   const { loading } = useLoading();
   // 上传图片功能
-  const onUploadImg = async (files: any, callback: any) => {
+  const onUploadImg = async (files: File[], callback: (urls: string[]) => void) => {
     loading.value = true;
     const res = await Promise.all(
-      files.map((file: any) => {
+      files.map((file: File) => {
         return new Promise((rev, rej) => {
           const form = new FormData();
           form.append('fileContents', file);
@@ -244,13 +235,13 @@
             .then((res) => rev(res))
             .catch((error) => rej(error));
         });
-      })
+      }),
     );
     loading.value = false;
     callback(
-      res.map((item) => {
+      res.map((item: any) => {
         return staticUrl + item.data[0].url;
-      })
+      }),
     );
   };
 </script>

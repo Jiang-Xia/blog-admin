@@ -13,11 +13,7 @@
             <a-row :gutter="16">
               <a-col :span="10">
                 <a-form-item label="路由name">
-                  <a-input
-                    v-model="formModel.content"
-                    placeholder="请输入路由name"
-                    disabled
-                  />
+                  <a-input v-model="formModel.content" placeholder="请输入路由name" disabled />
                 </a-form-item>
               </a-col>
               <a-col :span="5" style="text-align: right">
@@ -69,10 +65,7 @@
           <a-table-column title="filePath" data-index="filePath" />
           <a-table-column title="icon" data-index="meta">
             <template #cell="{ record }">
-              <DynamicIcon
-                v-if="record?.meta?.icon"
-                :icon="record?.meta?.icon"
-              />
+              <DynamicIcon v-if="record?.meta?.icon" :icon="record?.meta?.icon" />
             </template>
           </a-table-column>
           <!-- <a-table-column title="super" data-index="super">
@@ -129,19 +122,10 @@
           <a-table-column title="操作" data-index="operations">
             <template #cell="{ record }">
               <a-space :size="8">
-                <a-button
-                  size="mini"
-                  type="primary"
-                  @click="showModal('edit', record.id)"
-                >
+                <a-button size="mini" type="primary" @click="showModal('edit', record.id)">
                   <icon-edit />
                 </a-button>
-                <a-button
-                  size="mini"
-                  type="primary"
-                  status="danger"
-                  @click="delHandle(record.id)"
-                >
+                <a-button size="mini" type="primary" status="danger" @click="delHandle(record.id)">
                   <icon-delete />
                 </a-button>
               </a-space>
@@ -150,7 +134,7 @@
         </template>
       </a-table>
     </a-card>
-    <addMenu :ref="(el:any) => (addMenuRef = el)" @success="search"></addMenu>
+    <addMenu :ref="(el: any) => (addMenuRef = el)" @success="search"></addMenu>
   </div>
 </template>
 
