@@ -18,10 +18,10 @@ export default function useMenuTree() {
     copyRouter.sort((a: RouteRecordNormalized, b: RouteRecordNormalized) => {
       return (a.meta.order || 0) - (b.meta.order || 0);
     });
-    function travel(_routes: RouteRecordRaw[], layer: number) {
+    function travel(_routes: RouteRecordRaw[], layer: number): RouteRecordRaw[] {
       if (!_routes) return null;
 
-      const collector: any = _routes.map((element) => {
+      const collector = _routes.map((element): RouteRecordRaw | null => {
         // no access
         if (!permission.accessRouter(element)) {
           return null;
@@ -34,20 +34,18 @@ export default function useMenuTree() {
         }
 
         // route filter hideInMenu true
-        element.children = element.children.filter(
-          (x) => x.meta?.hideInMenu !== true
-        );
+        element.children = element.children.filter((x) => x.meta?.hideInMenu !== true);
 
         // Associated child node
-        const subItem = travel(element.children, layer + 1);
+        const subItem = travel(element.children as RouteRecordRaw[], layer + 1);
 
-        if (subItem.length) {
+        if (subItem && subItem.length) {
           element.children = subItem;
           return element;
         }
         // the else logic
         if (layer > 1) {
-          element.children = subItem;
+          element.children = subItem as RouteRecordRaw[];
           return element;
         }
 
@@ -57,9 +55,9 @@ export default function useMenuTree() {
 
         return null;
       });
-      return collector.filter(Boolean);
+      return collector.filter(Boolean) as RouteRecordRaw[];
     }
-    return travel(copyRouter, 0);
+    return travel(copyRouter as RouteRecordRaw[], 0);
   });
   console.log('menuTree:', menuTree);
   return {

@@ -64,10 +64,7 @@
       <a-row style="margin-bottom: 16px">
         <a-col :span="16">
           <a-space>
-            <a-button
-              type="primary"
-              @click="$router.push('/article/edit?type=add')"
-            >
+            <a-button type="primary" @click="$router.push('/article/edit?type=add')">
               <template #icon>
                 <icon-plus />
               </template>
@@ -125,10 +122,10 @@
               </span>
             </template>
           </a-table-column>
-          <a-table-column title="查看" data-index="views" :width="80"/>
-          <a-table-column title="点赞" data-index="likes" :width="80"/>
-          <a-table-column title="评论" data-index="commentCount" :width="80"/>
-          <a-table-column title="更新时间" data-index="uTime" :width="200"/>
+          <a-table-column title="查看" data-index="views" :width="80" />
+          <a-table-column title="点赞" data-index="likes" :width="80" />
+          <a-table-column title="评论" data-index="commentCount" :width="80" />
+          <a-table-column title="更新时间" data-index="uTime" :width="200" />
           <a-table-column title="置顶" :width="60" fixed="right">
             <template #cell="{ record }">
               <!-- :disabled="record.agreed" -->
@@ -240,13 +237,23 @@
       ...formModel.value,
     };
     const res = await getArticleList(params);
-    renderData.value = res.list.map((v: any) => {
-      // v.category = v.category.label;
-      v.tag = v.tags.map((v: any) => v.label).join();
-      v.tagColor = v.tags[0]?.color;
-      // console.log(v.category);
-      return v;
-    });
+    renderData.value = res.list.map(
+      (v: {
+        tags: Array<{ label: string; color?: string }>;
+        id: string | number;
+        cover: string;
+        title: string;
+        description: string;
+        category?: { label: string; color?: string };
+        [k: string]: unknown;
+      }) => {
+        // v.category = v.category.label;
+        v.tag = v.tags.map((it) => it.label).join();
+        v.tagColor = v.tags[0]?.color;
+        // console.log(v.category);
+        return v;
+      },
+    );
     pagination.total = res.pagination.total;
     setLoading(false);
   };
@@ -261,7 +268,7 @@
   const reset = () => {
     formModel.value = generateFormModel();
   };
-  const delArticleHandle = async (id: any) => {
+  const delArticleHandle = async (id: string | number) => {
     Modal.confirm({
       title: '删除文章',
       content: '确定删除该文章嘛？',
@@ -273,13 +280,13 @@
     });
   };
   // 文章禁用
-  const onSwitchChange = async (record: any) => {
+  const onSwitchChange = async (record: { isDelete: boolean; id: string | number }) => {
     const { isDelete, id } = record;
     const res = await request.patch(`/article/disabled`, { isDelete, id });
     Message.success('设置成功');
   };
   // 文章置顶
-  const onSwitchTopping = async (record: any) => {
+  const onSwitchTopping = async (record: { topping: boolean; id: string | number }) => {
     const { topping, id } = record;
     const res = await request.patch(`/article/topping`, { topping, id });
     Message.success('设置成功');

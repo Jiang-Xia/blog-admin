@@ -1,6 +1,6 @@
 import type { RouteLocationNormalized } from 'vue-router';
 import { defineStore } from 'pinia';
-import { TabBarState, TagProps } from './types';
+import type { TabBarState, TagProps } from './types';
 
 const formatTag = (route: RouteLocationNormalized): TagProps => {
   const { name, meta, fullPath, query } = route;

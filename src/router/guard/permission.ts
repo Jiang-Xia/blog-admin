@@ -31,10 +31,7 @@ export default function setupPermissionGuard(router: Router) {
 
       // 根据需要自行完善来源于服务端的菜单配置的permission逻辑
       // Refine the permission logic from the server's menu configuration as needed
-      if (
-        !appStore.appAsyncMenus.length &&
-        !WHITE_LIST.find((el) => el.name === to.name)
-      ) {
+      if (!appStore.appAsyncMenus.length && !WHITE_LIST.find((el) => el.name === to.name)) {
         await appStore.fetchServerMenuConfig();
       }
       const serverMenuConfig = [...appStore.appAsyncMenus, ...WHITE_LIST];
@@ -51,9 +48,7 @@ export default function setupPermissionGuard(router: Router) {
         if (element?.name === to.name) exist = true;
         // console.log('element,exist: ', element, exist);
         if (element?.children) {
-          serverMenuConfig.push(
-            ...(element.children as unknown as RouteRecordNormalized[])
-          );
+          serverMenuConfig.push(...(element.children as unknown as RouteRecordNormalized[]));
         }
       }
       // console.log(
@@ -68,12 +63,10 @@ export default function setupPermissionGuard(router: Router) {
         next();
       } else next(NOT_FOUND);
     } else {
-      // eslint-disable-next-line no-lonely-if
       if (permissionsAllow) next();
       else {
         const destination =
-          Permission.findFirstPermissionRoute(appRoutes, userStore.role) ||
-          NOT_FOUND;
+          Permission.findFirstPermissionRoute(appRoutes, userStore.role) || NOT_FOUND;
         next(destination);
       }
     }

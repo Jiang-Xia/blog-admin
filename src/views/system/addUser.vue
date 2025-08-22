@@ -29,20 +29,10 @@
       <a-form-item label="昵称" name="nickname" field="nickname">
         <a-input v-model="formState.nickname" placeholder="昵称" />
       </a-form-item>
-      <a-form-item
-        label="密码"
-        name="password"
-        field="password"
-        :max-length="16"
-      >
+      <a-form-item label="密码" name="password" field="password" :max-length="16">
         <a-input v-model="formState.password" placeholder="密码" />
       </a-form-item>
-      <a-form-item
-        label="确认密码"
-        name="passwordRepeat"
-        :max-length="16"
-        field="passwordRepeat"
-      >
+      <a-form-item label="确认密码" name="passwordRepeat" :max-length="16" field="passwordRepeat">
         <a-input v-model="formState.passwordRepeat" placeholder="确认密码" />
       </a-form-item>
 
@@ -101,10 +91,7 @@
     }
     Promise.resolve();
   };
-  const checkDescription = async (
-    value: string,
-    cb: (error?: string) => void
-  ) => {
+  const checkDescription = async (value: string, cb: (error?: string) => void) => {
     if (!value) {
       cb('请输入描述！');
     }

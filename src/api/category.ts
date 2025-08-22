@@ -8,7 +8,8 @@ export const getCategoryById = async (id: number) => {
   });
   return res.data;
 };
-export const getAllCategory = async (params?: any) => {
+type KeyValue = Record<string, unknown>;
+export const getAllCategory = async (params?: KeyValue) => {
   const res = await request({
     url: '/category',
     method: 'get',
@@ -16,7 +17,7 @@ export const getAllCategory = async (params?: any) => {
   });
   return res.data;
 };
-export const createCategory = async (data: any) => {
+export const createCategory = async (data: KeyValue) => {
   const res = await request({
     url: '/category',
     method: 'post',
@@ -24,7 +25,7 @@ export const createCategory = async (data: any) => {
   });
   return res.data;
 };
-export const updateCategory = async (data: any) => {
+export const updateCategory = async (data: KeyValue) => {
   const res = await request({
     url: '/category',
     method: 'patch',

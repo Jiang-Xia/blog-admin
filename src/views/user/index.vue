@@ -56,13 +56,7 @@
   // 修改除了密码之外的信息
   const handleFinish = async (values: any) => {
     // console.log('values', values)
-    const keys: string[] = [
-      'nickname',
-      'mobile',
-      'homepage',
-      'intro',
-      'avatar',
-    ];
+    const keys: string[] = ['nickname', 'mobile', 'homepage', 'intro', 'avatar'];
     const obj: stringKey = {};
     keys.forEach((v: string) => {
       obj[v] = values[v];
@@ -94,11 +88,7 @@
           <a-input v-model="form.mobile" placeholder="手机号" disabled />
         </a-form-item>
         <a-form-item field="nickname" label="昵称">
-          <a-input
-            v-model="form.nickname"
-            :max-length="11"
-            placeholder="昵称"
-          />
+          <a-input v-model="form.nickname" :max-length="11" placeholder="昵称" />
         </a-form-item>
         <a-form-item field="avatar" label="头像">
           <a-input v-model="form.avatar" placeholder="头像链接" />
@@ -107,10 +97,7 @@
           <a-input v-model="form.homepage" placeholder="个人主页地址" />
         </a-form-item>
         <a-form-item field="intro" label="介绍">
-          <a-input
-            v-model="form.intro"
-            placeholder="这个人很懒，什么都没有留下！"
-          />
+          <a-input v-model="form.intro" placeholder="这个人很懒，什么都没有留下！" />
         </a-form-item>
         <a-form-item>
           <a-button html-type="submit" type="primary">保存信息</a-button>

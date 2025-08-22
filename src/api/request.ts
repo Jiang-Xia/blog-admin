@@ -1,4 +1,4 @@
-import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, { type AxiosRequestConfig, type AxiosResponse } from 'axios';
 import { Message, Modal } from '@arco-design/web-vue';
 import { useUserStore } from '@/store';
 import { getToken } from '@/utils/auth';
@@ -69,7 +69,7 @@ request.interceptors.request.use(
   (error) => {
     // do something
     return Promise.reject(error);
-  }
+  },
 );
 // add response interceptors
 request.interceptors.response.use(
@@ -116,7 +116,7 @@ request.interceptors.response.use(
       errorMsg('请求失败，请检查网络是否已连接');
     }
     return Promise.reject(data);
-  }
+  },
 );
 
 export default request;

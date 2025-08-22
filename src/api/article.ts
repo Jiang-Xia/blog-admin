@@ -1,6 +1,8 @@
 import request from '@/api/request';
 
-export const getArticleList = async (data: any) => {
+type KeyValue = Record<string, unknown>;
+
+export const getArticleList = async (data: KeyValue) => {
   const res = await request({
     url: '/article/list',
     method: 'post',
@@ -8,7 +10,7 @@ export const getArticleList = async (data: any) => {
   });
   return res.data;
 };
-export const getArticleInfo = async (params: any) => {
+export const getArticleInfo = async (params: KeyValue) => {
   const res = await request({
     url: '/article/info',
     method: 'get',
@@ -17,7 +19,7 @@ export const getArticleInfo = async (params: any) => {
   return res.data;
 };
 
-export const createArticle = async (data: any) => {
+export const createArticle = async (data: KeyValue) => {
   const res = await request({
     url: '/article/create',
     method: 'post',
@@ -26,7 +28,7 @@ export const createArticle = async (data: any) => {
   return res.data;
 };
 
-export const editArticle = async (data: any) => {
+export const editArticle = async (data: KeyValue) => {
   const res = await request({
     url: '/article/edit',
     method: 'post',
@@ -34,7 +36,7 @@ export const editArticle = async (data: any) => {
   });
   return res.data;
 };
-export const delArticle = async (params: any) => {
+export const delArticle = async (params: KeyValue) => {
   const res = await request({
     url: '/article/delete',
     method: 'delete',
@@ -44,7 +46,7 @@ export const delArticle = async (params: any) => {
 };
 
 // 更新阅读量
-export const updateViews = async (data: any) => {
+export const updateViews = async (data: KeyValue) => {
   const res = await request({
     url: '/article/views',
     method: 'post',
@@ -54,7 +56,7 @@ export const updateViews = async (data: any) => {
 };
 
 // 更新点赞数
-export const updateLikes = async (data: any) => {
+export const updateLikes = async (data: KeyValue) => {
   const res = await request({
     url: '/like',
     method: 'post',
@@ -94,7 +96,7 @@ export const getComment = async (id: string) => {
   return res.data;
 };
 // 新增评论
-export const addComment = async (data: any) => {
+export const addComment = async (data: KeyValue) => {
   const res = await request({
     url: '/comment/create',
     method: 'post',
@@ -115,7 +117,7 @@ export const delComment = async (id: string) => {
 };
 
 // 新增回复
-export const addReply = async (data: any) => {
+export const addReply = async (data: KeyValue) => {
   const res = await request({
     url: '/reply/create',
     method: 'post',

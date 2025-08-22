@@ -13,10 +13,7 @@
             <a-row :gutter="16">
               <a-col :span="12">
                 <a-form-item label="标签名">
-                  <a-input
-                    v-model="formModel.title"
-                    placeholder="请输入标签名"
-                  />
+                  <a-input v-model="formModel.title" placeholder="请输入标签名" />
                 </a-form-item>
               </a-col>
             </a-row>
@@ -66,16 +63,12 @@
           <a-table-column title="标签名" data-index="label" />
           <a-table-column title="标签文章数" data-index="articleCount">
             <template #cell="{ record }">
-              <a-tag :color="record.color" size="small">{{
-                record.articleCount
-              }}</a-tag>
+              <a-tag :color="record.color" size="small">{{ record.articleCount }}</a-tag>
             </template>
           </a-table-column>
           <a-table-column title="颜色" data-index="color">
             <template #cell="{ record }">
-              <a-tag :color="record.color" size="small">{{
-                record.color
-              }}</a-tag>
+              <a-tag :color="record.color" size="small">{{ record.color }}</a-tag>
             </template>
           </a-table-column>
           <a-table-column title="创建时间" data-index="createAt">

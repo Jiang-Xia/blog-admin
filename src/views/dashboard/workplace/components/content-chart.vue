@@ -53,10 +53,7 @@
   // const { loading, setLoading } = useLoading(true);
   const xAxis = ref<string[]>([]);
   const chartsData = ref<number[]>([]);
-  const graphicElements = ref([
-    graphicFactory({ left: '2.6%' }),
-    graphicFactory({ right: 0 }),
-  ]);
+  const graphicElements = ref([graphicFactory({ left: '2.6%' }), graphicFactory({ right: 0 })]);
   const { chartOption } = useChartOption(() => {
     return {
       grid: {
@@ -129,7 +126,7 @@
           return `<div>
             <p class="tooltip-title">${firstElement.axisValueLabel}</p>
             <div class="content-panel"><span>访问量</span><span class="tooltip-value">${Number(
-              firstElement.value
+              firstElement.value,
             ).toLocaleString()}</span></div>
           </div>`;
         },

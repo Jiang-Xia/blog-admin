@@ -34,18 +34,13 @@
           <a-table-column title="描述" data-index="desp" />
           <a-table-column title="网址" data-index="url">
             <template #cell="{ record }">
-              <a-link :href="record.url" target="_blank">{{
-                record.url
-              }}</a-link>
+              <a-link :href="record.url" target="_blank">{{ record.url }}</a-link>
             </template>
           </a-table-column>
           <a-table-column title="状态" data-index="url">
             <template #cell="{ record }">
               <!-- :disabled="record.agreed" -->
-              <a-switch
-                v-model="record.agreed"
-                @change="onSwitchChange(record)"
-              >
+              <a-switch v-model="record.agreed" @change="onSwitchChange(record)">
                 <template #checked-icon>
                   <icon-check />
                 </template>
@@ -58,12 +53,7 @@
           <a-table-column title="操作" data-index="operations">
             <template #cell="{ record }">
               <a-space :size="8">
-                <a-button
-                  size="mini"
-                  type="primary"
-                  status="danger"
-                  @click="delHandle(record.id)"
-                >
+                <a-button size="mini" type="primary" status="danger" @click="delHandle(record.id)">
                   <icon-delete />
                 </a-button>
               </a-space>

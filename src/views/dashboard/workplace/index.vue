@@ -7,14 +7,10 @@
         <ContentChart v-if="loadedData" :chart-data="chartData" />
       </div>
       <a-grid :cols="24" :col-gap="16" :row-gap="16" style="margin-top: 16px">
-        <a-grid-item
-          :span="{ xs: 24, sm: 24, md: 24, lg: 12, xl: 12, xxl: 12 }"
-        >
+        <a-grid-item :span="{ xs: 24, sm: 24, md: 24, lg: 12, xl: 12, xxl: 12 }">
           <PopularContent />
         </a-grid-item>
-        <a-grid-item
-          :span="{ xs: 24, sm: 24, md: 24, lg: 12, xl: 12, xxl: 12 }"
-        >
+        <a-grid-item :span="{ xs: 24, sm: 24, md: 24, lg: 12, xl: 12, xxl: 12 }">
           <CategoriesPercent />
         </a-grid-item>
       </a-grid>
@@ -45,7 +41,6 @@
   import dayjs from 'dayjs';
   import request from '@/api/request';
   import { onMounted, reactive, ref } from 'vue';
-  // @ts-ignore
   import guidance from '@/utils/guidance';
   import Banner from './components/banner.vue';
   import DataPanel from './components/data-panel.vue';
@@ -72,9 +67,7 @@
       params: {
         url: '/rest/2.0/tongji/report/getData',
         site_id: 18269632,
-        start_date: dayjs(
-          new Date().getTime() - 24 * 60 * 60 * 1000 * 365
-        ).format('YYYYMMDD'),
+        start_date: dayjs(new Date().getTime() - 24 * 60 * 60 * 1000 * 365).format('YYYYMMDD'),
         end_date: dayjs().format('YYYYMMDD'),
         metrics: 'pv_count,visitor_count,ip_count',
         method: 'overview/getTimeTrendRpt',
@@ -86,15 +79,12 @@
       // countObj.allCount =
       const y = Number(data[data.length - 2][0]) || 0;
       const t = Number(data[data.length - 1][0]) || 0;
-      const a = data.reduce(
-        (total: number, curVal: any, curIdx: any, arr: any) => {
-          if (typeof curVal[0] === 'number') {
-            total += curVal[0];
-          }
-          return total;
-        },
-        0
-      );
+      const a = data.reduce((total: number, curVal: any, curIdx: any, arr: any) => {
+        if (typeof curVal[0] === 'number') {
+          total += curVal[0];
+        }
+        return total;
+      }, 0);
       countObj.yesterdayCount = y;
       countObj.todayCount = t;
       if (t) {

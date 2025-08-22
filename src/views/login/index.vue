@@ -45,16 +45,8 @@
     width: 100%;
     height: 100%;
     background: rgba(93, 84, 240, 0.5);
-    background: -webkit-linear-gradient(
-      left,
-      rgba(0, 168, 255, 0.5),
-      rgba(185, 0, 255, 0.5)
-    );
-    background: -moz-linear-gradient(
-      left,
-      rgba(0, 168, 255, 0.5),
-      rgba(185, 0, 255, 0.5)
-    );
+    background: -webkit-linear-gradient(left, rgba(0, 168, 255, 0.5), rgba(185, 0, 255, 0.5));
+    background: -moz-linear-gradient(left, rgba(0, 168, 255, 0.5), rgba(185, 0, 255, 0.5));
     content: '';
     pointer-events: none;
   }

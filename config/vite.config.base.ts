@@ -46,6 +46,10 @@ export default defineConfig({
         replacement: resolve(__dirname, '../src/assets'),
       },
       {
+        find: 'dayjs',
+        replacement: 'dayjs/esm',
+      },
+      {
         find: 'vue-i18n',
         replacement: 'vue-i18n/dist/vue-i18n.cjs.js', // Resolve the i18n warning issue
       },
@@ -63,9 +67,7 @@ export default defineConfig({
     preprocessorOptions: {
       less: {
         modifyVars: {
-          hack: `true; @import (reference) "${resolve(
-            'src/assets/style/breakpoint.less'
-          )}";`,
+          hack: `true; @import (reference) "${resolve('src/assets/style/breakpoint.less')}";`,
           // 'arcoblue-6': '#00ADB5',
         },
         javascriptEnabled: true,

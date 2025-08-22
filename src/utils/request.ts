@@ -53,7 +53,7 @@ $axios.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error);
-  }
+  },
 );
 /**
  * 响应拦截器
@@ -97,6 +97,6 @@ $axios.interceptors.response.use(
       errorMsg('请求失败，请检查网络是否已连接');
     }
     return Promise.reject(error);
-  }
+  },
 );
 export default $axios;

@@ -49,11 +49,7 @@
         :validate-trigger="['change', 'blur']"
         hide-label
       >
-        <a-input
-          v-model="userInfo.authCode"
-          placeholder="请输入验证码"
-          :max-length="6"
-        >
+        <a-input v-model="userInfo.authCode" placeholder="请输入验证码" :max-length="6">
           <template #suffix>
             <a-image
               height="30"
@@ -76,13 +72,7 @@
           </a-checkbox>
           <a-link>{{ $t('login.form.forgetPassword') }}</a-link>
         </div>
-        <a-button
-          type="primary"
-          html-type="submit"
-          long
-          :loading="loading"
-          class="login-btn"
-        >
+        <a-button type="primary" html-type="submit" long :loading="loading" class="login-btn">
           {{ $t('login.form.login') }}
         </a-button>
         <a-button type="text" long class="login-form-register-btn">
@@ -214,17 +204,8 @@
 
     .login-btn {
       background: rgb(93 84 240 / 50%);
-      background: linear-gradient(
-        left,
-        rgb(0 168 255 / 50%),
-        rgb(185 0 255 / 50%)
-      );
-      background: linear-gradient(
-          left,
-          rgb(0 168 255 / 50%),
-          rgb(185 0 255 / 50%)
-        )
-        no-repeat;
+      background: linear-gradient(left, rgb(0 168 255 / 50%), rgb(185 0 255 / 50%));
+      background: linear-gradient(left, rgb(0 168 255 / 50%), rgb(185 0 255 / 50%)) no-repeat;
       border-radius: 5px;
     }
   }

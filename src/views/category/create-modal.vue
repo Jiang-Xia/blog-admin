@@ -24,7 +24,7 @@
       if (n) {
         name.value = '';
       }
-    }
+    },
   );
   // console.log('props', props)
   const handleOk = () => {

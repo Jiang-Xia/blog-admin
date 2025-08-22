@@ -9,7 +9,9 @@
 // import request from '@/utils/request';
 import request from '@/api/request';
 
-export const registerUser = async (data: any) => {
+type KeyValue = Record<string, unknown>;
+
+export const registerUser = async (data: KeyValue) => {
   const res = await request({
     url: '/user/register',
     method: 'post',
@@ -18,7 +20,7 @@ export const registerUser = async (data: any) => {
   return res.data;
 };
 
-export const userLogin = async (data: any) => {
+export const userLogin = async (data: KeyValue) => {
   const res = await request({
     url: '/user/login',
     method: 'post',

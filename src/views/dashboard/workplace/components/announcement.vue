@@ -11,12 +11,7 @@
       </a-link>
     </template>
     <div>
-      <div
-        v-for="(item, idx) in list"
-        :key="idx"
-        class="item"
-        @click="clickItem(item.id)"
-      >
+      <div v-for="(item, idx) in list" :key="idx" class="item" @click="clickItem(item.id)">
         <a-tag :color="item.type" size="small">{{ item.label }}</a-tag>
         <span class="item-content">
           {{ item.content }}

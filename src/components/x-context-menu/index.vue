@@ -1,11 +1,6 @@
 <template>
   <transition name="slide-dynamic-origin">
-    <div
-      v-show="visible"
-      ref="elRef"
-      class="gi-context-menu"
-      :style="getStyle()"
-    >
+    <div v-show="visible" ref="elRef" class="gi-context-menu" :style="getStyle()">
       <slot></slot>
     </div>
   </transition>
@@ -18,17 +13,13 @@
 
   const props = defineProps<{
     event: PointerEvent;
-    options: any;
-    ignoreRefs: any[];
+    options: { alignPoint?: boolean };
+    ignoreRefs: Element[];
   }>();
 
-  const elRef = ref(null);
+  const elRef = ref<HTMLElement | null>(null);
 
-  const { visible, setVisible, getStyle } = useContextMenu(
-    props.event,
-    elRef,
-    props.options
-  );
+  const { visible, setVisible, getStyle } = useContextMenu(props.event, elRef, props.options);
 
   // 检测在一个元素之外的任何点击
   const emit = defineEmits(['close']);
@@ -37,7 +28,7 @@
     () => {
       setVisible(false);
       emit('close');
-    }
+    },
     // { capture: false, ignore: props.ignoreRefs }
   );
 
@@ -48,7 +39,7 @@
     () => {
       setVisible(false);
       emit('close');
-    }
+    },
   );
 
   const onHidden = () => {
@@ -70,6 +61,8 @@
     background: var(--color-bg-popup);
     border: 1px solid var(--color-border-2);
     border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
+    box-shadow:
+      0 2px 4px rgba(0, 0, 0, 0.12),
+      0 0 6px rgba(0, 0, 0, 0.04);
   }
 </style>

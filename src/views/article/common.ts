@@ -31,19 +31,17 @@ const getRandomClor = () => {
 };
 export { colors, getRandomClor };
 
-export const updateViews = async (
-  id: LocationQueryValue | LocationQueryValue[]
-) => {
+export const updateViews = async (id: LocationQueryValue | LocationQueryValue[]) => {
   await api.updateViews({ id });
 };
-export const updateLikes = async (data: any) => {
+export const updateLikes = async (data: Record<string, unknown>) => {
   const res = await api.updateLikes(data);
   return res;
 };
 
 const userStore = useUserStore();
 // 更新点赞数
-export const updateLikesHandle = async (item: any) => {
+export const updateLikesHandle = async (item: { id: string; checked: 0 | 1; likes: number }) => {
   if (!userStore.token) {
     Message.warning('请先登录！');
     return;

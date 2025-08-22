@@ -1,10 +1,4 @@
-import {
-  defineAsyncComponent,
-  defineComponent,
-  Component,
-  onMounted,
-  ref,
-} from 'vue';
+import { defineAsyncComponent, defineComponent, Component, onMounted, ref } from 'vue';
 import './index.less';
 // import hljs from 'highlight.js'
 // import dayjs from 'dayjs'
@@ -18,8 +12,8 @@ const XMarkdownReader = defineComponent({
       default: '',
     },
   },
-  setup(props: any, { emit }) {
-    const markdownRef = ref();
+  setup(props: { content: string }) {
+    const markdownRef = ref<HTMLElement | null>(null);
     onMounted(() => {
       // console.log(markdownRef.value)
       if (!markdownRef.value) {
@@ -42,13 +36,7 @@ const XMarkdownReader = defineComponent({
       }
     });
     // 坑点 tsx中 ref要写对应的变量，字符串没用
-    return () => (
-      <div
-        ref={markdownRef}
-        class={'x-markdown-reader'}
-        v-html={props.content}
-      ></div>
-    );
+    return () => <div ref={markdownRef} class={'x-markdown-reader'} v-html={props.content}></div>;
   },
 });
 

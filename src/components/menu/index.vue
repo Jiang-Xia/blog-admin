@@ -1,7 +1,7 @@
-<script lang="tsx">
-  import { defineComponent, ref, h, compile, computed } from 'vue';
+<script lang="ts">
+  import { defineComponent, ref, h, compile, computed, type VNode, type VNodeChild } from 'vue';
   import { useI18n } from 'vue-i18n';
-  import { useRoute, useRouter, RouteRecordRaw } from 'vue-router';
+  import { useRoute, useRouter, type RouteRecordRaw } from 'vue-router';
   import type { RouteMeta } from 'vue-router';
   import { useAppStore } from '@/store';
   import { listenerRouteChange } from '@/utils/route-listener';
@@ -9,7 +9,7 @@
   import useMenuTree from './useMenuTree';
 
   export default defineComponent({
-    emit: ['collapse'],
+    emits: ['collapse'],
     setup() {
       const { t } = useI18n();
       const appStore = useAppStore();
@@ -30,31 +30,23 @@
       const selectedKey = ref<string[]>([]);
 
       const goto = (item: RouteRecordRaw) => {
-        // Open external link
         if (regexUrl.test(item.path)) {
           openWindow(item.path);
           selectedKey.value = [item.name as string];
           return;
         }
-        // Eliminate external link side effects
         const { hideInMenu, activeMenu } = item.meta as RouteMeta;
         if (route.name === item.name && !hideInMenu && !activeMenu) {
           selectedKey.value = [item.name as string];
           return;
         }
-        // Trigger router change
-        router.push({
-          name: item.name,
-        });
+        router.push({ name: item.name });
       };
+
       const findMenuOpenKeys = (name: string) => {
         const result: string[] = [];
         let isFind = false;
-        const backtrack = (
-          item: RouteRecordRaw,
-          keys: string[],
-          target: string
-        ) => {
+        const backtrack = (item: RouteRecordRaw, keys: string[], target: string) => {
           if (item.name === target) {
             isFind = true;
             result.push(...keys, item.name as string);
@@ -67,87 +59,79 @@
           }
         };
         menuTree.value.forEach((el: RouteRecordRaw) => {
-          if (isFind) return; // Performance optimization
+          if (isFind) return;
           backtrack(el, [el.name as string], name);
         });
         return result;
       };
+
       listenerRouteChange((newRoute) => {
         const { requiresAuth, activeMenu, hideInMenu } = newRoute.meta;
         if (requiresAuth && (!hideInMenu || activeMenu)) {
-          const menuOpenKeys = findMenuOpenKeys(
-            (activeMenu || newRoute.name) as string
-          );
-
+          const menuOpenKeys = findMenuOpenKeys((activeMenu || newRoute.name) as string);
           const keySet = new Set([...menuOpenKeys, ...openKeys.value]);
           openKeys.value = [...keySet];
-
-          selectedKey.value = [
-            activeMenu || menuOpenKeys[menuOpenKeys.length - 1],
-          ];
+          selectedKey.value = [activeMenu || menuOpenKeys[menuOpenKeys.length - 1]];
         }
       }, true);
+
       const setCollapse = (val: boolean) => {
-        if (appStore.device === 'desktop')
-          appStore.updateSettings({ menuCollapse: val });
+        if (appStore.device === 'desktop') appStore.updateSettings({ menuCollapse: val });
       };
 
-      const renderSubMenu = () => {
-        function travel(_route: RouteRecordRaw[], nodes = []) {
-          if (_route) {
-            _route.forEach((element) => {
-              // This is demo, modify nodes as needed
-              // 直接渲染acro-design的icon组件
-              // const icon = element?.meta?.icon
-              //   ? () => h(compile(`<${element?.meta?.icon}/>`))
-              //   : null;
-              const icon = element?.meta?.icon
-                ? () => h(compile(`<x-icon icon=${element?.meta?.icon} />`))
-                : null;
-              const node =
-                element?.children && element?.children.length !== 0 ? (
-                  <a-sub-menu
-                    key={element?.name}
-                    v-slots={{
-                      icon,
-                      title: () => h(compile(t(element?.meta?.locale || ''))),
-                    }}
-                  >
-                    {travel(element?.children)}
-                  </a-sub-menu>
-                ) : (
-                  <a-menu-item
-                    key={element?.name}
-                    v-slots={{ icon }}
-                    onClick={() => goto(element)}
-                  >
-                    {t(element?.meta?.locale || '')}
-                  </a-menu-item>
-                );
-              nodes.push(node as never);
-            });
+      const travel = (_route: RouteRecordRaw[]): VNodeChild[] => {
+        const nodes: VNode[] = [];
+        if (!_route) return nodes;
+        _route.forEach((element) => {
+          const iconSlot = element?.meta?.icon
+            ? () => h(compile(`<x-icon icon=${element?.meta?.icon} />`))
+            : undefined;
+
+          if (element?.children && element.children.length !== 0) {
+            nodes.push(
+              h(
+                'a-sub-menu',
+                { key: element?.name },
+                {
+                  icon: iconSlot,
+                  title: () => h(compile(t(element?.meta?.locale || ''))),
+                  default: () => travel(element.children as RouteRecordRaw[]),
+                },
+              ),
+            );
+          } else {
+            nodes.push(
+              h(
+                'a-menu-item',
+                { key: element?.name, onClick: () => goto(element) },
+                {
+                  icon: iconSlot,
+                  default: () => t(element?.meta?.locale || ''),
+                },
+              ),
+            );
           }
-          return nodes;
-        }
-        return travel(menuTree.value);
+        });
+        return nodes;
       };
 
-      return () => (
-        <a-menu
-          v-model:collapsed={collapsed.value}
-          v-model:open-keys={openKeys.value}
-          show-collapse-button={appStore.device !== 'mobile'}
-          auto-open={false}
-          selected-keys={selectedKey.value}
-          auto-open-selected={true}
-          level-indent={34}
-          style="height: 100%"
-          onCollapse={setCollapse}
-          accordion
-        >
-          {renderSubMenu()}
-        </a-menu>
-      );
+      return () =>
+        h(
+          'a-menu',
+          {
+            'onCollapse': setCollapse,
+            'style': 'height: 100%',
+            'accordion': true,
+            'show-collapse-button': appStore.device !== 'mobile',
+            'auto-open': false,
+            'auto-open-selected': true,
+            'level-indent': 34,
+            'v-model:collapsed': collapsed.value,
+            'v-model:open-keys': openKeys.value,
+            'selected-keys': selectedKey.value,
+          },
+          { default: () => travel(menuTree.value as RouteRecordRaw[]) },
+        );
     },
   });
 </script>

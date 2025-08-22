@@ -19,11 +19,7 @@
       @submit-failed="handleFinishFailed"
     >
       <a-form-item label="id" name="id" field="id">
-        <a-input
-          v-model="formState.id"
-          :disabled="type === 'edit'"
-          placeholder="id"
-        />
+        <a-input v-model="formState.id" :disabled="type === 'edit'" placeholder="id" />
       </a-form-item>
       <a-form-item label="pid" name="pid" field="pid">
         <a-input v-model="formState.pid" placeholder="pid" />
@@ -109,10 +105,7 @@
     }
     Promise.resolve();
   };
-  const checkDescription = async (
-    value: string,
-    cb: (error?: string) => void
-  ) => {
+  const checkDescription = async (value: string, cb: (error?: string) => void) => {
     if (!value) {
       cb('请输入描述！');
     }

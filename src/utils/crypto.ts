@@ -1,4 +1,3 @@
-/* eslint-disable */
 import CryptoJS, { enc, mode, AES, pad } from 'crypto-js';
 import JSEncrypt from 'jsencrypt';
 import { publicKey, privateKey, serverPublicKey } from '@/config/ssh';
@@ -14,7 +13,7 @@ const iv = 'jiangxia';
  * @param {string} offset - 偏移量
  * @return 16进制字符串 256位
  */
-export function aesEncrypt(word: any, key = secretKey, offset = iv) {
+export function aesEncrypt(word: string, key = secretKey, offset = iv) {
   // 未加密的参数 - 从 UTF-8编码 解析出原始字符串
   const wordUTF8 = enc.Utf8.parse(word);
   // 密钥 - 从 UTF-8编码 解析出原始字符串
@@ -39,7 +38,7 @@ export function aesEncrypt(word: any, key = secretKey, offset = iv) {
  * @param {string} offset - 偏移量
  * @return utf8 字符串
  */
-export function aesDecrypt(encryptedWord: any, key = secretKey, offset = iv) {
+export function aesDecrypt(encryptedWord: string, key = secretKey, offset = iv) {
   // 密钥 - 从 UTF-8编码 解析出原始字符串
   const keyUTF8 = enc.Utf8.parse(key);
   // 偏移量 从 UTF-8编码 解析出原始字符串
@@ -85,11 +84,7 @@ export function rsaEncrypt(word = '非对称加解密', pubKey = serverPublicKey
  * @param {string} offset - 偏移量
  * @return utf8 字符串 (解密不出来返回原本字符串)
  */
-export function rsaDecrypt(
-  encryptedWord: any,
-  priKey = privateKey,
-  offset = iv
-) {
+export function rsaDecrypt(encryptedWord: string, priKey = privateKey, offset = iv) {
   const decrypt = new JSEncrypt();
   /* 私钥解密 */
   decrypt.setPrivateKey(priKey);

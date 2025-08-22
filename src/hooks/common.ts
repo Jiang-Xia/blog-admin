@@ -6,8 +6,8 @@ interface Options {
 
 export function useContextMenu(
   event: PointerEvent,
-  elRef: Ref,
-  options: Options = { alignPoint: false }
+  elRef: Ref<HTMLElement | null>,
+  options: Options = { alignPoint: false },
 ) {
   const visible = ref(false);
   const elWidth = ref(0);
@@ -18,7 +18,7 @@ export function useContextMenu(
   };
 
   const getStyle = () => {
-    const obj: any = {};
+    const obj: Record<string, string | number> = {};
     if (event.clientX > window.innerWidth - elHeight.value) {
       obj.right = options.alignPoint
         ? `${window.innerWidth - event.clientX - elWidth.value / 2}px`
