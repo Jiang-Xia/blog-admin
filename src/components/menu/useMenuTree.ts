@@ -1,5 +1,5 @@
 import { computed } from 'vue';
-import { RouteRecordRaw, RouteRecordNormalized } from 'vue-router';
+import type { RouteRecordRaw, RouteRecordNormalized } from 'vue-router';
 import usePermission from '@/hooks/permission';
 import { useAppStore } from '@/store';
 import appClientMenus from '@/router/appMenus';
@@ -59,7 +59,7 @@ export default function useMenuTree() {
     }
     return travel(copyRouter as RouteRecordRaw[], 0);
   });
-  console.log('menuTree:', menuTree);
+  // console.log('menuTree:', menuTree);
   return {
     menuTree,
   };

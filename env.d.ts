@@ -9,5 +9,6 @@ interface ImportMetaEnv {
   readonly VITE_API_BASE_URL: string;
 }
 
-declare const guidance: unknown;
-declare const dayjs: unknown;
+namespace guidance {}
+namespace dayjs {}
+namespace $t {}

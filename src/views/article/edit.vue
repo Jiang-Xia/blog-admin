@@ -89,9 +89,9 @@
   import request from '@/api/request';
   import { Message, Modal } from '@arco-design/web-vue';
   import { useRoute, useRouter } from 'vue-router';
-  import { ValidatedError } from '@arco-design/web-vue/es/form/interface';
+  import type { ValidatedError } from '@arco-design/web-vue/es/form/interface';
   // import { computed, onBeforeUnmount, onMounted } from 'vue'
-  import MdEditor from 'md-editor-v3';
+  import { MdEditor } from 'md-editor-v3';
   import { useAppStore } from '@/store';
   import { useTableNoPageList } from '@/hooks/data';
 
@@ -239,7 +239,7 @@
     );
     loading.value = false;
     callback(
-      res.map((item) => {
+      res.map((item: any) => {
         return staticUrl + item.data[0].url;
       }),
     );

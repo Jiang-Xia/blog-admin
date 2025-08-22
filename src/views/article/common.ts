@@ -1,6 +1,6 @@
 import { ref } from 'vue';
 import api from '@/api/index';
-import { LocationQueryValue } from 'vue-router';
+import type { LocationQueryValue } from 'vue-router';
 import { Message } from '@arco-design/web-vue';
 // import { getToken } from '@/utils/auth';
 import { useUserStore } from '@/store';

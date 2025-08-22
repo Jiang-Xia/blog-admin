@@ -1,4 +1,4 @@
-import { defineAsyncComponent, defineComponent, Component, onMounted, ref } from 'vue';
+import { defineAsyncComponent, defineComponent, type Component, onMounted, ref } from 'vue';
 import './index.less';
 // import hljs from 'highlight.js'
 // import dayjs from 'dayjs'

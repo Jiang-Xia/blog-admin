@@ -4,6 +4,8 @@ import { Message } from '@arco-design/web-vue';
 
 export default function useLocale() {
   const i18 = useI18n();
+  console.log('i18', i18.locale.value);
+
   const currentLocale = computed(() => {
     return i18.locale.value;
   });
