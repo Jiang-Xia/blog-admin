@@ -1,7 +1,7 @@
 <template>
   <div v-show="!ticket" class="login-form-wrapper">
-    <div class="login-form-title">{{ $t('login.form.title') }}</div>
-    <div class="login-form-sub-title">{{ $t('login.form.subtitle') }}</div>
+    <div class="login-form-title">{{ t('login.form.title') }}</div>
+    <div class="login-form-sub-title">{{ t('login.form.subtitle') }}</div>
     <div class="login-form-error-msg">{{ errorMessage }}</div>
     <a-form
       ref="loginForm"
@@ -12,13 +12,13 @@
     >
       <a-form-item
         field="username"
-        :rules="[{ required: true, message: $t('login.form.userName.errMsg') }]"
+        :rules="[{ required: true, message: t('login.form.userName.errMsg') }]"
         :validate-trigger="['change', 'blur']"
         hide-label
       >
         <a-input
           v-model="userInfo.username"
-          :placeholder="$t('login.form.userName.placeholder')"
+          :placeholder="t('login.form.userName.placeholder')"
           :max-length="11"
         >
           <template #prefix>
@@ -28,13 +28,13 @@
       </a-form-item>
       <a-form-item
         field="password"
-        :rules="[{ required: true, message: $t('login.form.password.errMsg') }]"
+        :rules="[{ required: true, message: t('login.form.password.errMsg') }]"
         :validate-trigger="['change', 'blur']"
         hide-label
       >
         <a-input-password
           v-model="userInfo.password"
-          :placeholder="$t('login.form.password.placeholder')"
+          :placeholder="t('login.form.password.placeholder')"
           allow-clear
           :max-length="16"
         >
@@ -68,15 +68,15 @@
             :model-value="loginConfig.rememberPassword"
             @change="setRememberPassword as any"
           >
-            {{ $t('login.form.rememberPassword') }}
+            {{ t('login.form.rememberPassword') }}
           </a-checkbox>
-          <a-link>{{ $t('login.form.forgetPassword') }}</a-link>
+          <a-link>{{ t('login.form.forgetPassword') }}</a-link>
         </div>
         <a-button type="primary" html-type="submit" long :loading="loading" class="login-btn">
-          {{ $t('login.form.login') }}
+          {{ t('login.form.login') }}
         </a-button>
-        <a-button type="text" long class="login-form-register-btn">
-          {{ $t('login.form.register') }}
+        <a-button type="text" long class="login-form-register-btn" @click="register">
+          {{ t('login.form.register') }}
         </a-button>
       </a-space>
     </a-form>
@@ -165,6 +165,9 @@
     authCodeUrl.value = `${baseUrl}/user/authCode?t=${new Date().getTime()}`;
   };
   changeAuthCodeUrl();
+  const register = () => {
+    window.open('https://jiang-xia.top');
+  };
 </script>
 
 <style lang="less" scoped>

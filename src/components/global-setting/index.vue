@@ -10,15 +10,15 @@
     :width="300"
     unmount-on-close
     :visible="visible"
-    :cancel-text="$t('settings.close')"
-    :ok-text="$t('settings.copySettings')"
+    :cancel-text="t('settings.close')"
+    :ok-text="t('settings.copySettings')"
     @ok="copySettings"
     @cancel="cancel"
   >
-    <template #title> {{ $t('settings.title') }} </template>
-    <Block :options="contentOpts" :title="$t('settings.content')" />
-    <Block :options="othersOpts" :title="$t('settings.otherSettings')" />
-    <a-alert>{{ $t('settings.alertContent') }}</a-alert>
+    <template #title> {{ t('settings.title') }} </template>
+    <Block :options="contentOpts" :title="t('settings.content')" />
+    <Block :options="othersOpts" :title="t('settings.otherSettings')" />
+    <a-alert>{{ t('settings.alertContent') }}</a-alert>
   </a-drawer>
 </template>
 

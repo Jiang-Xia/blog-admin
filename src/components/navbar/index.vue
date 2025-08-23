@@ -15,7 +15,7 @@
     </div>
     <ul class="right-side">
       <li>
-        <a-tooltip :content="$t('settings.search')">
+        <a-tooltip :content="t('settings.search')">
           <a-button class="nav-btn" type="outline" :shape="'circle'">
             <template #icon>
               <icon-search />
@@ -24,7 +24,7 @@
         </a-tooltip>
       </li>
       <li>
-        <a-tooltip :content="$t('settings.language')">
+        <a-tooltip :content="t('settings.language')">
           <a-button class="nav-btn" type="outline" :shape="'circle'" @click="setDropDownVisible">
             <template #icon>
               <icon-language />
@@ -44,8 +44,8 @@
         <a-tooltip
           :content="
             theme === 'light'
-              ? $t('settings.navbar.theme.toDark')
-              : $t('settings.navbar.theme.toLight')
+              ? t('settings.navbar.theme.toDark')
+              : t('settings.navbar.theme.toLight')
           "
         >
           <a-button class="nav-btn" type="outline" :shape="'circle'" @click="handleToggleTheme">
@@ -57,7 +57,7 @@
         </a-tooltip>
       </li>
       <!-- <li>
-        <a-tooltip :content="$t('settings.navbar.alerts')">
+        <a-tooltip :content="t('settings.navbar.alerts')">
           <div class="message-box-trigger">
             <a-badge :count="9" dot>
               <a-button
@@ -86,7 +86,7 @@
       <li>
         <a-tooltip
           :content="
-            isFullscreen ? $t('settings.navbar.screen.toExit') : $t('settings.navbar.screen.toFull')
+            isFullscreen ? t('settings.navbar.screen.toExit') : t('settings.navbar.screen.toFull')
           "
         >
           <a-button class="nav-btn" type="outline" :shape="'circle'" @click="toggleFullScreen">
@@ -98,7 +98,7 @@
         </a-tooltip>
       </li>
       <li>
-        <a-tooltip :content="$t('settings.title')">
+        <a-tooltip :content="t('settings.title')">
           <a-button class="nav-btn" type="outline" :shape="'circle'" @click="setVisible">
             <template #icon>
               <icon-settings />
@@ -117,23 +117,23 @@
               <a-space @click="switchRoles">
                 <icon-tag />
                 <span>
-                  {{ $t('messageBox.switchRoles') }}
+                  {{ t('messageBox.switchRoles') }}
                 </span>
               </a-space>
             </a-doption>
             <a-doption>
-              <a-space @click="$router.push({ name: 'UserSet' })">
+              <a-space @click="router.push({ name: 'UserSet' })">
                 <icon-user />
                 <span>
-                  {{ $t('messageBox.userCenter') }}
+                  {{ t('messageBox.userCenter') }}
                 </span>
               </a-space>
             </a-doption>
             <!-- <a-doption>
-              <a-space @click="$router.push({ name: 'Setting' })">
+              <a-space @click="router.push({ name: 'Setting' })">
                 <icon-settings />
                 <span>
-                  {{ $t('messageBox.userSettings') }}
+                  {{ t('messageBox.userSettings') }}
                 </span>
               </a-space>
             </a-doption> -->
@@ -141,7 +141,7 @@
               <a-space @click="handleLogout">
                 <icon-export />
                 <span>
-                  {{ $t('messageBox.logout') }}
+                  {{ t('messageBox.logout') }}
                 </span>
               </a-space>
             </a-doption>
@@ -156,13 +156,17 @@
   import { computed, ref, inject } from 'vue';
   import { Message } from '@arco-design/web-vue';
   import { useDark, useToggle, useFullscreen } from '@vueuse/core';
+  import { useRouter } from 'vue-router';
   import { useAppStore, useUserStore } from '@/store';
   import { LOCALE_OPTIONS } from '@/locale';
   import useLocale from '@/hooks/locale';
   import useUser from '@/hooks/user';
   // 项目导入svg路径不对
   import UserIcon from '../../assets/images/common/user.svg';
-  // import MessageBox from '../message-box/index.vue';
+  import { useI18n } from 'vue-i18n';
+
+  const { t } = useI18n();
+  const router = useRouter();
 
   const appStore = useAppStore();
   const userStore = useUserStore();

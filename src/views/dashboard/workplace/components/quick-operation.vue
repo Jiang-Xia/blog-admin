@@ -1,12 +1,12 @@
 <template>
   <a-card
     class="general-card"
-    :title="$t('workplace.quick.operation')"
+    :title="t('workplace.quick.operation')"
     :header-style="{ paddingBottom: '0' }"
     :body-style="{ padding: '24px 20px 0 20px' }"
   >
     <template #extra>
-      <a-link>{{ $t('workplace.quickOperation.setup') }}</a-link>
+      <a-link>{{ t('workplace.quickOperation.setup') }}</a-link>
     </template>
     <a-row :gutter="8">
       <a-col
@@ -14,7 +14,7 @@
         :key="link.text"
         :span="8"
         class="wrapper"
-        @click="$router.push(link.url)"
+        @click="router.push(link.url)"
       >
         <div class="icon">
           <component :is="link.icon" />
@@ -29,6 +29,11 @@
 </template>
 
 <script lang="ts" setup>
+  import { useI18n } from 'vue-i18n';
+  import { useRouter } from 'vue-router';
+
+  const router = useRouter();
+  const { t } = useI18n();
   const links = [
     { text: '文件管理', icon: 'icon-file', url: '/resource/list' },
     { text: '文章列表.', icon: 'icon-storage', url: '/article/list' },

@@ -6,13 +6,13 @@
           <span> {{ item.title }}{{ formatUnreadLength(item.key) }} </span>
         </template>
         <a-result v-if="!renderList.length" status="404">
-          <template #subtitle> {{ $t('messageBox.noContent') }} </template>
+          <template #subtitle> {{ t('messageBox.noContent') }} </template>
         </a-result>
         <List :render-list="renderList" :unread-count="unreadCount" @item-click="handleItemClick" />
       </a-tab-pane>
       <template #extra>
         <a-button type="text" @click="emptyList">
-          {{ $t('messageBox.tab.button') }}
+          {{ t('messageBox.tab.button') }}
         </a-button>
       </template>
     </a-tabs>
@@ -25,8 +25,8 @@
   import {
     queryMessageList,
     setMessageStatus,
-    MessageRecord,
-    MessageListType,
+    type MessageRecord,
+    type MessageListType,
   } from '@/api/message';
   import useLoading from '@/hooks/loading';
   import List from './list.vue';

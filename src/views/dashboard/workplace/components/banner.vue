@@ -2,7 +2,7 @@
   <a-col class="banner">
     <a-col :span="8">
       <a-typography-title :heading="5" style="margin-top: 0">
-        {{ $t('workplace.welcome') }} {{ userInfo.name }}
+        {{ t('workplace.welcome') }} {{ userInfo.name }}
       </a-typography-title>
     </a-col>
     <a-divider class="panel-border" />
@@ -12,7 +12,9 @@
 <script lang="ts" setup>
   import { computed } from 'vue';
   import { useUserStore } from '@/store';
+  import { useI18n } from 'vue-i18n';
 
+  const { t } = useI18n();
   const userStore = useUserStore();
   const userInfo = computed(() => {
     return {

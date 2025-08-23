@@ -7,7 +7,7 @@
     >
       <template #title> 主要分类内容 </template>
       <template #extra>
-        <a-link @click="$router.push('/category/list')">查看更多</a-link>
+        <a-link @click="router.push('/category/list')">查看更多</a-link>
       </template>
       <a-space direction="vertical" fill>
         <a-radio-group v-model:model-value="type" type="button" @change="typeChange">
@@ -45,12 +45,14 @@
 
 <script lang="ts" setup>
   import { ref } from 'vue';
+  import { useRouter } from 'vue-router';
   import useLoading from '@/hooks/loading';
   import type { TableData } from '@arco-design/web-vue/es/table/interface';
   import { getAllCategory } from '@/api/category';
   import { getArticleList } from '@/api/article';
-  import { ListState } from '@/types/global';
+  import type { ListState } from '@/types/global';
 
+  const router = useRouter();
   const type = ref('');
   const categoryOptions = ref<ListState[]>();
   const { loading, setLoading } = useLoading();

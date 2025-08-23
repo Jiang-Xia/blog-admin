@@ -12,7 +12,7 @@
               @click="goto(tag)"
             >
               <span class="tag-link">
-                {{ $t(tag.title) }}
+                {{ t(tag.title) }}
               </span>
               <span
                 class="arco-icon-hover arco-tag-icon-hover arco-icon-hover-size-medium arco-tag-close-btn"
@@ -36,7 +36,9 @@
   import { listenerRouteChange } from '@/utils/route-listener';
   import { useAppStore, useTabBarStore } from '@/store';
   import type { TagProps } from '@/store/modules/tab-bar/types';
+  import { useI18n } from 'vue-i18n';
 
+  const { t } = useI18n();
   const appStore = useAppStore();
   const tabBarStore = useTabBarStore();
 

@@ -49,10 +49,10 @@
     <template #footer>
       <a-space fill :size="0" :class="{ 'add-border-top': renderList.length < showMax }">
         <div class="footer-wrap">
-          <a-link @click="allRead">{{ $t('messageBox.allRead') }}</a-link>
+          <a-link @click="allRead">{{ t('messageBox.allRead') }}</a-link>
         </div>
         <div class="footer-wrap">
-          <a-link>{{ $t('messageBox.viewMore') }}</a-link>
+          <a-link>{{ t('messageBox.viewMore') }}</a-link>
         </div>
       </a-space>
     </template>
@@ -64,9 +64,11 @@
 </template>
 
 <script lang="ts" setup>
-  import { PropType } from 'vue';
-  import { MessageRecord, MessageListType } from '@/api/message';
+  import { type PropType } from 'vue';
+  import type { MessageRecord, MessageListType } from '@/api/message';
+  import { useI18n } from 'vue-i18n';
 
+  const { t } = useI18n();
   const props = defineProps({
     renderList: {
       type: Array as PropType<MessageListType>,

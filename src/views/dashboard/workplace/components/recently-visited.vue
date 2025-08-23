@@ -1,7 +1,7 @@
 <template>
   <a-card
     class="general-card"
-    :title="$t('workplace.recently.visited')"
+    :title="t('workplace.recently.visited')"
     :header-style="{ paddingBottom: '0' }"
     :body-style="{ paddingTop: '26px' }"
   >
@@ -12,7 +12,7 @@
           :key="link.text"
           :span="8"
           class="wrapper"
-          @click="$router.push(link.url)"
+          @click="router.push(link.url)"
         >
           <div class="icon">
             <component :is="link.icon" />
@@ -27,6 +27,11 @@
 </template>
 
 <script lang="ts" setup>
+  import { useI18n } from 'vue-i18n';
+  import { useRouter } from 'vue-router';
+
+  const { t } = useI18n();
+  const router = useRouter();
   const links = [{ text: '文章编辑.', icon: 'icon-storage', url: '/article/edit' }];
 </script>
 

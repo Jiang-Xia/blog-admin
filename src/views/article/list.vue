@@ -64,7 +64,7 @@
       <a-row style="margin-bottom: 16px">
         <a-col :span="16">
           <a-space>
-            <a-button type="primary" @click="$router.push('/article/edit?type=add')">
+            <a-button type="primary" @click="router.push('/article/edit?type=add')">
               <template #icon>
                 <icon-plus />
               </template>
@@ -168,7 +168,7 @@
                   type="primary"
                   @click="
                     () => {
-                      $router.push(`/article/edit?type=edit&id=${record.id}`);
+                      router.push(`/article/edit?type=edit&id=${record.id}`);
                     }
                   "
                 >
@@ -195,14 +195,16 @@
 <script lang="ts" setup>
   import { computed, ref, reactive } from 'vue';
   import { useI18n } from 'vue-i18n';
+  import { useRouter } from 'vue-router';
   import useLoading from '@/hooks/loading';
-  import { Pagination } from '@/types/global';
+  import type { Pagination } from '@/types/global';
   import { getArticleInfo, getArticleList, delArticle } from '@/api/article';
   import { Message, Modal } from '@arco-design/web-vue';
   import request from '@/api/request';
   import { useUserStore } from '@/store';
 
   const { role } = useUserStore();
+  const router = useRouter();
   const generateFormModel = () => {
     return {
       page: 1,
