@@ -166,7 +166,7 @@
   };
   changeAuthCodeUrl();
   const register = () => {
-    window.open('https://jiang-xia.top');
+    window.open('https://jiang-xia.top/register');
   };
 </script>
 

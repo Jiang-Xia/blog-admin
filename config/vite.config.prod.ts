@@ -2,18 +2,13 @@ import { mergeConfig } from 'vite';
 import baseConfig from './vite.config.base';
 import configCompressPlugin from './plugin/compress';
 import configVisualizerPlugin from './plugin/visualizer';
-// import configImageminPlugin from './plugin/imagemin';
 
 const images = ['png', 'jpeg', 'svg'];
 export default mergeConfig(
   {
     mode: 'production',
     base: './',
-    plugins: [
-      configCompressPlugin('gzip'),
-      configVisualizerPlugin(),
-      // configImageminPlugin(),
-    ],
+    plugins: [configCompressPlugin('gzip'), configVisualizerPlugin()],
     build: {
       rollupOptions: {
         output: {

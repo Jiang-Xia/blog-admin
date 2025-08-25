@@ -70,6 +70,12 @@
               </template>
               {{ '新建' }}
             </a-button>
+            <a-button type="primary" @click="exportToExcel" :loading="exportLoading">
+              <template #icon>
+                <icon-download />
+              </template>
+              {{ '导出Excel' }}
+            </a-button>
           </a-space>
         </a-col>
       </a-row>
@@ -202,6 +208,7 @@
   import { Message, Modal } from '@arco-design/web-vue';
   import request from '@/api/request';
   import { useUserStore } from '@/store';
+  import * as XLSX from 'xlsx';
 
   const { role } = useUserStore();
   const router = useRouter();
@@ -222,6 +229,7 @@
   const { t } = useI18n();
   const renderData = ref([{}]);
   const formModel = ref(generateFormModel());
+  const exportLoading = ref(false);
   const basePagination: Pagination = {
     current: 1,
     pageSize: 10,
@@ -292,6 +300,92 @@
     const { topping, id } = record;
     const res = await request.patch(`/article/topping`, { topping, id });
     Message.success('设置成功');
+  };
+
+  // 导出Excel
+  const exportToExcel = async () => {
+    try {
+      exportLoading.value = true;
+
+      // 获取所有文章数据（使用最大pageSize）
+      const onlyMy = role === 'author';
+      const exportParams = {
+        onlyMy,
+        page: 1,
+        pageSize: 999999, // 设置一个很大的值来获取所有数据
+        title: formModel.value.title,
+        description: formModel.value.description,
+        content: formModel.value.content,
+        category: formModel.value.category,
+        tags: formModel.value.tags,
+        uid: formModel.value.uid,
+      };
+
+      const res = await getArticleList(exportParams);
+      const articles = res.list.map(
+        (v: {
+          tags: Array<{ label: string; color?: string }>;
+          id: string | number;
+          cover: string;
+          title: string;
+          description: string;
+          category?: { label: string; color?: string };
+          [k: string]: unknown;
+        }) => {
+          return {
+            文章ID: v.id,
+            标题: v.title,
+            描述: v.description,
+            分类: v.category?.label || '',
+            标签: v.tags.map((it) => it.label).join(', '),
+            查看数: v.views || 0,
+            点赞数: v.likes || 0,
+            评论数: v.commentCount || 0,
+            更新时间: v.uTime || '',
+            置顶状态: v.topping ? '是' : '否',
+            禁用状态: v.isDelete ? '是' : '否',
+          };
+        },
+      );
+
+      // 创建工作簿
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.json_to_sheet(articles);
+
+      // 设置列宽
+      const colWidths = [
+        { wch: 10 }, // 文章ID
+        { wch: 30 }, // 标题
+        { wch: 40 }, // 描述
+        { wch: 15 }, // 分类
+        { wch: 20 }, // 标签
+        { wch: 10 }, // 查看数
+        { wch: 10 }, // 点赞数
+        { wch: 10 }, // 评论数
+        { wch: 20 }, // 更新时间
+        { wch: 10 }, // 置顶状态
+        { wch: 10 }, // 禁用状态
+      ];
+      ws['!cols'] = colWidths;
+
+      // 添加工作表到工作簿
+      XLSX.utils.book_append_sheet(wb, ws, '文章列表');
+
+      // 生成文件名
+      const now = new Date();
+      const timestamp = `${now.getFullYear()}${(now.getMonth() + 1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}_${now.getHours().toString().padStart(2, '0')}${now.getMinutes().toString().padStart(2, '0')}${now.getSeconds().toString().padStart(2, '0')}`;
+      const fileName = `文章列表_${timestamp}.xlsx`;
+
+      // 下载文件
+      XLSX.writeFile(wb, fileName);
+
+      Message.success('导出成功！');
+    } catch (error) {
+      console.error('导出失败:', error);
+      Message.error('导出失败，请重试');
+    } finally {
+      exportLoading.value = false;
+    }
   };
 </script>
 
