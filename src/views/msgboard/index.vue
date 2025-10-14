@@ -124,10 +124,10 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, ref, reactive } from 'vue';
+  import { computed, ref, reactive, watch } from 'vue';
   import { useI18n } from 'vue-i18n';
   import useLoading from '@/hooks/loading';
-  import { Pagination } from '@/types/global';
+  import { type Pagination } from '@/types/global';
   import { Message, Modal } from '@arco-design/web-vue';
   import request from '@/api/request';
   import { useTableList } from '@/hooks/data';
@@ -138,25 +138,43 @@
       comment: '',
       eamil: '',
       respondent: '',
+      page: 1,
+      pageSize: 10,
     };
   };
   const formModel = ref(generateFormModel());
+  const basePagination: Pagination = {
+    current: 1,
+    pageSize: 10,
+  };
+  const pagination = reactive({
+    ...basePagination,
+  });
   const {
-    pagination,
     action,
     loading,
+    total,
     list: renderData,
     loadMore,
   } = useTableList('/msgboard', formModel.value);
+  watch(
+    () => renderData.value,
+    (n) => {
+      pagination.total = total.value;
+    },
+  );
   const search = () => {
     action.value = formModel.value;
     loadMore();
   };
   const onPageChange = (current: number) => {
+    formModel.value.page = current;
+    pagination.current = current;
     search();
   };
   const reset = () => {
     formModel.value = generateFormModel();
+    pagination.current = 1;
     search();
   };
   const delHandle = async (id: number) => {

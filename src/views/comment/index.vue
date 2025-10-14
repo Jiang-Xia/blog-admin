@@ -54,24 +54,34 @@
         @page-change="onPageChange"
       >
         <template #columns>
-          <a-table-column title="昵称" data-index="userInfo.nickname" align="center" :width="140">
+          <a-table-column
+            title="评论人昵称"
+            data-index="userInfo.nickname"
+            align="center"
+            :width="140"
+          >
             <template #cell="{ record }">
               {{ record.userInfo.nickname }}
             </template>
           </a-table-column>
-          <a-table-column title="头像" data-index="avatar" align="center" :width="100">
+          <a-table-column title="评论人头像" data-index="avatar" align="center" :width="140">
             <template #cell="{ record }">
               <a-avatar>
                 <img :alt="record.title" :src="record.userInfo.avatar" />
               </a-avatar>
             </template>
           </a-table-column>
-          <a-table-column title="@昵称" data-index="userInfo.nickname" align="center" :width="140">
+          <a-table-column
+            title="被回复人昵称"
+            data-index="userInfo.nickname"
+            align="center"
+            :width="140"
+          >
             <template #cell="{ record }">
               <span v-if="record.tUserInfo">@{{ record.tUserInfo.nickname }}</span>
             </template>
           </a-table-column>
-          <a-table-column title="@头像" data-index="avatar" align="center" :width="100">
+          <a-table-column title="被回复人头像" data-index="avatar" align="center" :width="140">
             <template #cell="{ record }">
               <a-avatar v-if="record.tUserInfo">
                 <img :alt="record.title" :src="record.tUserInfo.avatar" />
@@ -101,10 +111,10 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, ref, reactive } from 'vue';
+  import { computed, ref, reactive, watch } from 'vue';
   // import { useI18n } from 'vue-i18n';
   // import useLoading from '@/hooks/loading';
-  // import { Pagination } from '@/types/global';
+  import type { Pagination } from '@/types/global';
   import { Message, Modal } from '@arco-design/web-vue';
   import request from '@/api/request';
   import { useTableList } from '@/hooks/data';
@@ -113,18 +123,26 @@
   const generateFormModel = () => {
     return {
       articleId: '',
+      page: 1,
+      pageSize: 10,
     };
   };
   const formModel = ref(generateFormModel());
+  const basePagination: Pagination = {
+    current: 1,
+    pageSize: 10,
+  };
+  const pagination = reactive({
+    ...basePagination,
+  });
   const {
-    pagination,
     action,
     loading,
     list: commentData,
+    total,
     loadMore,
   } = useTableList('/comment/findAll', formModel.value, undefined, false);
   const articleOptions: any = ref([]);
-
   const renderData = computed(() => {
     const list = commentData.value.map((v: any) => {
       v.isLeaf = !v.replys.length;
@@ -136,7 +154,12 @@
     });
     return list;
   });
-
+  watch(
+    () => commentData.value,
+    (n) => {
+      pagination.total = total.value;
+    },
+  );
   getArticleList({
     sort: 'desc',
     page: 1,
@@ -152,10 +175,14 @@
     loadMore();
   };
   const onPageChange = (current: number) => {
+    formModel.value.page = current;
+    pagination.current = current;
     search();
   };
   const reset = () => {
     formModel.value = generateFormModel();
+    formModel.value.articleId = articleOptions.value[0]?.id;
+    pagination.current = 1;
     search();
   };
   const delHandle = async (record: any) => {

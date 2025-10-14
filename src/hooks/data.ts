@@ -24,6 +24,9 @@ export const useTableList = (url: string, data: KeyValue, method = 'get', immedi
     list.value = res.data.list;
     res.data.pagination.current = res.data.pagination.page;
     pagination.value = res.data.pagination;
+    if (res.data.pagination) {
+      total.value = res.data.pagination.total;
+    }
   };
   if (immediate) {
     loadMore();
