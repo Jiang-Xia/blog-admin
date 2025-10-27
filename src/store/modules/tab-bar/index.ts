@@ -1,4 +1,4 @@
-import type { RouteLocationNormalized } from 'vue-router';
+import { useRoute, type RouteLocationNormalized } from 'vue-router';
 import { defineStore } from 'pinia';
 import type { TabBarState, TagProps } from './types';
 
@@ -45,6 +45,23 @@ const useTabBarStore = defineStore('tabBar', {
     deleteTag(idx: number, tag: TagProps) {
       this.tagList.splice(idx, 1);
       this.cacheTabList.delete(tag.name);
+    },
+    // route 当前页面路由信息
+    deleteCurrentTag(route: any) {
+      const idx = this.tagList.findIndex((tag) => tag.fullPath === route.fullPath);
+      const tag = this.tagList[idx];
+      this.tagList.splice(idx, 1);
+      this.cacheTabList.delete(tag.name);
+    },
+    deleteAllTag() {
+      this.tagList = [
+        {
+          title: 'menu.dashboard.workplace',
+          name: 'Workplace',
+          fullPath: '/dashboard/workplace',
+        },
+      ];
+      this.cacheTabList = new Set();
     },
   },
 });

@@ -7,7 +7,7 @@ const images = ['png', 'jpeg', 'svg'];
 export default mergeConfig(
   {
     mode: 'production',
-    base: './',
+    base: '/',
     plugins: [configCompressPlugin('gzip'), configVisualizerPlugin()],
     build: {
       rollupOptions: {

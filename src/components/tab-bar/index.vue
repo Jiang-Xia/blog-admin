@@ -8,7 +8,7 @@
               v-for="(tag, index) in tagList"
               :key="tag.fullPath"
               class="arco-tag arco-tag-size-medium arco-tag-checked"
-              :class="{ 'link-activated': tag.fullPath === $route.fullPath }"
+              :class="{ 'link-activated': tag.fullPath === route.fullPath }"
               @click="goto(tag)"
             >
               <span class="tag-link">
@@ -23,7 +23,15 @@
             </span>
           </div>
         </div>
-        <div class="tag-bar-operation"></div>
+        <div class="tag-bar-operation">
+          <a-dropdown trigger="hover" @select="closeSelect">
+            <a-tag color="red">关闭</a-tag>
+            <template #content>
+              <a-doption value="current">当前页</a-doption>
+              <a-doption value="all">所有页</a-doption>
+            </template>
+          </a-dropdown>
+        </div>
       </div>
     </a-affix>
   </div>
@@ -31,18 +39,20 @@
 
 <script lang="ts" setup>
   import { ref, computed, watch } from 'vue';
-  import { useRouter } from 'vue-router';
+  import { useRoute, useRouter } from 'vue-router';
   import type { RouteLocationNormalized } from 'vue-router';
   import { listenerRouteChange } from '@/utils/route-listener';
   import { useAppStore, useTabBarStore } from '@/store';
   import type { TagProps } from '@/store/modules/tab-bar/types';
   import { useI18n } from 'vue-i18n';
+  import { Message } from '@arco-design/web-vue';
 
   const { t } = useI18n();
   const appStore = useAppStore();
   const tabBarStore = useTabBarStore();
 
   const router = useRouter();
+  const route = useRoute();
   const affixRef = ref();
   const tagList = computed(() => {
     return tabBarStore.getTabList;
@@ -63,16 +73,31 @@
     }
   }, true);
   const tagClose = (tag: TagProps, idx: number) => {
+    if (tag.fullPath === '/dashboard/workplace') {
+      Message.warning('固定页不能关闭！');
+      return;
+    }
     tabBarStore.deleteTag(idx, tag);
-    // console.log(idx, tag);
-    if (idx === tagList.value.length) {
+    console.log(idx, tag);
+    if (idx === tagList.value.length || route.fullPath === tag.fullPath) {
       const latest = tagList.value[tagList.value.length - 1];
       // console.log('closeTab:', latest);
       router.push({ name: latest.name });
     }
   };
-  const goto = (tag: TagProps) => {
+  const goto = (tag: any) => {
     router.push({ ...tag });
+  };
+  console.log(tagList.value);
+  const closeSelect = (val: string) => {
+    // console.log(val)
+    if (val === 'current') {
+      const idx = tagList.value.findIndex((tag) => tag.fullPath === route.fullPath);
+      tagClose(tagList.value[idx], idx);
+    } else if (val === 'all') {
+      tabBarStore.deleteAllTag();
+      router.replace({ name: 'Workplace' });
+    }
   };
 </script>
 
@@ -117,6 +142,9 @@
     .tag-bar-operation {
       width: 100px;
       height: 32px;
+      padding-top: 4px;
+      padding-right: 20px;
+      text-align: right;
     }
   }
 

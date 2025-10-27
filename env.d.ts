@@ -12,3 +12,5 @@ interface ImportMetaEnv {
 namespace guidance {}
 namespace dayjs {}
 namespace $t {}
+namespace $router {}
+namespace $route {}

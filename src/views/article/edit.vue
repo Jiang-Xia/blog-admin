@@ -92,7 +92,7 @@
   import type { ValidatedError } from '@arco-design/web-vue/es/form/interface';
   // import { computed, onBeforeUnmount, onMounted } from 'vue'
   import { MdEditor } from 'md-editor-v3';
-  import { useAppStore } from '@/store';
+  import { useAppStore, useTabBarStore } from '@/store';
   import { useTableNoPageList } from '@/hooks/data';
 
   const appStore = useAppStore();
@@ -172,6 +172,8 @@
       Message.success('新建成功！');
     }
     router.push('/article/list');
+    const tabBarStore = useTabBarStore();
+    tabBarStore.deleteCurrentTag(route);
   };
   // 提交失败
   const handleFinishFailed = (errors: Record<string, ValidatedError>) => {
@@ -200,7 +202,7 @@
     formState.category = info.category.id;
     formState.cover = info.cover;
     formState.tags = info.tags.map((v) => v.id);
-    console.log(formState);
+    // console.log(formState);
   };
   if (type === 'edit') {
     getArticleInfoHandle();
