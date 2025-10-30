@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { type LoginData } from '@/api/user';
+import { type LoginData, type MobileLoginData, type EmailLoginData } from '@/api/user';
 import { setToken, clearToken, getToken } from '@/utils/auth';
 import { removeRouteListener } from '@/utils/route-listener';
 import { userInfo, userLogin } from '@/api/login';
@@ -8,6 +8,7 @@ import { rsaEncrypt } from '@/utils/crypto';
 import useAppStore from '../app';
 
 interface UserState {
+  email: string;
   nickname: string;
   mobile: string;
   token: string;
@@ -24,6 +25,7 @@ interface UserState {
 
 const useUserStore = defineStore('user', {
   state: (): UserState => ({
+    email: '',
     nickname: '',
     mobile: '',
     token: getToken(),
@@ -64,16 +66,42 @@ const useUserStore = defineStore('user', {
     // Login
     async login(loginForm: LoginData) {
       try {
-        const res = await userLogin({
-          mobile: loginForm.username,
-          authCode: loginForm.authCode,
-          password: rsaEncrypt(loginForm.password),
-          admin: true,
-        });
-        const user = res.info.user as UserState;
-        setToken(res.info.token);
-        this.$state.token = res.info.token;
-        this.info(user);
+        // 判断是手机号登录还是邮箱登录
+        if ('username' in loginForm && 'authCode' in loginForm) {
+          // 手机号登录
+          const mobileLogin = loginForm as MobileLoginData;
+          const res = await userLogin(
+            {
+              mobile: mobileLogin.username,
+              authCode: mobileLogin.authCode,
+              password: rsaEncrypt(mobileLogin.password),
+              admin: true,
+            },
+            'mobile',
+          );
+          const user = res.info.user as UserState;
+          setToken(res.info.token);
+          this.$state.token = res.info.token;
+          this.info(user);
+        } else if ('email' in loginForm && 'verificationCode' in loginForm) {
+          // 邮箱登录
+          const emailLogin = loginForm as EmailLoginData;
+          const res = await userLogin(
+            {
+              email: emailLogin.email,
+              verificationCode: emailLogin.verificationCode,
+              password: rsaEncrypt(emailLogin.password),
+              admin: true,
+            },
+            'email',
+          );
+          const user = res.info.user as UserState;
+          setToken(res.info.token);
+          this.$state.token = res.info.token;
+          this.info(user);
+        } else {
+          throw new Error('Invalid login data');
+        }
       } catch (err) {
         clearToken();
         throw err;

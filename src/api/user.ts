@@ -2,15 +2,24 @@ import request from '@/api/request';
 import type { RouteRecordNormalized } from 'vue-router';
 import type { UserState } from '@/store/modules/user/types';
 
-export interface LoginData {
+export interface MobileLoginData {
   username: string;
   password: string;
   authCode: string;
 }
 
+export interface EmailLoginData {
+  email: string;
+  password: string;
+  verificationCode: string;
+}
+
+export type LoginData = MobileLoginData | EmailLoginData;
+
 export interface LoginRes {
   token: string;
 }
+
 export function login(data: LoginData) {
   return request.post<LoginRes>('/api/user/login', data);
 }
@@ -34,4 +43,9 @@ export async function getMenuList(role: string) {
   });
   // console.log('res2', res2);
   return res2;
+}
+
+// 发送邮箱验证码
+export function sendEmailCaptcha(email: string) {
+  return request.post('/api/user/sendEmailCaptcha', { email });
 }

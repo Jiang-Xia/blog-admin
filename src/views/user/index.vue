@@ -9,14 +9,15 @@
     [propName: string]: string | number;
   }
   const { logout } = useUser();
-  const { nickname, mobile, homepage, intro, avatar, id: uid } = useUserStore();
+  const { email, nickname, mobile, homepage, intro, avatar, id: uid } = useUserStore();
   const visible = ref(false);
   const form = reactive({
     password: '',
     passwordRepeat: '',
+    passwordOld: '',
     nickname,
     mobile,
-    passwordOld: '',
+    email,
     homepage,
     intro,
     avatar,
@@ -84,8 +85,11 @@
       </template>
 
       <a-form :model="form" auto-label-width @submit-success="handleFinish">
-        <a-form-item field="mobile" label="手机号">
+        <a-form-item v-if="form.mobile" field="mobile" label="手机号">
           <a-input v-model="form.mobile" placeholder="手机号" disabled />
+        </a-form-item>
+        <a-form-item v-if="form.email" field="email" label="邮箱">
+          <a-input v-model="form.email" placeholder="邮箱" disabled />
         </a-form-item>
         <a-form-item field="nickname" label="昵称">
           <a-input v-model="form.nickname" :max-length="11" placeholder="昵称" />

@@ -20,9 +20,10 @@ export const registerUser = async (data: KeyValue) => {
   return res.data;
 };
 
-export const userLogin = async (data: KeyValue) => {
+export const userLogin = async (data: KeyValue, type = 'email') => {
+  const url = type === 'email' ? '/user/email/login' : '/user/login';
   const res = await request({
-    url: '/user/login',
+    url: url,
     method: 'post',
     data,
     withCredentials: true,
@@ -42,6 +43,15 @@ export const getAuthCode = async () => {
   const res = await request({
     url: '/user/authCode',
     method: 'get',
+  });
+  return res.data;
+};
+
+export const getEmailAuthCode = async (data: KeyValue) => {
+  const res = await request({
+    url: '/user/email/sendCode',
+    method: 'post',
+    data,
   });
   return res.data;
 };
