@@ -80,12 +80,7 @@
             <template #cell="{ record }">
               <a-space :size="8">
                 <!-- v-permission="['admin']" -->
-                <a-button
-                  size="mini"
-                  type="primary"
-                  status="danger"
-                  @click="delHandle(record.value)"
-                >
+                <a-button size="mini" type="primary" status="danger" @click="delHandle(record.id)">
                   <icon-delete />
                 </a-button>
               </a-space>
