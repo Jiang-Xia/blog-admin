@@ -27,7 +27,7 @@ export const createCategory = async (data: KeyValue) => {
 };
 export const updateCategory = async (data: KeyValue) => {
   const res = await request({
-    url: '/category',
+    url: `/category/${data.id}`,
     method: 'patch',
     data,
   });

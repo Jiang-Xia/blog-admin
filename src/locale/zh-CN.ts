@@ -48,6 +48,9 @@ export default {
   'menu.server.system': '系统管理',
   'menu.server.userManage': '用户管理',
   'menu.server.menuManage': '菜单管理',
+  'menu.server.roleManage': '角色管理',
+  'menu.server.privilegeManage': '权限管理',
+  'menu.server.deptManage': '部门管理',
 
   'menu.server.resource': '资源管理',
   'menu.server.resourceList': '资源列表',

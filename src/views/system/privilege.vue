@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <!-- <Breadcrumb :items="['menu.list', 'menu.list.searchTable']" /> -->
-    <a-card class="general-card" title="菜单查询">
+    <a-card class="general-card" title="权限查询">
       <a-row>
         <a-col :flex="1">
           <a-form
@@ -11,9 +11,17 @@
             label-align="left"
           >
             <a-row :gutter="16">
-              <a-col :span="10">
-                <a-form-item label="路由name">
-                  <a-input v-model="formModel.content" placeholder="请输入路由name" disabled />
+              <a-col :span="8">
+                <a-form-item label="权限名称">
+                  <a-input v-model="formModel.privilegeName" placeholder="请输入权限名称" />
+                </a-form-item>
+              </a-col>
+              <a-col :span="8">
+                <a-form-item label="是否可见">
+                  <a-select v-model="formModel.isVisible" placeholder="请选择是否可见" allow-clear>
+                    <a-option :value="true">是</a-option>
+                    <a-option :value="false">否</a-option>
+                  </a-select>
                 </a-form-item>
               </a-col>
               <a-col :span="5" style="text-align: right">
@@ -59,58 +67,18 @@
         @page-change="onPageChange"
       >
         <template #columns>
-          <a-table-column min-width="100" title="菜单id" data-index="id" />
-          <a-table-column min-width="120" title="菜单英文名称" data-index="name" />
-          <a-table-column min-width="120" title="菜单中文名称" data-index="menuCnName" />
-          <a-table-column min-width="100" title="菜单路径" data-index="path" />
-          <a-table-column min-width="120" title="菜单文件路径" data-index="filePath" />
-          <a-table-column min-width="120" title="菜单图标" data-index="meta">
+          <a-table-column title="权限名称" data-index="privilegeName" align="center" />
+          <a-table-column title="权限识别码" data-index="privilegeCode" align="center" />
+          <a-table-column title="所属页面" data-index="privilegePage" align="center" />
+          <a-table-column title="是否可见" data-index="isVisible" align="center">
             <template #cell="{ record }">
-              <DynamicIcon v-if="record?.meta?.icon" :icon="record?.meta?.icon" />
+              <a-tag :color="record.isVisible ? 'green' : 'red'">
+                {{ record.isVisible ? '是' : '否' }}
+              </a-tag>
             </template>
           </a-table-column>
-          <a-table-column min-width="120" title="菜单超级管理员权限" data-index="admin">
-            <template #cell="{ record }">
-              <a-switch
-                v-model="record.admin"
-                type="line"
-                size="small"
-                active-color="red"
-                @change="onSwitchChange('admin', record)"
-              />
-            </template>
-          </a-table-column>
-          <a-table-column min-width="120" title="菜单作者权限" data-index="author">
-            <template #cell="{ record }">
-              <a-switch
-                v-model="record.author"
-                type="round"
-                size="small"
-                active-color="red"
-                @change="onSwitchChange('author', record)"
-              />
-            </template>
-          </a-table-column>
-          <a-table-column min-width="120" title="菜单禁用状态" data-index="isDelete">
-            <template #cell="{ record }">
-              <a-switch
-                v-model="record.isDelete"
-                active-color="red"
-                :checked-value="true"
-                :unchecked-value="false"
-                size="small"
-                @change="onSwitchChange('isDelete', record)"
-              >
-                <template #checked-icon>
-                  <icon-check />
-                </template>
-                <template #unchecked-icon>
-                  <icon-lock />
-                </template>
-              </a-switch>
-            </template>
-          </a-table-column>
-          <a-table-column min-width="100" title="操作" data-index="operations" fixed="right">
+
+          <a-table-column title="操作" data-index="operations">
             <template #cell="{ record }">
               <a-space :size="8">
                 <a-button size="mini" type="primary" @click="showModal('edit', record.id)">
@@ -125,36 +93,32 @@
         </template>
       </a-table>
     </a-card>
-    <addMenu :ref="(el: any) => (addMenuRef = el)" @success="search"></addMenu>
+    <add-modal ref="addRef" @success="search"></add-modal>
   </div>
 </template>
 
 <script lang="ts" setup>
-  import { reactive, ref, h, compile, Component } from 'vue';
+  import { ref, reactive } from 'vue';
   import { useI18n } from 'vue-i18n';
   import useLoading from '@/hooks/loading';
-  import { Pagination } from '@/types/global';
+  import type { Pagination } from '@/types/global';
   import { Message, Modal } from '@arco-design/web-vue';
-  import request from '@/api/request';
-  import addMenu from './addMenu.vue';
-  // 函数式组件 https://vuejs.org/guide/extras/render-function.html#functional-components
-  const DynamicIcon = (props: any, context: any) => {
-    return h(compile(`<${props.icon}/>`), context.attrs, context.slots);
-  };
-  DynamicIcon.props = ['icon'];
+  import { getAllPrivilege, delPrivilege } from '@/api/privilege';
+  import addModal from './addPrivilege.vue';
+
   const generateFormModel = () => {
     return {
       page: 1,
       pageSize: 10,
       total: 0,
-      content: '',
+      privilegeName: '',
+      isVisible: null,
     };
   };
   const { loading, setLoading } = useLoading(true);
   const { t } = useI18n();
   const renderData = ref([{}]);
   const formModel = ref(generateFormModel());
-  const addMenuRef = ref(addMenu);
   const basePagination: Pagination = {
     current: 1,
     pageSize: 10,
@@ -166,11 +130,10 @@
     setLoading(true);
     formModel.value.page = val;
     pagination.current = val;
-    const res = await request
-      .get('/admin/menu', { params: { role: 'super' } })
-      .then((res) => res.data);
+    const res = await getAllPrivilege(formModel.value).then((res) => res.data);
     // console.log(res);
-    renderData.value = res;
+    renderData.value = res.list;
+    pagination.total = res.pagination.total;
     setLoading(false);
   };
   const search = () => {
@@ -186,34 +149,24 @@
   };
   const delHandle = async (id: any) => {
     Modal.confirm({
-      title: '删除用户',
-      content: '确定删除该用户嘛？',
+      title: '删除权限',
+      content: '确定删除该权限嘛？',
       onOk: async () => {
-        const res = await request.delete('/admin/menu', { params: { id } });
+        const res = await delPrivilege(id);
         Message.success('删除成功');
         getTableListHandle();
       },
     });
   };
-  // 修改菜单
-  const onSwitchChange = async (type: string, record: any) => {
-    const { id } = record;
-    const res = await request.patch(`/admin/menu`, {
-      [type]: record[type],
-      id,
-    });
-    Message.success('设置成功');
-  };
+  const addRef = ref(addModal);
   const showModal = (type: string, id?: string) => {
-    // console.log(addMenuRef);
-    // console.log(addMenuRef.value);
-    addMenuRef.value.show({ type, id });
+    addRef.value.show({ type, id });
   };
 </script>
 
 <script lang="ts">
   export default {
-    name: 'UserManageTable',
+    name: 'PrivilegeManageTable',
   };
 </script>
 

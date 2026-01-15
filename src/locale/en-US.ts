@@ -49,6 +49,9 @@ export default {
   'menu.server.system': 'System',
   'menu.server.userManage': 'UserManage',
   'menu.server.menuManage': 'MenuManage',
+  'menu.server.roleManage': 'RoleManage',
+  'menu.server.privilegeManage': 'PrivilegeManage',
+  'menu.server.deptManage': 'DeptManage',
 
   'menu.server.resource': 'Resource',
   'menu.server.resourceList': 'ResourceList',

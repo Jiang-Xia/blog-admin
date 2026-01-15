@@ -80,6 +80,9 @@
             <template #cell="{ record }">
               <a-space :size="8">
                 <!-- v-permission="['admin']" -->
+                <a-button size="mini" type="primary" @click="editHandle(record)">
+                  <icon-edit />
+                </a-button>
                 <a-button size="mini" type="primary" status="danger" @click="delHandle(record.id)">
                   <icon-delete />
                 </a-button>
@@ -97,18 +100,36 @@
           }
         "
       />
+      <CreateModal
+        v-model:value="editVisible"
+        type="分类"
+        :edit-data="editData"
+        @ok="
+          ({ name, type, id }) => {
+            updateCategoryHandle({ name, type, id, cb: search });
+          }
+        "
+      />
     </a-card>
   </div>
 </template>
 
 <script lang="ts" setup>
   import { ref, reactive } from 'vue';
-  import { Pagination } from '@/types/global';
+  import type { Pagination } from '@/types/global';
   import { Message, Modal } from '@arco-design/web-vue';
   import { formateDate } from '@/utils';
+  import {
+    IconEdit,
+    IconDelete,
+    IconPlus,
+    IconSearch,
+    IconRefresh,
+  } from '@arco-design/web-vue/es/icon';
   import { useTableNoPageList } from '@/hooks/data';
   import CreateModal from './create-modal.vue';
   import { ceateOkHandle, delCategoryTag } from '../article/common';
+  import { updateCategory } from '@/api/category';
 
   const generateFormModel = () => {
     return {
@@ -124,6 +145,8 @@
     ...basePagination,
   });
   const visibale = ref(false);
+  const editData = ref<Record<string, any> | undefined>(undefined);
+  const editVisible = ref(false);
   const {
     action,
     loading,
@@ -145,6 +168,11 @@
   const addHandle = () => {
     visibale.value = true;
   };
+
+  const editHandle = (record: Record<string, any>) => {
+    editData.value = record;
+    editVisible.value = true;
+  };
   const delHandle = async (id: string) => {
     Modal.confirm({
       title: '删除分类',
@@ -155,6 +183,22 @@
         search();
       },
     });
+  };
+
+  const updateCategoryHandle = async ({
+    name,
+    type,
+    id,
+    cb,
+  }: {
+    name: string;
+    type: string;
+    id: string;
+    cb: () => void;
+  }) => {
+    const res = await updateCategory({ id, label: name, value: name });
+    Message.success('更新成功！');
+    cb();
   };
 </script>
 

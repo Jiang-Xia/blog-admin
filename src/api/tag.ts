@@ -26,7 +26,7 @@ export const createTag = async (data: KeyValue) => {
 };
 export const updateTag = async (data: KeyValue) => {
   const res = await request({
-    url: '/tag',
+    url: `/tag/${data.id}`,
     method: 'patch',
     data,
   });

@@ -80,6 +80,9 @@
             <template #cell="{ record }">
               <a-space :size="8">
                 <!-- v-permission="['admin']" -->
+                <a-button size="mini" type="primary" @click="editHandle(record)">
+                  <icon-edit />
+                </a-button>
                 <a-button size="mini" type="primary" status="danger" @click="delHandle(record.id)">
                   <icon-delete />
                 </a-button>
@@ -97,18 +100,28 @@
           }
         "
       />
+      <CreateModal
+        v-model:value="editVisibale"
+        :edit-data="editRecord"
+        type="标签"
+        @ok="
+          ({ name, type, id }) => {
+            editOkHandle({ name, type, id });
+          }
+        "
+      />
     </a-card>
   </div>
 </template>
 
 <script lang="ts" setup>
   import { ref, reactive } from 'vue';
-  import { Pagination } from '@/types/global';
+  import type { Pagination } from '@/types/global';
   import { Message, Modal } from '@arco-design/web-vue';
   import { formateDate } from '@/utils';
   import { useTableNoPageList } from '@/hooks/data';
   import CreateModal from '../category/create-modal.vue';
-  import { ceateOkHandle, delCategoryTag } from '../article/common';
+  import { ceateOkHandle, delCategoryTag, updateCategoryTag } from '../article/common';
 
   const generateFormModel = () => {
     return {
@@ -133,6 +146,8 @@
     ...basePagination,
   });
   const visibale = ref(false);
+  const editVisibale = ref(false);
+  const editRecord = ref<Record<string, any> | undefined>(undefined);
 
   const {
     action,
@@ -165,6 +180,15 @@
         search();
       },
     });
+  };
+
+  const editHandle = (record: Record<string, any>) => {
+    editRecord.value = record;
+    editVisibale.value = true;
+  };
+
+  const editOkHandle = async ({ name, type, id }: { name: string; type: string; id: string }) => {
+    await updateCategoryTag({ name, type, id, cb: search });
   };
 </script>
 

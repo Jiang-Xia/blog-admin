@@ -96,3 +96,21 @@ export const delCategoryTag = async (type: string, id: string) => {
   const res = await api.delTag(id);
   return res;
 };
+
+// 更新分类和标签
+type U = { name: string; type: string; id: string; cb: () => void };
+export const updateCategoryTag = async ({ name, type, id, cb }: U) => {
+  const obj = {
+    label: name,
+    value: name,
+  };
+  if (type === '分类') {
+    await api.updateCategory({ id, ...obj });
+    Message.success('更新成功！');
+    cb();
+  } else {
+    await api.updateTag({ id, ...obj });
+    Message.success('更新成功！');
+    cb();
+  }
+};

@@ -11,35 +11,38 @@
       name="custom-validation"
       :model="formState"
       :rules="rules"
-      :label-col-props="{ span: 3, offset: 0 }"
-      :wrapper-col-props="{ span: 20, offset: 0 }"
+      :label-col-props="{ span: 6, offset: 0 }"
+      :wrapper-col-props="{ span: 18, offset: 0 }"
       hide-cancel
       autocomplete="off"
       @submit-success="handleFinish"
       @submit-failed="handleFinishFailed"
     >
-      <a-form-item label="id" name="id" field="id">
+      <a-form-item label="菜单id" name="id" field="id">
         <a-input v-model="formState.id" :disabled="type === 'edit'" placeholder="id" />
       </a-form-item>
-      <a-form-item label="pid" name="pid" field="pid">
+      <a-form-item label="父级pid" name="pid" field="pid">
         <a-input v-model="formState.pid" placeholder="pid" />
       </a-form-item>
-      <a-form-item label="path" name="path" field="path">
+      <a-form-item label="菜单路由path" name="path" field="path">
         <a-input v-model="formState.path" placeholder="path" />
       </a-form-item>
-      <a-form-item label="name" name="name" field="name">
+      <a-form-item label="菜单英文名称" name="name" field="name">
         <a-input v-model="formState.name" placeholder="name" />
       </a-form-item>
-      <a-form-item label="icon" name="icon" field="icon">
+      <a-form-item label="菜单中文名称" name="menuCnName" field="menuCnName">
+        <a-input v-model="formState.menuCnName" placeholder="菜单中文名称" />
+      </a-form-item>
+      <a-form-item label="图标" name="icon" field="icon">
         <a-input v-model="formState.icon" placeholder="icon" />
       </a-form-item>
-      <a-form-item label="locale" name="locale" field="locale">
+      <a-form-item label="本地化标识" name="locale" field="locale">
         <a-input v-model="formState.locale" placeholder="locale" />
       </a-form-item>
-      <a-form-item label="filePath" name="filePath" field="filePath">
+      <a-form-item label="文件路径" name="filePath" field="filePath">
         <a-input v-model="formState.filePath" placeholder="filePath" />
       </a-form-item>
-      <a-form-item label="order" name="order" field="order">
+      <a-form-item label="排序" name="order" field="order">
         <a-input-number v-model="formState.order" placeholder="order" />
       </a-form-item>
       <a-form-item :wrapper-col-props="{ span: 13, offset: 7 }">
@@ -77,6 +80,7 @@
     pid: string;
     path: string;
     name: string;
+    menuCnName: string;
     order: number;
     icon: string;
     locale: string;
@@ -87,6 +91,7 @@
     pid: '',
     path: '',
     name: '',
+    menuCnName: '',
     order: 1,
     icon: '',
     locale: '',
@@ -111,7 +116,33 @@
     }
     Promise.resolve();
   };
-  const rules = {};
+  const rules = {
+    id: [
+      { required: true, message: '请输入菜单ID' },
+      { maxLength: 50, message: '菜单ID长度不能超过50个字符' },
+      { pattern: /^[a-zA-Z0-9_-]+$/, message: '菜单ID只能包含字母、数字、下划线和横线' },
+    ],
+    pid: [
+      { maxLength: 50, message: '父级ID长度不能超过50个字符' },
+      { pattern: /^[a-zA-Z0-9_-]*$/, message: '父级ID只能包含字母、数字、下划线和横线' },
+    ],
+    path: [
+      { required: true, message: '请输入菜单路径' },
+      { maxLength: 100, message: '路径长度不能超过100个字符' },
+    ],
+    name: [
+      { required: true, message: '请输入菜单名称' },
+      { maxLength: 50, message: '菜单名称长度不能超过50个字符' },
+    ],
+    menuCnName: [
+      { required: true, message: '请输入菜单中文名称' },
+      { maxLength: 50, message: '菜单中文名称长度不能超过50个字符' },
+    ],
+    icon: [{ maxLength: 50, message: '图标名称长度不能超过50个字符' }],
+    locale: [{ maxLength: 50, message: '本地化标识长度不能超过50个字符' }],
+    filePath: [{ maxLength: 100, message: '文件路径长度不能超过100个字符' }],
+    order: [{ type: 'number', min: 0, max: 999999, message: '排序值必须在0-999999之间' }],
+  };
   // 提交成功
   const handleFinish = async (values: any) => {
     // console.log('values', values)
@@ -146,7 +177,7 @@
   };
 
   // const ArticleInfo = ref({})
-  // 文章编辑
+  // 菜单编辑
   const getInfoHandle = async () => {
     const res = await request.get('admin/menu/detail', {
       params: { id: currentId.value },

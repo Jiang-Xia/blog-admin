@@ -31,5 +31,35 @@ export default {
         roles: ['*'],
       },
     },
+    {
+      path: '/system/roleManage',
+      name: 'RoleManage',
+      component: () => import('@/views/system/role.vue'),
+      meta: {
+        locale: 'menu.server.roleManage',
+        requiresAuth: true,
+        roles: ['*'],
+      },
+    },
+    {
+      path: '/system/privilegeManage',
+      name: 'PrivilegeManage',
+      component: () => import('@/views/system/privilege.vue'),
+      meta: {
+        locale: 'menu.server.privilegeManage',
+        requiresAuth: true,
+        roles: ['*'],
+      },
+    },
+    {
+      path: '/system/deptManage',
+      name: 'DeptManage',
+      component: () => import('@/views/system/dept.vue'),
+      meta: {
+        locale: 'menu.server.deptManage',
+        requiresAuth: true,
+        roles: ['*'],
+      },
+    },
   ],
 };
