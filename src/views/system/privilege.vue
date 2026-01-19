@@ -17,6 +17,39 @@
                 </a-form-item>
               </a-col>
               <a-col :span="8">
+                <a-form-item label="路径模式">
+                  <a-input v-model="formModel.pathPattern" placeholder="请输入路径模式" />
+                </a-form-item>
+              </a-col>
+              <a-col :span="8">
+                <a-form-item label="HTTP方法">
+                  <a-select v-model="formModel.httpMethod" placeholder="请选择HTTP方法" allow-clear>
+                    <a-option value="GET">GET</a-option>
+                    <a-option value="POST">POST</a-option>
+                    <a-option value="PUT">PUT</a-option>
+                    <a-option value="DELETE">DELETE</a-option>
+                    <a-option value="PATCH">PATCH</a-option>
+                    <a-option value="HEAD">HEAD</a-option>
+                    <a-option value="OPTIONS">OPTIONS</a-option>
+                    <a-option value="*">*(全部)</a-option>
+                  </a-select>
+                </a-form-item>
+              </a-col>
+            </a-row>
+            <a-row :gutter="16">
+              <a-col :span="8">
+                <a-form-item label="是否公开接口">
+                  <a-select
+                    v-model="formModel.isPublic"
+                    placeholder="请选择是否公开接口"
+                    allow-clear
+                  >
+                    <a-option :value="true">是</a-option>
+                    <a-option :value="false">否</a-option>
+                  </a-select>
+                </a-form-item>
+              </a-col>
+              <a-col :span="8">
                 <a-form-item label="是否可见">
                   <a-select v-model="formModel.isVisible" placeholder="请选择是否可见" allow-clear>
                     <a-option :value="true">是</a-option>
@@ -24,7 +57,7 @@
                   </a-select>
                 </a-form-item>
               </a-col>
-              <a-col :span="5" style="text-align: right">
+              <a-col :span="8" style="text-align: right">
                 <a-space :size="8">
                   <a-button type="primary" @click="search">
                     <template #icon>
@@ -67,18 +100,59 @@
         @page-change="onPageChange"
       >
         <template #columns>
-          <a-table-column title="权限名称" data-index="privilegeName" align="center" />
-          <a-table-column title="权限识别码" data-index="privilegeCode" align="center" />
-          <a-table-column title="所属页面" data-index="privilegePage" align="center" />
-          <a-table-column title="是否可见" data-index="isVisible" align="center">
+          <a-table-column
+            min-width="130"
+            title="权限名称"
+            data-index="privilegeName"
+            align="center"
+          />
+          <a-table-column
+            min-width="130"
+            title="权限识别码"
+            data-index="privilegeCode"
+            align="center"
+          />
+          <a-table-column
+            min-width="130"
+            title="所属页面"
+            data-index="privilegePage"
+            align="center"
+          />
+          <a-table-column
+            min-width="130"
+            title="路径模式"
+            data-index="pathPattern"
+            align="center"
+          />
+          <a-table-column min-width="180" title="HTTP方法" data-index="httpMethod" align="center" />
+          <a-table-column min-width="100" title="是否公开接口" data-index="isPublic" align="center">
+            <template #cell="{ record }">
+              <a-tag :color="record.isPublic ? 'blue' : 'orange'">
+                {{ record.isPublic ? '是' : '否' }}
+              </a-tag>
+            </template>
+          </a-table-column>
+          <a-table-column
+            min-width="140"
+            title="是否需要检查资源所有权"
+            data-index="requireOwnership"
+            align="center"
+          >
+            <template #cell="{ record }">
+              <a-tag :color="record.requireOwnership ? 'purple' : 'gray'">
+                {{ record.requireOwnership ? '是' : '否' }}
+              </a-tag>
+            </template>
+          </a-table-column>
+          <a-table-column min-width="100" title="是否可见" data-index="isVisible" align="center">
             <template #cell="{ record }">
               <a-tag :color="record.isVisible ? 'green' : 'red'">
                 {{ record.isVisible ? '是' : '否' }}
               </a-tag>
             </template>
           </a-table-column>
-
-          <a-table-column title="操作" data-index="operations">
+          <a-table-column min-width="150" title="描述" data-index="description" align="center" />
+          <a-table-column min-width="150" title="操作" data-index="operations" fixed="right">
             <template #cell="{ record }">
               <a-space :size="8">
                 <a-button size="mini" type="primary" @click="showModal('edit', record.id)">
@@ -112,13 +186,17 @@
       pageSize: 10,
       total: 0,
       privilegeName: '',
+      pathPattern: '',
+      httpMethod: '',
+      isPublic: null,
+      requireOwnership: null,
       isVisible: null,
     };
   };
   const { loading, setLoading } = useLoading(true);
   const { t } = useI18n();
   const renderData = ref([{}]);
-  const formModel = ref(generateFormModel());
+  const formModel = ref<any>(generateFormModel());
   const basePagination: Pagination = {
     current: 1,
     pageSize: 10,

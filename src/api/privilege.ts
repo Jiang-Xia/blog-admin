@@ -29,7 +29,7 @@ export const createPrivilege = async (data: KeyValue) => {
 
 export const updatePrivilege = async (data: KeyValue) => {
   const res = await request({
-    url: `/privilege/${data.id}`,
+    url: `/privilege/${data.editId}`,
     method: 'patch',
     data,
   });

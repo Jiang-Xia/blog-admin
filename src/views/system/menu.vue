@@ -62,7 +62,7 @@
           <a-table-column min-width="100" title="菜单id" data-index="id" />
           <a-table-column min-width="120" title="菜单英文名称" data-index="name" />
           <a-table-column min-width="120" title="菜单中文名称" data-index="menuCnName" />
-          <a-table-column min-width="100" title="菜单路径" data-index="path" />
+          <a-table-column min-width="120" title="菜单路径" data-index="path" />
           <a-table-column min-width="120" title="菜单文件路径" data-index="filePath" />
           <a-table-column min-width="120" title="菜单图标" data-index="meta">
             <template #cell="{ record }">

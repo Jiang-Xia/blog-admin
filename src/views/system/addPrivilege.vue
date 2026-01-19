@@ -19,12 +19,7 @@
       @submit-failed="handleFinishFailed"
     >
       <a-form-item label="权限名称" name="privilegeName" field="privilegeName">
-        <a-input
-          v-model="formState.privilegeName"
-          :disabled="type === 'edit'"
-          :max-length="20"
-          placeholder="权限名称"
-        />
+        <a-input v-model="formState.privilegeName" :max-length="20" placeholder="权限名称" />
       </a-form-item>
       <a-form-item label="权限识别码" name="privilegeCode" field="privilegeCode">
         <a-input v-model="formState.privilegeCode" placeholder="权限识别码" />
@@ -42,6 +37,42 @@
           @change="handleTreeChange"
           label-in-value
         />
+      </a-form-item>
+      <a-form-item label="路径模式" name="pathPattern" field="pathPattern">
+        <a-input v-model="formState.pathPattern" placeholder="路径模式，如 /api/users/:id" />
+      </a-form-item>
+      <a-form-item label="HTTP方法" name="httpMethod" field="httpMethod">
+        <a-select v-model="formState.httpMethod" placeholder="请选择HTTP方法">
+          <a-option value="GET">GET</a-option>
+          <a-option value="POST">POST</a-option>
+          <a-option value="PUT">PUT</a-option>
+          <a-option value="DELETE">DELETE</a-option>
+          <a-option value="PATCH">PATCH</a-option>
+          <a-option value="HEAD">HEAD</a-option>
+          <a-option value="OPTIONS">OPTIONS</a-option>
+          <a-option value="*">*(全部)</a-option>
+        </a-select>
+      </a-form-item>
+      <a-form-item label="是否公开接口" name="isPublic" field="isPublic">
+        <a-switch
+          v-model="formState.isPublic"
+          :checked-value="true"
+          :unchecked-value="false"
+          checked-text="是"
+          unchecked-text="否"
+        />
+      </a-form-item>
+      <a-form-item label="是否需要检查资源所有权" name="requireOwnership" field="requireOwnership">
+        <a-switch
+          v-model="formState.requireOwnership"
+          :checked-value="true"
+          :unchecked-value="false"
+          checked-text="是"
+          unchecked-text="否"
+        />
+      </a-form-item>
+      <a-form-item label="描述" name="description" field="description">
+        <a-textarea v-model="formState.description" placeholder="请输入描述" :max-length="500" />
       </a-form-item>
       <a-form-item label="是否可见" name="isVisible" field="isVisible">
         <a-switch
@@ -91,12 +122,22 @@
     privilegeCode: string;
     privilegePage: string;
     isVisible: boolean;
+    pathPattern: string;
+    httpMethod: string;
+    isPublic: boolean;
+    requireOwnership: boolean;
+    description: string;
   }
   const defaultForm = {
     privilegeName: '',
     privilegeCode: '',
     privilegePage: '',
     isVisible: true,
+    pathPattern: '',
+    httpMethod: '',
+    isPublic: false,
+    requireOwnership: false,
+    description: '',
   };
 
   const formRef = ref();
@@ -134,6 +175,15 @@
       { maxLength: 50, message: '权限识别码不能超过50个字符' },
     ],
     privilegePage: [{ required: true, message: '所属页面不能为空' }],
+    pathPattern: [
+      { required: true, message: '路径模式不能为空' },
+      { maxLength: 500, message: '路径模式不能超过500个字符' },
+    ],
+    httpMethod: [
+      { required: true, message: 'HTTP方法不能为空' },
+      { maxLength: 10, message: 'HTTP方法不能超过10个字符' },
+    ],
+    description: [{ maxLength: 500, message: '描述不能超过500个字符' }],
   };
   // 提交成功
   const handleFinish = async (values: any) => {
@@ -181,6 +231,12 @@
     formState.privilegePage = responseData.privilegePage || '';
     formState.privilegePage = responseData.privilegePage || '';
     formState.isVisible = responseData.isVisible !== undefined ? responseData.isVisible : true;
+    formState.pathPattern = responseData.pathPattern || '';
+    formState.httpMethod = responseData.httpMethod || '';
+    formState.isPublic = responseData.isPublic !== undefined ? responseData.isPublic : false;
+    formState.requireOwnership =
+      responseData.requireOwnership !== undefined ? responseData.requireOwnership : false;
+    formState.description = responseData.description || '';
 
     // 如果是编辑模式，需要将privilegePage转换为树形选择器需要的格式
     // 由于树形选择器需要节点的ID，直接赋值即可

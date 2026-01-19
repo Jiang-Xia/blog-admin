@@ -19,12 +19,7 @@
       @submit-failed="handleFinishFailed"
     >
       <a-form-item label="角色名" name="roleName" field="roleName">
-        <a-input
-          v-model="formState.roleName"
-          :disabled="type === 'edit'"
-          :max-length="11"
-          placeholder="角色名"
-        />
+        <a-input v-model="formState.roleName" :max-length="11" placeholder="角色名" />
       </a-form-item>
       <a-form-item label="角色描述" name="roleDesc" field="roleDesc">
         <a-input v-model="formState.roleDesc" placeholder="角色描述" />
