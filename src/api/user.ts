@@ -33,14 +33,12 @@ export function getUserInfo() {
 }
 
 // 获取菜单数据
-export async function getMenuList(role: string) {
+export async function getMenuList() {
   // mock
   // const res2 = await request.post<RouteRecordNormalized[]>('/api/user/menu');
   // console.log('res1', res1);
   // server
-  const res2 = await request.get<RouteRecordNormalized[]>('/admin/menu', {
-    params: { role },
-  });
+  const res2 = await request.get<RouteRecordNormalized[]>('/admin/menu');
   // console.log('res2', res2);
   return res2;
 }

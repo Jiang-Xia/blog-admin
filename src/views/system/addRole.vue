@@ -30,7 +30,7 @@
           style="max-height: 400px; overflow-y: auto; width: 100%"
           :checkable="true"
           v-model:checked-keys="formState.privileges"
-          :check-strictly="false"
+          :check-strictly="true"
           :only-check-leaf="false"
           :data="treeData"
           :field-names="{
@@ -54,7 +54,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { computed, ref, reactive } from 'vue';
+  import { computed, ref, reactive, nextTick } from 'vue';
   // import useLoading from '@/hooks/loading';
   // import { Pagination } from '@/types/global';
   import { Message, Modal } from '@arco-design/web-vue';
@@ -110,8 +110,12 @@
 
   // 处理树形组件勾选事件
   const onTreeCheck = (checkedKeys: string[], e: any) => {
-    // 更新选中的keys
-    formState.privileges = [...checkedKeys];
+    const subKeys = checkedSubKeys(e.node.children);
+    if (e.checked) {
+      formState.privileges = [...checkedKeys, ...subKeys];
+    } else {
+      formState.privileges = formState.privileges.filter((key) => !subKeys.includes(key));
+    }
   };
 
   const getMenuPrivilegeTree = async (val = 1) => {
@@ -122,36 +126,16 @@
     treeData.value = res;
   };
 
-  // 收集已选中的key
-  const collectCheckedKeys = (data: any[]): string[] => {
+  // 已选中的子节点
+  const checkedSubKeys = (data: any[]): string[] => {
+    if (!data || data.length === 0) return [];
     let keys: string[] = [];
-
     data.forEach((item) => {
-      // 添加菜单本身的key
-      if (item.checked) {
-        keys.push(item.value || item.id);
-      }
-
-      // 添加已选中的权限key
-      if (item.checkedPrivilegeIds && item.checkedPrivilegeIds.length > 0) {
-        keys = [...keys, ...item.checkedPrivilegeIds];
-      }
-
-      // 递归处理子节点
+      keys.push(item.value || item.id);
       if (item.children && item.children.length > 0) {
-        keys = [...keys, ...collectCheckedKeys(item.children)];
-      }
-
-      // 如果是菜单项并且有权限子节点
-      if (item.privileges && item.privileges.length > 0) {
-        item.privileges.forEach((privilege: any) => {
-          if (privilege.checked) {
-            keys.push(privilege.privilegeId || privilege.value || privilege.id);
-          }
-        });
+        keys = [...keys, ...checkedSubKeys(item.children)];
       }
     });
-
     return keys;
   };
 

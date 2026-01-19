@@ -69,28 +69,6 @@
               <DynamicIcon v-if="record?.meta?.icon" :icon="record?.meta?.icon" />
             </template>
           </a-table-column>
-          <a-table-column min-width="120" title="菜单超级管理员权限" data-index="admin">
-            <template #cell="{ record }">
-              <a-switch
-                v-model="record.admin"
-                type="line"
-                size="small"
-                active-color="red"
-                @change="onSwitchChange('admin', record)"
-              />
-            </template>
-          </a-table-column>
-          <a-table-column min-width="120" title="菜单作者权限" data-index="author">
-            <template #cell="{ record }">
-              <a-switch
-                v-model="record.author"
-                type="round"
-                size="small"
-                active-color="red"
-                @change="onSwitchChange('author', record)"
-              />
-            </template>
-          </a-table-column>
           <a-table-column min-width="120" title="菜单禁用状态" data-index="isDelete">
             <template #cell="{ record }">
               <a-switch
@@ -130,10 +108,10 @@
 </template>
 
 <script lang="ts" setup>
-  import { reactive, ref, h, compile, Component } from 'vue';
+  import { reactive, ref, h, compile } from 'vue';
   import { useI18n } from 'vue-i18n';
   import useLoading from '@/hooks/loading';
-  import { Pagination } from '@/types/global';
+  import type { Pagination } from '@/types/global';
   import { Message, Modal } from '@arco-design/web-vue';
   import request from '@/api/request';
   import addMenu from './addMenu.vue';
@@ -166,9 +144,7 @@
     setLoading(true);
     formModel.value.page = val;
     pagination.current = val;
-    const res = await request
-      .get('/admin/menu', { params: { role: 'super' } })
-      .then((res) => res.data);
+    const res = await request.get('/admin/menu').then((res) => res.data);
     // console.log(res);
     renderData.value = res;
     setLoading(false);

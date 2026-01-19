@@ -57,8 +57,7 @@ const useAppStore = defineStore('app', {
           closable: true,
         });
         // console.log(this);
-        const { role } = useUserStore();
-        const { data } = await getMenuList(role);
+        const { data } = await getMenuList();
         this.serverMenu = data;
         console.log('serverMenu:', data);
         notifyInstance = Notification.success({
