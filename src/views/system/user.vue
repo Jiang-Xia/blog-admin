@@ -11,12 +11,22 @@
             label-align="left"
           >
             <a-row :gutter="16">
-              <a-col :span="12">
+              <a-col :span="6">
                 <a-form-item label="手机号">
                   <a-input v-model="formModel.mobile" placeholder="请输入手机号" />
                 </a-form-item>
               </a-col>
-              <a-col :span="5" style="text-align: right">
+              <a-col :span="6">
+                <a-form-item label="账号">
+                  <a-input v-model="formModel.username" placeholder="请输入账号" />
+                </a-form-item>
+              </a-col>
+              <a-col :span="6">
+                <a-form-item label="昵称">
+                  <a-input v-model="formModel.nickname" placeholder="请输入昵称" />
+                </a-form-item>
+              </a-col>
+              <a-col :span="4" style="text-align: right">
                 <a-space :size="8">
                   <a-button type="primary" @click="search">
                     <template #icon>
@@ -67,8 +77,19 @@
               </a-avatar>
             </template>
           </a-table-column>
+          <a-table-column title="账号" data-index="username" align="center" />
           <a-table-column title="昵称" data-index="nickname" />
           <a-table-column title="角色类型" data-index="role" />
+          <a-table-column title="创建时间" data-index="createTime" align="center">
+            <template #cell="{ record }">
+              {{ formatDate(record.createTime) }}
+            </template>
+          </a-table-column>
+          <a-table-column title="更新时间" data-index="updateTime" align="center">
+            <template #cell="{ record }">
+              {{ formatDate(record.updateTime) }}
+            </template>
+          </a-table-column>
           <a-table-column title="锁定" data-index="status">
             <template #cell="{ record }">
               <!-- :disabled="record.agreed" -->
@@ -99,6 +120,15 @@
                   size="mini"
                   type="primary"
                   :disabled="record.role === 'super'"
+                  @click="showModal('edit', record.id)"
+                >
+                  编辑
+                  <icon-edit />
+                </a-button>
+                <a-button
+                  size="mini"
+                  type="primary"
+                  :disabled="record.role === 'super'"
                   @click="resetHandle(record)"
                 >
                   重置密码
@@ -118,9 +148,10 @@
   import { ref, reactive } from 'vue';
   import { useI18n } from 'vue-i18n';
   import useLoading from '@/hooks/loading';
-  import { Pagination } from '@/types/global';
+  import type { Pagination } from '@/types/global';
   import { Message, Modal } from '@arco-design/web-vue';
   import request from '@/api/request';
+  import dayjs from 'dayjs';
   import addModal from './addUser.vue';
 
   const generateFormModel = () => {
@@ -129,11 +160,25 @@
       pageSize: 10,
       total: 0,
       mobile: '',
+      nickname: '',
+      username: '',
     };
   };
   const { loading, setLoading } = useLoading(true);
   const { t } = useI18n();
-  const renderData = ref([{}]);
+  interface User {
+    id: string;
+    mobile: string;
+    username: string;
+    nickname: string;
+    avatar: string;
+    role: string;
+    status: string;
+    createTime?: string;
+    updateTime?: string;
+  }
+
+  const renderData = ref<User[]>([]);
   const formModel = ref(generateFormModel());
   const basePagination: Pagination = {
     current: 1,
@@ -164,9 +209,10 @@
     formModel.value = generateFormModel();
   };
   const delHandle = async (id: any) => {
+    const record = renderData.value.find((item) => item.id === id);
     Modal.confirm({
       title: '删除用户',
-      content: '确定删除该用户嘛？',
+      content: `确定删除用户 ${record?.nickname || record?.mobile || '该用户'} 吗？`,
       onOk: async () => {
         const res = await request.delete('/user', { params: { id } });
         Message.success('删除成功');
@@ -190,6 +236,10 @@
       nickname,
     });
     Message.success(res.message);
+  };
+
+  const formatDate = (date: string) => {
+    return date ? dayjs(date).format('YYYY-MM-DD HH:mm:ss') : '--';
   };
 </script>
 

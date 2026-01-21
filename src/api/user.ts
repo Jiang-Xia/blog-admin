@@ -47,3 +47,34 @@ export async function getMenuList() {
 export function sendEmailCaptcha(email: string) {
   return request.post('/api/user/sendEmailCaptcha', { email });
 }
+
+// 管理员创建用户
+export interface AdminCreateUserData {
+  nickname: string;
+  username?: string;
+  mobile: string;
+  email?: string;
+  password: string;
+  roleIds?: number[];
+  deptId?: number;
+  intro?: string;
+  avatar?: string;
+}
+
+// 管理员更新用户（不包含手机号、用户名和密码字段，因为这些不可修改）
+export interface AdminUpdateUserData {
+  nickname: string;
+  roleIds?: number[];
+  deptId?: number;
+  intro?: string;
+  avatar?: string;
+}
+
+export function adminCreateUser(data: AdminCreateUserData) {
+  return request.post('/user/admin/create', data);
+}
+
+// 管理员更新用户
+export function adminUpdateUser(id: number, data: AdminUpdateUserData) {
+  return request.post(`/user/admin/update/${id}`, data);
+}
