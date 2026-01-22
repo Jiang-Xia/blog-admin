@@ -81,7 +81,7 @@
       <a-row style="margin-bottom: 16px">
         <a-col :span="16">
           <a-space>
-            <a-button type="primary" @click="showModal('add')">
+            <a-button v-permission="'privilege:create'" type="primary" @click="showModal('add')">
               <template #icon>
                 <icon-plus />
               </template>
@@ -155,10 +155,21 @@
           <a-table-column min-width="150" title="操作" data-index="operations" fixed="right">
             <template #cell="{ record }">
               <a-space :size="8">
-                <a-button size="mini" type="primary" @click="showModal('edit', record.id)">
+                <a-button
+                  v-permission="'privilege:update'"
+                  size="mini"
+                  type="primary"
+                  @click="showModal('edit', record.id)"
+                >
                   <icon-edit />
                 </a-button>
-                <a-button size="mini" type="primary" status="danger" @click="delHandle(record.id)">
+                <a-button
+                  v-permission="'privilege:delete'"
+                  size="mini"
+                  type="primary"
+                  status="danger"
+                  @click="delHandle(record.id)"
+                >
                   <icon-delete />
                 </a-button>
               </a-space>

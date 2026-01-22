@@ -17,6 +17,8 @@ interface UserState {
   avatar: string;
   homepage: string;
   intro: string;
+  roles: any[];
+  privileges: string[];
 }
 /*
   使用 const userStore = useUserStore(); userStore.id
@@ -34,6 +36,8 @@ const useUserStore = defineStore('user', {
     avatar: '',
     homepage: '',
     intro: '',
+    roles: [],
+    privileges: [],
   }),
 
   getters: {
@@ -132,6 +136,20 @@ const useUserStore = defineStore('user', {
       try {
         const res = await userInfo();
         this.info(res);
+        // 提取所有角色的权限码
+        if (res.roles && Array.isArray(res.roles)) {
+          const privilegeCodes: string[] = [];
+          res.roles.forEach((role: any) => {
+            if (role.privileges && Array.isArray(role.privileges)) {
+              role.privileges.forEach((privilege: any) => {
+                if (privilege.privilegeCode && !privilegeCodes.includes(privilege.privilegeCode)) {
+                  privilegeCodes.push(privilege.privilegeCode);
+                }
+              });
+            }
+          });
+          this.privileges = privilegeCodes;
+        }
       } catch (err) {
         clearToken();
         throw err;

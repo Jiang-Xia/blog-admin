@@ -50,7 +50,7 @@
       <a-row style="margin-bottom: 16px">
         <a-col :span="16">
           <a-space>
-            <a-button type="primary" @click="showModal('add')">
+            <a-button v-permission="'user:create'" type="primary" @click="showModal('add')">
               <template #icon>
                 <icon-plus />
               </template>
@@ -94,6 +94,7 @@
             <template #cell="{ record }">
               <!-- :disabled="record.agreed" -->
               <a-switch
+                v-permission="'user:status'"
                 v-model="record.status"
                 active-color="red"
                 checked-value="locked"
@@ -113,10 +114,17 @@
           <a-table-column title="操作" data-index="operations">
             <template #cell="{ record }">
               <a-space :size="8">
-                <a-button size="mini" type="primary" status="danger" @click="delHandle(record.id)">
+                <a-button
+                  v-permission="'user:delete'"
+                  size="mini"
+                  type="primary"
+                  status="danger"
+                  @click="delHandle(record.id)"
+                >
                   <icon-delete />
                 </a-button>
                 <a-button
+                  v-permission="'user:edit'"
                   size="mini"
                   type="primary"
                   :disabled="record.role === 'super'"
@@ -126,6 +134,7 @@
                   <icon-edit />
                 </a-button>
                 <a-button
+                  v-permission="'user:resetPassword'"
                   size="mini"
                   type="primary"
                   :disabled="record.role === 'super'"

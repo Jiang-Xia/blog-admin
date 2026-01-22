@@ -64,7 +64,11 @@
       <a-row style="margin-bottom: 16px">
         <a-col :span="16">
           <a-space>
-            <a-button type="primary" @click="router.push('/article/edit?type=add')">
+            <a-button
+              v-permission="'article:create'"
+              type="primary"
+              @click="router.push('/article/edit?type=add')"
+            >
               <template #icon>
                 <icon-plus />
               </template>
@@ -136,6 +140,7 @@
             <template #cell="{ record }">
               <!-- :disabled="record.agreed" -->
               <a-switch
+                v-permission="'article:topping'"
                 v-model="record.topping"
                 active-color="red"
                 @change="onSwitchTopping(record)"
@@ -153,6 +158,7 @@
             <template #cell="{ record }">
               <!-- :disabled="record.agreed" -->
               <a-switch
+                v-permission="'article:disabled'"
                 v-model="record.isDelete"
                 active-color="red"
                 @change="onSwitchChange(record)"
@@ -170,6 +176,7 @@
             <template #cell="{ record }">
               <a-space :size="8">
                 <a-button
+                  v-permission="'article:edit'"
                   size="mini"
                   type="primary"
                   @click="
@@ -180,8 +187,8 @@
                 >
                   <icon-edit />
                 </a-button>
-                <!-- v-permission="['admin']" -->
                 <a-button
+                  v-permission="'article:delete'"
                   size="mini"
                   type="primary"
                   status="danger"

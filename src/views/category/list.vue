@@ -42,7 +42,7 @@
       <a-row style="margin-bottom: 16px">
         <a-col :span="16">
           <a-space>
-            <a-button type="primary" @click="addHandle">
+            <a-button v-permission="'category:create'" type="primary" @click="addHandle">
               <template #icon>
                 <icon-plus />
               </template>
@@ -79,11 +79,21 @@
           <a-table-column title="操作" data-index="operations">
             <template #cell="{ record }">
               <a-space :size="8">
-                <!-- v-permission="['admin']" -->
-                <a-button size="mini" type="primary" @click="editHandle(record)">
+                <a-button
+                  v-permission="'category:update'"
+                  size="mini"
+                  type="primary"
+                  @click="editHandle(record)"
+                >
                   <icon-edit />
                 </a-button>
-                <a-button size="mini" type="primary" status="danger" @click="delHandle(record.id)">
+                <a-button
+                  v-permission="'category:delete'"
+                  size="mini"
+                  type="primary"
+                  status="danger"
+                  @click="delHandle(record.id)"
+                >
                   <icon-delete />
                 </a-button>
               </a-space>
