@@ -3,6 +3,7 @@ import NProgress from 'nprogress'; // progress bar
 
 import { useUserStore } from '@/store';
 import { isLogin } from '@/utils/auth';
+import { WHITE_LIST } from '../constants';
 
 export default function setupUserLoginInfoGuard(router: Router) {
   router.beforeEach(async (to, from, next) => {
@@ -26,6 +27,11 @@ export default function setupUserLoginInfoGuard(router: Router) {
         }
       }
     } else {
+      // 检查是否在白名单中
+      if (WHITE_LIST.some((item) => item.name === to.name)) {
+        next();
+        return;
+      }
       if (to.name === 'login') {
         next();
         return;

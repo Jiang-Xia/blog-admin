@@ -27,6 +27,14 @@ const router = createRouter({
       },
     },
     {
+      path: '/datascreen',
+      name: 'datascreen',
+      component: () => import('@/views/dashboard/datascreen/index.vue'),
+      meta: {
+        requiresAuth: false,
+      },
+    },
+    {
       path: '/useTsx',
       name: 'useTsx',
       component: () => import('@/views/user/index.vue'),

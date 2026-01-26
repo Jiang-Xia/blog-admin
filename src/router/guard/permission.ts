@@ -18,8 +18,8 @@ export default function setupPermissionGuard(router: Router) {
 
     // 自定义
     if (!hasToken) {
-      // 未登录 访问登录页未白名单直接next
-      if (WHITE_LIST.findIndex((v) => v.name === to.path)) {
+      // 未登录 访问登录页或白名单直接next
+      if (WHITE_LIST.some((v) => v.name === to.name)) {
         next();
       } else {
         // 访问其他页跳转login
