@@ -98,14 +98,14 @@ export default defineComponent({
                   key={element?.name}
                   v-slots={{
                     icon,
-                    title: () => t(element?.meta?.locale || ''),
+                    title: () => (element?.meta?.locale ? t(element?.meta?.locale) : ''),
                   }}
                 >
                   {travel(element?.children)}
                 </a-sub-menu>
               ) : (
                 <a-menu-item key={element?.name} v-slots={{ icon }} onClick={() => goto(element)}>
-                  {t(element?.meta?.locale || '')}
+                  {element?.meta?.locale ? t(element?.meta?.locale) : ''}
                 </a-menu-item>
               );
             nodes.push(node as never);
