@@ -2,7 +2,7 @@
   <div class="chart-card">
     <div class="chart-header">
       <icon-apps class="header-icon" />
-      <span class="chart-title">分类文章统计</span>
+      <span class="chart-title">{{ t('datascreen.chart.categoryStatistics') }}</span>
     </div>
     <a-spin :loading="loading" style="width: 100%">
       <Chart height="300px" :option="chartOption" />
@@ -12,7 +12,10 @@
 
 <script lang="ts" setup>
   import { ref, onMounted, watch } from 'vue';
+  import { useI18n } from 'vue-i18n';
   import useChartOption from '@/hooks/chart-option';
+
+  const { t } = useI18n();
 
   const props = defineProps({
     loading: {
@@ -64,7 +67,7 @@
       },
       series: [
         {
-          name: '分类统计',
+          name: t('datascreen.series.categoryStats'),
           type: 'pie',
           radius: ['40%', '70%'],
           center: ['35%', '50%'],

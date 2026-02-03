@@ -1,0 +1,32 @@
+export default {
+  // Resource Management - File Type Categories
+  'resource.fileType.all': 'All',
+  'resource.fileType.image': 'Image',
+  'resource.fileType.document': 'Document',
+  'resource.fileType.video': 'Video',
+  'resource.fileType.audio': 'Audio',
+  'resource.fileType.application': 'Other',
+
+  // Resource Management - Page Operations
+  'resource.title': 'File Management',
+  'resource.breadcrumb.allFiles': 'All Files',
+  'resource.breadcrumb.backToRoot': 'Back to Root',
+  'resource.button.upload': 'Upload Resource',
+  'resource.button.newFolder': 'New Folder',
+  'resource.placeholder.search': 'Enter file name to search',
+  'resource.modal.newFolder': 'New Folder',
+  'resource.modal.moveFile': 'Move File',
+  'resource.modal.uploadFile': 'Upload File',
+  'resource.modal.complete': 'Complete',
+  'resource.placeholder.folderName': 'Please enter folder name',
+  'resource.placeholder.selectFolder': 'Please select folder',
+  'resource.menu.copyLink': 'Copy Link',
+  'resource.menu.rename': 'Rename',
+  'resource.menu.moveTo': 'Move to',
+  'resource.menu.delete': 'Delete',
+  'resource.message.deleteSuccess': 'Delete Successful',
+  'resource.message.moveSuccess': 'Move Completed',
+  'resource.message.copySuccess': 'Copy Successful',
+  'resource.message.createSuccess': 'Create Successful',
+  'resource.empty': 'No files',
+};

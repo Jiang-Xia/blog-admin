@@ -1,0 +1,23 @@
+export default {
+  // 留言板管理
+  'msgboard.query.title': '留言板查询',
+  'msgboard.form.commentContent': '评论内容',
+  'msgboard.form.replyContent': '回复内容',
+  'msgboard.form.email': '邮箱',
+  'msgboard.form.nickname': '昵称',
+  'msgboard.form.placeholder.comment': '请输入评论内容',
+  'msgboard.form.placeholder.reply': '请输入回复内容',
+  'msgboard.form.placeholder.email': '请输入邮箱',
+  'msgboard.form.placeholder.nickname': '请输入昵称',
+  'msgboard.table.nickname': '昵称',
+  'msgboard.table.avatar': '头像',
+  'msgboard.table.comment': '评论内容',
+  'msgboard.table.address': '网址',
+  'msgboard.button.search': '搜索',
+  'msgboard.button.reset': '重置',
+  'msgboard.table.operation': '操作',
+  'msgboard.confirm.delete': '删除留言',
+  'msgboard.confirm.deleteContent': '确定删除该留言嘛？',
+  'msgboard.message.deleteSuccess': '删除成功',
+  'msgboard.message.setSuccess': '设置成功',
+};

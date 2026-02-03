@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <!-- <Breadcrumb :items="['menu.list', 'menu.list.searchTable']" /> -->
-    <a-card class="general-card" title="标签查询">
+    <a-card class="general-card" :title="t('tag.query.title')">
       <a-row>
         <a-col :flex="1">
           <a-form
@@ -12,8 +12,11 @@
           >
             <a-row :gutter="16">
               <a-col :span="12">
-                <a-form-item label="标签名">
-                  <a-input v-model="formModel.title" placeholder="请输入标签名" />
+                <a-form-item :label="t('tag.form.name')">
+                  <a-input
+                    v-model="formModel.title"
+                    :placeholder="t('tag.form.placeholder.name')"
+                  />
                 </a-form-item>
               </a-col>
             </a-row>
@@ -25,13 +28,13 @@
               <template #icon>
                 <icon-search />
               </template>
-              {{ '搜索' }}
+              {{ t('common.button.search') }}
             </a-button>
             <a-button @click="reset">
               <template #icon>
                 <icon-refresh />
               </template>
-              {{ '重置' }}
+              {{ t('common.button.reset') }}
             </a-button>
           </a-space>
         </a-col>
@@ -46,7 +49,7 @@
               <template #icon>
                 <icon-plus />
               </template>
-              {{ '新建' }}
+              {{ t('tag.button.create') }}
             </a-button>
           </a-space>
         </a-col>
@@ -60,23 +63,23 @@
         @page-change="onPageChange"
       >
         <template #columns>
-          <a-table-column title="标签名" data-index="label" />
-          <a-table-column title="标签文章数" data-index="articleCount">
+          <a-table-column :title="t('tag.table.name')" data-index="label" />
+          <a-table-column :title="t('tag.table.articleCount')" data-index="articleCount">
             <template #cell="{ record }">
               <a-tag :color="record.color" size="small">{{ record.articleCount }}</a-tag>
             </template>
           </a-table-column>
-          <a-table-column title="颜色" data-index="color">
+          <a-table-column :title="t('tag.table.color')" data-index="color">
             <template #cell="{ record }">
               <a-tag :color="record.color" size="small">{{ record.color }}</a-tag>
             </template>
           </a-table-column>
-          <a-table-column title="创建时间" data-index="createAt">
+          <a-table-column :title="t('common.table.createTime')" data-index="createAt">
             <template #cell="{ record }">
               {{ formateDate(record.createAt) }}
             </template>
           </a-table-column>
-          <a-table-column title="操作" data-index="operations">
+          <a-table-column :title="t('common.table.operation')" data-index="operations">
             <template #cell="{ record }">
               <a-space :size="8">
                 <a-button
@@ -103,7 +106,7 @@
       </a-table>
       <CreateModal
         v-model:value="visibale"
-        type="标签"
+        :type="t('tag.form.name')"
         @ok="
           ({ name, type }) => {
             ceateOkHandle({ name, type, cb: search });
@@ -113,7 +116,7 @@
       <CreateModal
         v-model:value="editVisibale"
         :edit-data="editRecord"
-        type="标签"
+        :type="t('tag.form.name')"
         @ok="
           ({ name, type, id }) => {
             editOkHandle({ name, type, id });
@@ -126,12 +129,15 @@
 
 <script lang="ts" setup>
   import { ref, reactive } from 'vue';
+  import { useI18n } from 'vue-i18n';
   import type { Pagination } from '@/types/global';
   import { Message, Modal } from '@arco-design/web-vue';
   import { formateDate } from '@/utils';
   import { useTableNoPageList } from '@/hooks/data';
   import CreateModal from '../category/create-modal.vue';
   import { ceateOkHandle, delCategoryTag, updateCategoryTag } from '../article/common';
+
+  const { t } = useI18n();
 
   const generateFormModel = () => {
     return {
@@ -182,11 +188,11 @@
   };
   const delHandle = async (id: string) => {
     Modal.confirm({
-      title: '删除标签',
-      content: '确定删除该标签嘛？',
+      title: t('tag.confirm.delete'),
+      content: t('common.confirm.content'),
       onOk: async () => {
-        const res = await delCategoryTag('标签', id);
-        Message.success('删除成功');
+        const res = await delCategoryTag(t('tag.form.name'), id);
+        Message.success(t('tag.message.deleteSuccess'));
         search();
       },
     });

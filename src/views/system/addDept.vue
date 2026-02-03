@@ -20,43 +20,64 @@
       auto-label-width
       label-align="center"
     >
-      <a-form-item label="部门名称" name="deptName" field="deptName">
-        <a-input v-model="formState.deptName" :max-length="20" placeholder="请输入部门名称" />
+      <a-form-item :label="t('dept.form.deptName')" name="deptName" field="deptName">
+        <a-input
+          v-model="formState.deptName"
+          :max-length="20"
+          :placeholder="t('dept.form.placeholder.deptName')"
+        />
       </a-form-item>
-      <a-form-item label="部门编码" name="deptCode" field="deptCode">
-        <a-input v-model="formState.deptCode" :max-length="20" placeholder="请输入部门编码" />
+      <a-form-item :label="t('dept.form.deptCode')" name="deptCode" field="deptCode">
+        <a-input
+          v-model="formState.deptCode"
+          :max-length="20"
+          :placeholder="t('dept.form.placeholder.deptCode')"
+        />
       </a-form-item>
-      <a-form-item label="父级部门" name="parentId" field="parentId">
+      <a-form-item :label="t('dept.form.parentId')" name="parentId" field="parentId">
         <a-tree-select
           v-model="formState.parentId"
           :data="deptTreeData"
           :field-names="{ key: 'id', title: 'deptName', children: 'children' }"
-          placeholder="请选择父级部门"
+          :placeholder="t('dept.form.placeholder.parentId')"
           allow-clear
         />
       </a-form-item>
-      <a-form-item label="部门负责人ID" name="leaderId" field="leaderId">
-        <a-input v-model="formState.leaderId" placeholder="请输入部门负责人ID" />
+      <a-form-item :label="t('dept.form.leaderId')" name="leaderId" field="leaderId">
+        <a-input v-model="formState.leaderId" :placeholder="t('dept.form.placeholder.leaderId')" />
       </a-form-item>
-      <a-form-item label="部门负责人姓名" name="leaderName" field="leaderName">
-        <a-input v-model="formState.leaderName" placeholder="请输入部门负责人姓名" />
+      <a-form-item :label="t('dept.form.leaderName')" name="leaderName" field="leaderName">
+        <a-input
+          v-model="formState.leaderName"
+          :placeholder="t('dept.form.placeholder.leaderName')"
+        />
       </a-form-item>
-      <a-form-item label="部门排序" name="orderNum" field="orderNum">
-        <a-input-number v-model="formState.orderNum" placeholder="请输入部门排序" :min="0" />
+      <a-form-item :label="t('dept.form.orderNum')" name="orderNum" field="orderNum">
+        <a-input-number
+          v-model="formState.orderNum"
+          :placeholder="t('dept.form.placeholder.orderNum')"
+          :min="0"
+        />
       </a-form-item>
-      <a-form-item label="状态" name="status" field="status">
+      <a-form-item :label="t('dept.form.status')" name="status" field="status">
         <a-radio-group v-model="formState.status">
-          <a-radio :value="1">正常</a-radio>
-          <a-radio :value="0">禁用</a-radio>
+          <a-radio :value="1">{{ t('dept.status.normal') }}</a-radio>
+          <a-radio :value="0">{{ t('dept.status.disabled') }}</a-radio>
         </a-radio-group>
       </a-form-item>
-      <a-form-item label="部门描述" name="remark" field="remark">
-        <a-textarea v-model="formState.remark" placeholder="请输入部门描述" :max-length="200" />
+      <a-form-item :label="t('dept.form.remark')" name="remark" field="remark">
+        <a-textarea
+          v-model="formState.remark"
+          :placeholder="t('dept.form.placeholder.remark')"
+          :max-length="200"
+        />
       </a-form-item>
 
       <a-form-item :wrapper-col-props="{ span: 13, offset: 7 }">
-        <a-button type="primary" html-type="submit">提交</a-button>
-        <a-button style="margin-left: 10px" @click="resetForm">重置</a-button>
+        <a-button type="primary" html-type="submit">{{ t('common.button.submit') }}</a-button>
+        <a-button style="margin-left: 10px" @click="resetForm">{{
+          t('common.button.reset')
+        }}</a-button>
       </a-form-item>
     </a-form>
     <template #footer><div> </div></template>
@@ -70,9 +91,10 @@
   import { useAppStore } from '@/store';
   import { useI18n } from 'vue-i18n';
   import { getDeptById, createDept, updateDept, getDeptTree } from '@/api/dept';
+  const { t } = useI18n();
   const type = ref('add');
   const title = computed(() => {
-    return type.value === 'edit' ? '编辑机构' : '新增机构';
+    return type.value === 'edit' ? t('dept.modal.edit') : t('dept.modal.add');
   });
   interface stringKey {
     [propName: string]: string | number;
@@ -110,43 +132,43 @@
       const res = await getDeptTree();
       deptTreeData.value = res.data || [];
     } catch (error) {
-      console.error('加载部门树失败:', error);
+      console.error(t('system.message.loadDeptTreeFailed'), error);
     }
   };
   // 自定义异步校验
   const checkTitle = async (value: string, cb: (error?: string) => void) => {
     console.log(value);
     if (!value) {
-      cb('请输入标题！');
+      cb(t('system.validate.titleRequired'));
     }
     Promise.resolve();
   };
   const checkDescription = async (value: string, cb: (error?: string) => void) => {
     if (!value) {
-      cb('请输入描述！');
+      cb(t('system.validate.descriptionRequired'));
     }
     Promise.resolve();
   };
 
   const rules = {
     deptName: [
-      { required: true, message: '请输入部门名称' },
-      { minLength: 2, message: '部门名称至少2个字符' },
-      { maxLength: 20, message: '部门名称不能超过20个字符' },
+      { required: true, message: t('system.validate.deptName.required') },
+      { minLength: 2, message: t('system.validate.deptName.minLength') },
+      { maxLength: 20, message: t('system.validate.deptName.maxLength') },
     ],
     deptCode: [
-      { required: true, message: '请输入部门编码' },
-      { minLength: 2, message: '部门编码至少2个字符' },
-      { maxLength: 20, message: '部门编码不能超过20个字符' },
+      { required: true, message: t('system.validate.deptCode.required') },
+      { minLength: 2, message: t('system.validate.deptCode.minLength') },
+      { maxLength: 20, message: t('system.validate.deptCode.maxLength') },
     ],
-    parentId: [{ required: true, message: '请选择父级部门' }],
-    leaderId: [{ maxLength: 20, message: '部门负责人ID不能超过20个字符' }],
-    leaderName: [{ maxLength: 20, message: '部门负责人姓名不能超过20个字符' }],
+    parentId: [{ required: true, message: t('system.validate.parentId.required') }],
+    leaderId: [{ maxLength: 20, message: t('system.validate.leaderId.maxLength') }],
+    leaderName: [{ maxLength: 20, message: t('system.validate.leaderName.maxLength') }],
     orderNum: [
-      { required: true, message: '请输入部门排序' },
-      { type: 'number', min: 0, message: '排序必须为非负数' },
+      { required: true, message: t('system.validate.orderNum.required') },
+      { type: 'number', min: 0, message: t('system.validate.orderNum.min') },
     ],
-    remark: [{ maxLength: 200, message: '部门描述不能超过200个字符' }],
+    remark: [{ maxLength: 200, message: t('system.validate.remark.maxLength') }],
   };
   // 提交成功
   const handleFinish = async (values: any) => {
@@ -162,13 +184,13 @@
       const res = await updateDept(params);
       visible.value = false;
       // console.log({ res });
-      Message.success('修改成功！');
+      Message.success(t('dept.message.updateSuccess'));
       resetForm();
     } else {
       // 新建
       const res = await createDept(params);
       visible.value = false;
-      Message.success('新建成功！');
+      Message.success(t('dept.message.createSuccess'));
       resetForm();
     }
     emits('success');
@@ -208,8 +230,8 @@
         }
       });
     } catch (error) {
-      console.error('获取部门信息失败:', error);
-      Message.error('获取部门信息失败');
+      console.error(t('dept.message.getDeptInfoFailed'), error);
+      Message.error(t('dept.message.getDeptInfoFailed'));
     }
   };
   const handleOk = () => {

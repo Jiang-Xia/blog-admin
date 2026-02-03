@@ -18,41 +18,44 @@
       @submit-success="handleFinish"
       @submit-failed="handleFinishFailed"
     >
-      <a-form-item label="账号" name="username" field="username">
+      <a-form-item :label="t('user.form.username')" name="username" field="username">
         <a-input
           v-model="formState.username"
           :disabled="type === 'edit'"
           :max-length="11"
-          placeholder="账号"
+          :placeholder="t('user.form.placeholder.username')"
         />
       </a-form-item>
-      <a-form-item label="昵称" name="nickname" field="nickname">
-        <a-input v-model="formState.nickname" placeholder="昵称" />
+      <a-form-item :label="t('user.form.nickname')" name="nickname" field="nickname">
+        <a-input v-model="formState.nickname" :placeholder="t('user.form.placeholder.nickname')" />
       </a-form-item>
       <a-form-item
         v-if="type !== 'edit'"
-        label="密码"
+        :label="t('user.form.password')"
         name="password"
         field="password"
         :max-length="16"
       >
-        <a-input v-model="formState.password" placeholder="密码" />
+        <a-input v-model="formState.password" :placeholder="t('user.form.placeholder.password')" />
       </a-form-item>
       <a-form-item
         v-if="type !== 'edit'"
-        label="确认密码"
+        :label="t('user.form.passwordRepeat')"
         name="passwordRepeat"
         :max-length="16"
         field="passwordRepeat"
       >
-        <a-input v-model="formState.passwordRepeat" placeholder="确认密码" />
+        <a-input
+          v-model="formState.passwordRepeat"
+          :placeholder="t('user.form.placeholder.passwordRepeat')"
+        />
       </a-form-item>
 
-      <a-form-item label="所属部门" name="deptId" field="deptId">
+      <a-form-item :label="t('user.form.deptId')" name="deptId" field="deptId">
         <a-select
           v-model="formState.deptId"
           :loading="loadingDepts"
-          placeholder="请选择用户所属部门"
+          :placeholder="t('user.form.placeholder.deptId')"
           :filterable="true"
         >
           <a-option v-for="dept in deptOptions" :key="dept.value" :value="dept.value">
@@ -61,12 +64,12 @@
         </a-select>
       </a-form-item>
 
-      <a-form-item label="所属角色" name="roleIds" field="roleIds">
+      <a-form-item :label="t('user.form.roleIds')" name="roleIds" field="roleIds">
         <a-select
           v-model="formState.roleIds"
           multiple
           :loading="loadingRoles"
-          placeholder="请选择用户所属角色"
+          :placeholder="t('user.form.placeholder.roleIds')"
           allow-create
           :filterable="true"
         >
@@ -79,16 +82,22 @@
         </a-select>
       </a-form-item>
 
-      <a-form-item label="头像" name="avatar" field="avatar">
-        <a-input v-model="formState.avatar" placeholder="头像URL" />
+      <a-form-item :label="t('user.form.avatar')" name="avatar" field="avatar">
+        <a-input v-model="formState.avatar" :placeholder="t('user.form.placeholder.avatar')" />
       </a-form-item>
 
-      <a-form-item label="简介" name="intro" field="intro">
-        <a-textarea v-model="formState.intro" placeholder="个人简介或签名" :max-length="100" />
+      <a-form-item :label="t('user.form.intro')" name="intro" field="intro">
+        <a-textarea
+          v-model="formState.intro"
+          :placeholder="t('user.form.placeholder.intro')"
+          :max-length="100"
+        />
       </a-form-item>
       <a-form-item :wrapper-col-props="{ span: 13, offset: 7 }">
-        <a-button type="primary" html-type="submit">提交</a-button>
-        <a-button style="margin-left: 10px" @click="resetForm">重置</a-button>
+        <a-button type="primary" html-type="submit">{{ t('common.button.submit') }}</a-button>
+        <a-button style="margin-left: 10px" @click="resetForm">{{
+          t('common.button.reset')
+        }}</a-button>
       </a-form-item>
     </a-form>
     <template #footer><div> </div></template>
@@ -102,10 +111,12 @@
   import { useAppStore } from '@/store';
   import request from '@/api/request';
   import { adminCreateUser, adminUpdateUser } from '@/api/user';
+  import { useI18n } from 'vue-i18n';
 
+  const { t } = useI18n();
   const type = ref('add');
   const title = computed(() => {
-    return type.value === 'edit' ? '编辑用户' : '新增用户';
+    return type.value === 'edit' ? t('user.modal.edit') : t('user.modal.add');
   });
   interface stringKey {
     [propName: string]: string | number | undefined | any[];
@@ -145,25 +156,25 @@
   const checkTitle = async (value: string, cb: (error?: string) => void) => {
     console.log(value);
     if (!value) {
-      cb('请输入标题！');
+      cb(t('system.validate.titleRequired'));
     }
     Promise.resolve();
   };
   const checkDescription = async (value: string, cb: (error?: string) => void) => {
     if (!value) {
-      cb('请输入描述！');
+      cb(t('system.validate.descriptionRequired'));
     }
     Promise.resolve();
   };
   const rules = {
     username: [
-      { required: true, message: '请输入手机号' },
-      { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号码' },
-      { maxLength: 11, message: '手机号不能超过11个字符' },
+      { required: true, message: t('user.validate.username.required') },
+      { pattern: /^1[3-9]\d{9}$/, message: t('user.validate.username.pattern') },
+      { maxLength: 11, message: t('user.validate.username.maxLength') },
     ],
     nickname: [
-      { required: true, message: '请输入昵称' },
-      { maxLength: 6, message: '昵称不能超过6个字符' },
+      { required: true, message: t('user.validate.nickname.required') },
+      { maxLength: 6, message: t('user.validate.nickname.maxLength') },
     ],
     password: [
       {
@@ -172,11 +183,11 @@
           if (type.value === 'add') {
             // 添加模式下必须输入密码
             if (!value) {
-              callback('请输入密码');
+              callback(t('user.validate.password.required'));
             } else if (value.length < 6) {
-              callback('密码至少需要6个字符');
+              callback(t('user.validate.password.minLength'));
             } else if (value.length > 18) {
-              callback('密码不能超过18个字符');
+              callback(t('user.validate.password.maxLength'));
             } else {
               callback();
             }
@@ -185,7 +196,7 @@
             callback();
           }
         },
-        message: '请输入密码',
+        message: t('user.validate.password.required'),
       },
     ],
     passwordRepeat: [
@@ -195,9 +206,9 @@
           if (type.value === 'add') {
             // 添加模式下需要验证重复密码
             if (!value) {
-              callback('请再次输入密码');
+              callback(t('user.validate.passwordRepeat.required'));
             } else if (value !== formState.password) {
-              callback('两次输入的密码不一致');
+              callback(t('user.validate.passwordRepeat.notMatch'));
             } else {
               callback();
             }
@@ -206,7 +217,7 @@
             callback();
           }
         },
-        message: '请再次输入密码',
+        message: t('user.validate.passwordRepeat.required'),
       },
     ],
     avatar: [],
@@ -218,7 +229,7 @@
           if (type.value === 'add') {
             // 添加模式下必须选择角色
             if (!value || value.length === 0) {
-              callback('请选择至少一个角色');
+              callback(t('user.validate.roleIds.required'));
             } else {
               callback();
             }
@@ -227,7 +238,7 @@
             callback();
           }
         },
-        message: '请选择用户所属角色',
+        message: t('user.validate.roleIds.required'),
       },
     ],
     deptId: [
@@ -237,7 +248,7 @@
           if (type.value === 'add') {
             // 添加模式下必须选择部门
             if (!value) {
-              callback('请选择用户所属部门');
+              callback(t('user.validate.deptId.required'));
             } else {
               callback();
             }
@@ -246,7 +257,7 @@
             callback();
           }
         },
-        message: '请选择用户所属部门',
+        message: t('user.validate.deptId.required'),
       },
     ],
   };
@@ -280,13 +291,13 @@
       const res = await adminUpdateUser(parseInt(currentId.value), params);
       visible.value = false;
       // console.log({ res });
-      Message.success('修改成功！');
+      Message.success(t('user.message.updateSuccess'));
       resetForm();
     } else {
       // 新建 - 使用管理员创建用户接口
       const res = await adminCreateUser(params);
       visible.value = false;
-      Message.success('新建成功！');
+      Message.success(t('user.message.createSuccess'));
       resetForm();
     }
     emits('success');
@@ -306,7 +317,7 @@
       }));
     } catch (error) {
       console.error('获取角色列表失败:', error);
-      Message.error('获取角色列表失败');
+      Message.error(t('user.message.getRolesFailed'));
     } finally {
       loadingRoles.value = false;
     }
@@ -322,7 +333,7 @@
       }));
     } catch (error) {
       console.error('获取部门列表失败:', error);
-      Message.error('获取部门列表失败');
+      Message.error(t('user.message.getDeptsFailed'));
     } finally {
       loadingDepts.value = false;
     }

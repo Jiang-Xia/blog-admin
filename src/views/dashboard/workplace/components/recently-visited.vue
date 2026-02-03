@@ -9,7 +9,7 @@
       <a-row :gutter="8">
         <a-col
           v-for="link in links"
-          :key="link.text"
+          :key="link.i18n"
           :span="8"
           class="wrapper"
           @click="router.push(link.url)"
@@ -18,7 +18,7 @@
             <component :is="link.icon" />
           </div>
           <a-typography-paragraph class="text">
-            {{ link.text }}
+            {{ t(link.i18n) }}
           </a-typography-paragraph>
         </a-col>
       </a-row>
@@ -32,7 +32,7 @@
 
   const { t } = useI18n();
   const router = useRouter();
-  const links = [{ text: '文章编辑.', icon: 'icon-storage', url: '/article/edit' }];
+  const links = [{ i18n: 'workplace.articleEdit', icon: 'icon-storage', url: '/article/edit' }];
 </script>
 
 <style lang="less" scoped>

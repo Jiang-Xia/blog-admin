@@ -4,11 +4,13 @@
   import request from '@/api/request';
   import { Message, Modal } from '@arco-design/web-vue';
   import useUser from '@/hooks/user';
+  import { useI18n } from 'vue-i18n';
 
   interface stringKey {
     [propName: string]: string | number;
   }
   const { logout } = useUser();
+  const { t } = useI18n();
   const { email, nickname, mobile, homepage, intro, avatar, id: uid } = useUserStore();
   const visible = ref(false);
   const form = reactive({
@@ -40,7 +42,7 @@
       .patch(`/user/password`, obj)
       .then(() => {
         done();
-        Message.success('修改成功,请重新登陆！');
+        Message.success(t('user.message.changePasswordSuccess'));
         // console.log({ logout, dom: modalForm.value });
         modalForm.value.resetFields();
         setTimeout(() => {
@@ -67,7 +69,7 @@
       ...obj,
       id: uid,
     });
-    Message.success('修改成功！');
+    Message.success(t('user.message.updateSuccess'));
   };
 </script>
 
@@ -79,61 +81,69 @@
         <template v-else>{{ form.nickname }}</template>
       </a-avatar>
     </div>
-    <a-card :style="{ width: '80%' }" title="个人信息">
+    <a-card :style="{ width: '80%' }" :title="t('user.title')">
       <template #extra>
-        <a-button type="text" @click="handleClick">修改密码</a-button>
+        <a-button type="text" @click="handleClick">{{ t('user.button.changePassword') }}</a-button>
       </template>
 
       <a-form :model="form" auto-label-width @submit-success="handleFinish">
-        <a-form-item v-if="form.mobile" field="mobile" label="手机号">
-          <a-input v-model="form.mobile" placeholder="手机号" disabled />
+        <a-form-item v-if="form.mobile" field="mobile" :label="t('user.form.mobile')">
+          <a-input
+            v-model="form.mobile"
+            :placeholder="t('user.form.placeholder.mobile')"
+            disabled
+          />
         </a-form-item>
-        <a-form-item v-if="form.email" field="email" label="邮箱">
-          <a-input v-model="form.email" placeholder="邮箱" disabled />
+        <a-form-item v-if="form.email" field="email" :label="t('user.form.email')">
+          <a-input v-model="form.email" :placeholder="t('user.form.placeholder.email')" disabled />
         </a-form-item>
-        <a-form-item field="nickname" label="昵称">
-          <a-input v-model="form.nickname" :max-length="11" placeholder="昵称" />
+        <a-form-item field="nickname" :label="t('user.form.nickname')">
+          <a-input
+            v-model="form.nickname"
+            :max-length="11"
+            :placeholder="t('user.form.placeholder.nickname')"
+          />
         </a-form-item>
-        <a-form-item field="avatar" label="头像">
-          <a-input v-model="form.avatar" placeholder="头像链接" />
+        <a-form-item field="avatar" :label="t('user.form.avatar')">
+          <a-input v-model="form.avatar" :placeholder="t('user.form.placeholder.avatar')" />
         </a-form-item>
-        <a-form-item field="homepage" label="主页">
-          <a-input v-model="form.homepage" placeholder="个人主页地址" />
+        <a-form-item field="homepage" :label="t('user.form.homepage')">
+          <a-input v-model="form.homepage" :placeholder="t('user.form.placeholder.homepage')" />
         </a-form-item>
-        <a-form-item field="intro" label="介绍">
-          <a-input v-model="form.intro" placeholder="这个人很懒，什么都没有留下！" />
+        <a-form-item field="intro" :label="t('user.form.intro')">
+          <a-input v-model="form.intro" :placeholder="t('user.form.placeholder.intro')" />
         </a-form-item>
         <a-form-item>
-          <a-button html-type="submit" type="primary">保存信息</a-button>
+          <a-button html-type="submit" type="primary">{{ t('common.button.save') }}</a-button>
         </a-form-item>
       </a-form>
     </a-card>
 
     <a-modal
       v-model:visible="visible"
-      title="修改密码"
+      :title="t('user.modal.changePassword')"
       @cancel="handleCancel"
       @before-ok="handleBeforeOk"
     >
       <a-form ref="modalForm" :model="form">
-        <a-form-item field="passwordOld" label="旧密码">
+        <a-form-item field="passwordOld" :label="t('user.form.passwordOld')">
           <a-input-password
             v-model="form.passwordOld"
             allow-clear
             :max-length="16"
-            placeholder="旧密码"
+            :placeholder="t('user.form.placeholder.passwordOld')"
           >
             <template #prefix>
               <icon-lock />
             </template>
           </a-input-password>
         </a-form-item>
-        <a-form-item field="password" label="新密码">
+        <a-form-item field="password" :label="t('user.form.password')">
           <a-input-password
             v-model="form.password"
             allow-clear
             :max-length="16"
-            placeholder="新密码"
+            :placeholder="t('user.form.placeholder.password')"
             auto-com
           >
             <template #prefix>
@@ -141,11 +151,11 @@
             </template>
           </a-input-password>
         </a-form-item>
-        <a-form-item field="passwordRepeat" label="确认密码">
+        <a-form-item field="passwordRepeat" :label="t('user.form.passwordRepeat')">
           <a-input-password
             v-model="form.passwordRepeat"
             allow-clear
-            placeholder="确认密码"
+            :placeholder="t('user.form.placeholder.passwordRepeat')"
             :max-length="16"
           >
             <template #prefix>

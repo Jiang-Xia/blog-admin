@@ -1,6 +1,6 @@
 <template>
   <div v-if="windowWidth > 715" class="file-aside">
-    <div class="heading">文件管理</div>
+    <div class="heading">{{ t('resource.title') }}</div>
     <a-menu
       :style="{ 'width': '220px', 'height': '100%', 'border-radius': '2px' }"
       :default-open-keys="['0']"
@@ -10,7 +10,7 @@
         <template #icon>
           <icon-apps></icon-apps>
         </template>
-        <template #title>文件类型</template>
+        <template #title>{{ t('resource.fileType.document') }}</template>
         <a-menu-item
           v-for="item in fileTypeList"
           :key="item.value.toString()"
@@ -19,7 +19,7 @@
           <template #icon>
             <x-icon :icon="item.icon"></x-icon>
           </template>
-          <span>{{ item.name }}</span>
+          <span>{{ t(item.i18nKey) }}</span>
         </a-menu-item>
       </a-sub-menu>
     </a-menu>
@@ -28,9 +28,11 @@
 
 <script setup lang="ts">
   import { ref } from 'vue';
+  import { useI18n } from 'vue-i18n';
   import { useWindowSize } from '@vueuse/core';
   import { fileTypeList, type fileTypeListItem } from './file-map';
 
+  const { t } = useI18n();
   const emits = defineEmits(['menuSelect']);
 
   const { width: windowWidth } = useWindowSize();

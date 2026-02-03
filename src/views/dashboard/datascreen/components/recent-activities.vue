@@ -2,7 +2,7 @@
   <div class="chart-card">
     <div class="chart-header">
       <icon-history class="header-icon" />
-      <span class="chart-title">最近活动</span>
+      <span class="chart-title">{{ t('datascreen.chart.recentActivities') }}</span>
     </div>
     <a-spin :loading="loading" style="width: 100%">
       <div class="activity-list">
@@ -31,6 +31,9 @@
 
 <script lang="ts" setup>
   import { ref, onMounted, watch } from 'vue';
+  import { useI18n } from 'vue-i18n';
+
+  const { t } = useI18n();
 
   const props = defineProps({
     loading: {
@@ -64,16 +67,16 @@
 
     if (days > 30) {
       const months = Math.floor(days / 30);
-      return `${months}个月前`;
+      return `${months}${t('datascreen.time.monthsAgo')}`;
     }
     if (days > 7) {
       const weeks = Math.floor(days / 7);
-      return `${weeks}周前`;
+      return `${weeks}${t('datascreen.time.weeksAgo')}`;
     }
-    if (days > 0) return `${days}天前`;
-    if (hours > 0) return `${hours}小时前`;
-    if (minutes > 0) return `${minutes}分钟前`;
-    return '刚刚';
+    if (days > 0) return `${days}${t('datascreen.time.daysAgo')}`;
+    if (hours > 0) return `${hours}${t('datascreen.time.hoursAgo')}`;
+    if (minutes > 0) return `${minutes}${t('datascreen.time.minutesAgo')}`;
+    return t('datascreen.time.justNow');
   };
 
   // 监听 chartData 变化
@@ -107,8 +110,10 @@
           const colors = ['#165DFF', '#14C9C9', '#F7BA1E', '#F77234', '#00B42A', '#722ED1'];
 
           return {
-            type: isUpdated ? '文章编辑' : '文章发布',
-            desc: `${isUpdated ? '修改了' : '发布了新'}文章《${article.title}》`,
+            type: isUpdated
+              ? t('datascreen.activity.articleEdit')
+              : t('datascreen.activity.articlePublish'),
+            desc: `${isUpdated ? t('datascreen.activity.edited') : t('datascreen.activity.published')}文章《${article.title}》`,
             time: getTimeAgo(time),
             icon: isUpdated ? 'icon-edit' : 'icon-file',
             color: colors[index % colors.length],

@@ -2,7 +2,7 @@
   <div class="chart-card">
     <div class="chart-header">
       <icon-bar-chart class="header-icon" />
-      <span class="chart-title">文章发布趋势</span>
+      <span class="chart-title">{{ t('datascreen.chart.publishTrend') }}</span>
     </div>
     <a-spin :loading="loading" style="width: 100%">
       <Chart height="300px" :option="chartOption" />
@@ -12,7 +12,10 @@
 
 <script lang="ts" setup>
   import { ref, onMounted, watch } from 'vue';
+  import { useI18n } from 'vue-i18n';
   import useChartOption from '@/hooks/chart-option';
+
+  const { t } = useI18n();
 
   const props = defineProps({
     loading: {
@@ -92,7 +95,7 @@
       },
       series: [
         {
-          name: '发布数量',
+          name: t('datascreen.series.publishCount'),
           type: 'bar',
           data: publishData.value.values,
           barWidth: '50%',

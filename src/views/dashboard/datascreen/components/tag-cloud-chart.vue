@@ -2,7 +2,7 @@
   <div class="chart-card">
     <div class="chart-header">
       <icon-tags class="header-icon" />
-      <span class="chart-title">标签词云</span>
+      <span class="chart-title">{{ t('datascreen.chart.tagCloud') }}</span>
     </div>
     <a-spin :loading="loading" style="width: 100%">
       <Chart height="300px" :option="chartOption" />
@@ -12,8 +12,11 @@
 
 <script lang="ts" setup>
   import { ref, onMounted, watch } from 'vue';
+  import { useI18n } from 'vue-i18n';
   import useChartOption from '@/hooks/chart-option';
   import 'echarts-wordcloud';
+
+  const { t } = useI18n();
 
   const props = defineProps({
     loading: {
@@ -52,7 +55,7 @@
           color: '#fff',
         },
         formatter: (params: any) => {
-          return `${params.name}: ${Math.floor(params.value / 10)} 篇`;
+          return `${params.name}: ${Math.floor(params.value / 10)} ${t('datascreen.unit.article.short')}`;
         },
       },
       series: [

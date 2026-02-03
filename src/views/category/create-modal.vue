@@ -1,6 +1,9 @@
 <script setup lang="ts">
   import { Message } from '@arco-design/web-vue';
   import { ref, watch } from 'vue';
+  import { useI18n } from 'vue-i18n';
+
+  const { t } = useI18n();
   // defineProps之类不用自己导入
   // 定义props属性
   const props = defineProps({
@@ -47,11 +50,11 @@
 
   const handleOk = () => {
     if (!name.value) {
-      Message.warning('请输入名称');
+      Message.warning(t('category.validate.nameRequired'));
       return;
     }
     if (name.value && name.value.length < 2) {
-      Message.warning('字数要两个以上哦！');
+      Message.warning(t('category.validate.minLength'));
       return;
     }
     emit('update:value', false);
@@ -66,13 +69,16 @@
 <template>
   <a-modal
     v-model:visible="localValue"
-    :title="isEdit ? '编辑' + type : '新增' + type"
-    cancel-text="取消"
-    ok-text="确认"
+    :title="isEdit ? t('category.modal.edit') + type : t('category.modal.create') + type"
+    :cancel-text="t('category.button.cancel')"
+    :ok-text="t('category.button.confirm')"
     @ok="handleOk"
     @cancel="emit('update:value', false)"
   >
-    <a-input v-model="name" :placeholder="'请输入' + type + '名'"></a-input>
+    <a-input
+      v-model="name"
+      :placeholder="t('category.form.placeholder.input') + type + t('category.form.nameSuffix')"
+    ></a-input>
   </a-modal>
 </template>
 

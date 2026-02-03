@@ -1,0 +1,32 @@
+export default {
+  // 资源管理 - 文件类型分类
+  'resource.fileType.all': '全部',
+  'resource.fileType.image': '图片',
+  'resource.fileType.document': '文档',
+  'resource.fileType.video': '视频',
+  'resource.fileType.audio': '音频',
+  'resource.fileType.application': '其他',
+
+  // 资源管理 - 页面操作
+  'resource.title': '文件管理',
+  'resource.breadcrumb.allFiles': '全部文件',
+  'resource.breadcrumb.backToRoot': '返回根目录',
+  'resource.button.upload': '上传资源',
+  'resource.button.newFolder': '新建文件夹',
+  'resource.placeholder.search': '输入文件名搜索',
+  'resource.modal.newFolder': '新建文件夹',
+  'resource.modal.moveFile': '移动文件',
+  'resource.modal.uploadFile': '上传文件',
+  'resource.modal.complete': '完成',
+  'resource.placeholder.folderName': '请输入文件夹名',
+  'resource.placeholder.selectFolder': '请选择文件夹',
+  'resource.menu.copyLink': '复制链接',
+  'resource.menu.rename': '重命名',
+  'resource.menu.moveTo': '移动到',
+  'resource.menu.delete': '删除',
+  'resource.message.deleteSuccess': '删除成功',
+  'resource.message.moveSuccess': '移动完成',
+  'resource.message.copySuccess': '复制成功',
+  'resource.message.createSuccess': '新建完成',
+  'resource.empty': '暂无文件',
+};

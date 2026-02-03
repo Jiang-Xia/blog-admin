@@ -4,10 +4,10 @@
     <div class="screen-header">
       <div class="header-left">
         <icon-dashboard class="header-icon" />
-        <span class="header-title">博客数据大屏</span>
+        <span class="header-title">{{ t('datascreen.header.title') }}</span>
         <div class="live-indicator">
           <span class="live-dot"></span>
-          <span class="live-text">实时</span>
+          <span class="live-text">{{ t('datascreen.header.realtime') }}</span>
         </div>
       </div>
       <div class="header-center">
@@ -19,7 +19,9 @@
             <icon-fullscreen v-if="!isFullscreen" />
             <icon-fullscreen-exit v-else />
           </template>
-          {{ isFullscreen ? '退出全屏' : '全屏显示' }}
+          {{
+            isFullscreen ? t('datascreen.header.exitFullscreen') : t('datascreen.header.fullscreen')
+          }}
         </a-button>
       </div>
     </div>
@@ -70,6 +72,9 @@
   import TagCloudChart from './components/tag-cloud-chart.vue';
   import PopularArticles from './components/popular-articles.vue';
   import RecentActivities from './components/recent-activities.vue';
+  import { useI18n } from 'vue-i18n';
+
+  const { t } = useI18n();
 
   const isFullscreen = ref(false);
   const currentTime = ref('');
@@ -78,28 +83,28 @@
 
   const overviewData = ref([
     {
-      title: '文章总数',
+      title: t('datascreen.metric.articleTotal'),
       value: 0,
       icon: 'icon-file',
       color: '#165DFF',
       trend: 0,
     },
     {
-      title: '总访问量',
+      title: t('datascreen.metric.totalViewsSum'),
       value: 0,
       icon: 'icon-eye',
       color: '#14C9C9',
       trend: 0,
     },
     {
-      title: '总点赞数',
+      title: t('datascreen.metric.totalLikesSum'),
       value: 0,
       icon: 'icon-thumb-up',
       color: '#F7BA1E',
       trend: 0,
     },
     {
-      title: '评论总数',
+      title: t('datascreen.metric.commentTotal'),
       value: 0,
       icon: 'icon-message',
       color: '#F77234',
@@ -146,17 +151,19 @@
         const { total, totalViews, totalLikes, totalComments, trends } = res.data;
 
         // 设置概览数据
-        overviewData.value[0].value = total || 0;
-        overviewData.value[0].trend = trends?.article || 0;
+        const values = [total || 0, totalViews || 0, totalLikes || 0, totalComments || 0];
+        const trendKeys: Array<'article' | 'views' | 'likes' | 'comments'> = [
+          'article',
+          'views',
+          'likes',
+          'comments',
+        ];
 
-        overviewData.value[1].value = totalViews || 0;
-        overviewData.value[1].trend = trends?.views || 0;
-
-        overviewData.value[2].value = totalLikes || 0;
-        overviewData.value[2].trend = trends?.likes || 0;
-
-        overviewData.value[3].value = totalComments || 0;
-        overviewData.value[3].trend = trends?.comments || 0;
+        overviewData.value.forEach((item, index) => {
+          item.value = values[index] || 0;
+          const trendKey = trendKeys[index];
+          item.trend = trendKey && trends ? trends[trendKey] || 0 : 0;
+        });
       }
     } catch (error) {
       console.error('加载统计数据失败:', error);

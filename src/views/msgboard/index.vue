@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <!-- <Breadcrumb :items="['menu.list', 'menu.list.searchTable']" /> -->
-    <a-card class="general-card" title="留言板查询">
+    <a-card class="general-card" :title="t('msgboard.query.title')">
       <a-row align="center">
         <a-col :flex="1">
           <a-form
@@ -12,19 +12,19 @@
           >
             <a-row :gutter="16">
               <a-col :span="12">
-                <a-form-item label="评论内容">
+                <a-form-item :label="t('msgboard.form.commentContent')">
                   <a-input
                     v-model="formModel.comment"
-                    placeholder="请输入评论内容"
+                    :placeholder="t('msgboard.form.placeholder.comment')"
                     @press-enter="search()"
                   />
                 </a-form-item>
               </a-col>
               <a-col :span="12">
-                <a-form-item label="回复内容">
+                <a-form-item :label="t('msgboard.form.replyContent')">
                   <a-input
                     v-model="formModel.respondent"
-                    placeholder="请输入回复内容"
+                    :placeholder="t('msgboard.form.placeholder.reply')"
                     @press-enter="search()"
                   />
                 </a-form-item>
@@ -32,19 +32,19 @@
             </a-row>
             <a-row :gutter="16">
               <a-col :span="12">
-                <a-form-item label="邮箱">
+                <a-form-item :label="t('msgboard.form.email')">
                   <a-input
                     v-model="formModel.eamil"
-                    placeholder="请输入邮箱"
+                    :placeholder="t('msgboard.form.placeholder.email')"
                     @press-enter="search()"
                   />
                 </a-form-item>
               </a-col>
               <a-col :span="12">
-                <a-form-item label="昵称">
+                <a-form-item :label="t('msgboard.form.nickname')">
                   <a-input
                     v-model="formModel.name"
-                    placeholder="请输入昵称"
+                    :placeholder="t('msgboard.form.placeholder.nickname')"
                     @press-enter="search()"
                   />
                 </a-form-item>
@@ -58,13 +58,13 @@
               <template #icon>
                 <icon-search />
               </template>
-              {{ '搜索' }}
+              {{ t('msgboard.button.search') }}
             </a-button>
             <a-button @click="reset">
               <template #icon>
                 <icon-refresh />
               </template>
-              {{ '重置' }}
+              {{ t('msgboard.button.reset') }}
             </a-button>
           </a-space>
         </a-col>
@@ -79,16 +79,37 @@
         stripe
       >
         <template #columns>
-          <a-table-column title="昵称" data-index="name" align="center" :width="100" />
-          <a-table-column title="头像" data-index="avatar" align="center" :width="100">
+          <a-table-column
+            :title="t('msgboard.table.nickname')"
+            data-index="name"
+            align="center"
+            :width="100"
+          />
+          <a-table-column
+            :title="t('msgboard.table.avatar')"
+            data-index="avatar"
+            align="center"
+            :width="100"
+          >
             <template #cell="{ record }">
               <a-avatar>
                 <img :alt="record.title" :src="record.avatar" />
               </a-avatar>
             </template>
           </a-table-column>
-          <a-table-column title="评论内容" data-index="comment" :width="460" tooltip ellipsis />
-          <a-table-column title="网址" data-index="address" :width="200" tooltip>
+          <a-table-column
+            :title="t('msgboard.table.comment')"
+            data-index="comment"
+            :width="460"
+            tooltip
+            ellipsis
+          />
+          <a-table-column
+            :title="t('msgboard.table.address')"
+            data-index="address"
+            :width="200"
+            tooltip
+          >
             <template #cell="{ record }">
               <a-link :href="record.address" target="_blank">{{ record.address }}</a-link>
             </template>
@@ -108,7 +129,12 @@
               </a-switch>
             </template>
           </a-table-column> -->
-          <a-table-column title="操作" data-index="operations" :width="100" fixed="right">
+          <a-table-column
+            :title="t('msgboard.table.operation')"
+            data-index="operations"
+            :width="100"
+            fixed="right"
+          >
             <template #cell="{ record }">
               <a-space :size="8">
                 <a-button size="mini" type="primary" status="danger" @click="delHandle(record.id)">
@@ -131,6 +157,8 @@
   import { Message, Modal } from '@arco-design/web-vue';
   import request from '@/api/request';
   import { useTableList } from '@/hooks/data';
+
+  const { t } = useI18n();
 
   const generateFormModel = () => {
     return {
@@ -179,11 +207,11 @@
   };
   const delHandle = async (id: number) => {
     Modal.confirm({
-      title: '删除留言',
-      content: '确定删除该留言嘛？',
+      title: t('msgboard.confirm.delete'),
+      content: t('msgboard.confirm.deleteContent'),
       onOk: async () => {
         const res = await request.post('/msgboard/delete', [id]);
-        Message.success('删除成功');
+        Message.success(t('msgboard.message.deleteSuccess'));
         search();
       },
     });
@@ -191,7 +219,7 @@
   const onSwitchChange = async (record: any) => {
     const { agreed, id } = record;
     const res = await request.patch(`/msgboard`, { agreed, id });
-    Message.success('设置成功');
+    Message.success(t('msgboard.message.setSuccess'));
   };
 </script>
 

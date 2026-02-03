@@ -2,8 +2,10 @@
   <div class="chart-card">
     <div class="chart-header">
       <icon-bar-chart class="header-icon" />
-      <span class="chart-title">访问量趋势</span>
-      <a-tag color="arcoblue" size="small" style="margin-left: 8px">近30天</a-tag>
+      <span class="chart-title">{{ t('datascreen.chart.viewTrend') }}</span>
+      <a-tag color="arcoblue" size="small" style="margin-left: 8px">{{
+        t('datascreen.time.last30Days')
+      }}</a-tag>
     </div>
     <a-spin :loading="loading" style="width: 100%">
       <Chart height="300px" :option="chartOption" />
@@ -13,8 +15,11 @@
 
 <script lang="ts" setup>
   import { ref, computed, onMounted, watch } from 'vue';
+  import { useI18n } from 'vue-i18n';
   import useChartOption from '@/hooks/chart-option';
   import { graphic } from 'echarts';
+
+  const { t } = useI18n();
 
   const props = defineProps({
     loading: {
@@ -104,7 +109,7 @@
       },
       series: [
         {
-          name: '访问量',
+          name: t('datascreen.series.viewCount'),
           type: 'line',
           smooth: true,
           symbol: 'circle',

@@ -25,10 +25,10 @@
         </div>
         <div class="tag-bar-operation">
           <a-dropdown trigger="hover" @select="closeSelect">
-            <a-tag color="red">关闭</a-tag>
+            <a-tag color="red">{{ t('common.tabBar.close') }}</a-tag>
             <template #content>
-              <a-doption value="current">当前页</a-doption>
-              <a-doption value="all">所有页</a-doption>
+              <a-doption value="current">{{ t('common.tabBar.closeCurrent') }}</a-doption>
+              <a-doption value="all">{{ t('common.tabBar.closeAll') }}</a-doption>
             </template>
           </a-dropdown>
         </div>
@@ -74,7 +74,7 @@
   }, true);
   const tagClose = (tag: TagProps, idx: number) => {
     if (tag.fullPath === '/dashboard/workplace') {
-      Message.warning('固定页不能关闭！');
+      Message.warning(t('common.tabBar.fixedPageCannotClose'));
       return;
     }
     tabBarStore.deleteTag(idx, tag);
@@ -82,7 +82,7 @@
     if (idx === tagList.value.length || route.fullPath === tag.fullPath) {
       const latest = tagList.value[tagList.value.length - 1];
       // console.log('closeTab:', latest);
-      router.push({ name: latest.name });
+      router.push({ name: latest?.name });
     }
   };
   const goto = (tag: any) => {
@@ -93,7 +93,7 @@
     // console.log(val)
     if (val === 'current') {
       const idx = tagList.value.findIndex((tag) => tag.fullPath === route.fullPath);
-      tagClose(tagList.value[idx], idx);
+      tagClose(tagList.value[idx] as TagProps, idx);
     } else if (val === 'all') {
       tabBarStore.deleteAllTag();
       router.replace({ name: 'Workplace' });

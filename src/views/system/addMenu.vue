@@ -18,36 +18,48 @@
       @submit-success="handleFinish"
       @submit-failed="handleFinishFailed"
     >
-      <a-form-item label="菜单id" name="id" field="id">
-        <a-input v-model="formState.id" :disabled="type === 'edit'" placeholder="id" />
+      <a-form-item :label="t('menu.form.menuId')" name="id" field="id">
+        <a-input
+          v-model="formState.id"
+          :disabled="type === 'edit'"
+          :placeholder="t('menu.form.placeholder.menuId')"
+        />
       </a-form-item>
-      <a-form-item label="父级pid" name="pid" field="pid">
-        <a-input v-model="formState.pid" placeholder="pid" />
+      <a-form-item :label="t('menu.form.parentId')" name="pid" field="pid">
+        <a-input v-model="formState.pid" :placeholder="t('menu.form.placeholder.parentId')" />
       </a-form-item>
-      <a-form-item label="菜单路由path" name="path" field="path">
-        <a-input v-model="formState.path" placeholder="path" />
+      <a-form-item :label="t('menu.form.menuPath')" name="path" field="path">
+        <a-input v-model="formState.path" :placeholder="t('menu.form.placeholder.menuPath')" />
       </a-form-item>
-      <a-form-item label="菜单英文名称" name="name" field="name">
-        <a-input v-model="formState.name" placeholder="name" />
+      <a-form-item :label="t('menu.form.menuName')" name="name" field="name">
+        <a-input v-model="formState.name" :placeholder="t('menu.form.placeholder.menuName')" />
       </a-form-item>
-      <a-form-item label="菜单中文名称" name="menuCnName" field="menuCnName">
-        <a-input v-model="formState.menuCnName" placeholder="菜单中文名称" />
+      <a-form-item :label="t('menu.form.menuCnName')" name="menuCnName" field="menuCnName">
+        <a-input
+          v-model="formState.menuCnName"
+          :placeholder="t('menu.form.placeholder.menuCnName')"
+        />
       </a-form-item>
-      <a-form-item label="图标" name="icon" field="icon">
-        <a-input v-model="formState.icon" placeholder="icon" />
+      <a-form-item :label="t('menu.form.menuIcon')" name="icon" field="icon">
+        <a-input v-model="formState.icon" :placeholder="t('menu.form.placeholder.menuIcon')" />
       </a-form-item>
-      <a-form-item label="本地化标识" name="locale" field="locale">
-        <a-input v-model="formState.locale" placeholder="locale" />
+      <a-form-item :label="t('menu.form.locale')" name="locale" field="locale">
+        <a-input v-model="formState.locale" :placeholder="t('menu.form.placeholder.locale')" />
       </a-form-item>
-      <a-form-item label="文件路径" name="filePath" field="filePath">
-        <a-input v-model="formState.filePath" placeholder="filePath" />
+      <a-form-item :label="t('menu.form.filePath')" name="filePath" field="filePath">
+        <a-input v-model="formState.filePath" :placeholder="t('menu.form.placeholder.filePath')" />
       </a-form-item>
-      <a-form-item label="排序" name="order" field="order">
-        <a-input-number v-model="formState.order" placeholder="order" />
+      <a-form-item :label="t('menu.form.menuSort')" name="order" field="order">
+        <a-input-number
+          v-model="formState.order"
+          :placeholder="t('menu.form.placeholder.menuSort')"
+        />
       </a-form-item>
       <a-form-item :wrapper-col-props="{ span: 13, offset: 7 }">
-        <a-button type="primary" html-type="submit">提交</a-button>
-        <a-button style="margin-left: 10px" @click="resetForm">重置</a-button>
+        <a-button type="primary" html-type="submit">{{ t('common.button.submit') }}</a-button>
+        <a-button style="margin-left: 10px" @click="resetForm">{{
+          t('common.button.reset')
+        }}</a-button>
       </a-form-item>
     </a-form>
     <template #footer><div> </div></template>
@@ -64,13 +76,15 @@
   // import { computed, onBeforeUnmount, onMounted } from 'vue'
   // import { useAppStore } from '@/store';
   import request from '@/api/request';
+  import { useI18n } from 'vue-i18n';
 
+  const { t } = useI18n();
   // const appStore = useAppStore();
   // const router = useRouter();
   // const route = useRoute();
   const type = ref('add');
   const title = computed(() => {
-    return type.value === 'edit' ? '编辑菜单' : '新增菜单';
+    return type.value === 'edit' ? t('menu.modal.edit') : t('menu.modal.add');
   });
   interface stringKey {
     [propName: string]: string | number;
@@ -106,42 +120,42 @@
   const checkTitle = async (value: string, cb: (error?: string) => void) => {
     console.log(value);
     if (!value) {
-      cb('请输入标题！');
+      cb(t('system.validate.titleRequired'));
     }
     Promise.resolve();
   };
   const checkDescription = async (value: string, cb: (error?: string) => void) => {
     if (!value) {
-      cb('请输入描述！');
+      cb(t('system.validate.descriptionRequired'));
     }
     Promise.resolve();
   };
   const rules = {
     id: [
-      { required: true, message: '请输入菜单ID' },
-      { maxLength: 50, message: '菜单ID长度不能超过50个字符' },
-      { pattern: /^[a-zA-Z0-9_-]+$/, message: '菜单ID只能包含字母、数字、下划线和横线' },
+      { required: true, message: t('system.validate.menuId.required') },
+      { maxLength: 50, message: t('menu.validate.menuId.maxLength') },
+      { pattern: /^[a-zA-Z0-9_-]+$/, message: t('menu.validate.menuId.pattern') },
     ],
     pid: [
-      { maxLength: 50, message: '父级ID长度不能超过50个字符' },
-      { pattern: /^[a-zA-Z0-9_-]*$/, message: '父级ID只能包含字母、数字、下划线和横线' },
+      { maxLength: 50, message: t('menu.validate.parentId.maxLength') },
+      { pattern: /^[a-zA-Z0-9_-]*$/, message: t('menu.validate.parentId.pattern') },
     ],
     path: [
-      { required: true, message: '请输入菜单路径' },
-      { maxLength: 100, message: '路径长度不能超过100个字符' },
+      { required: true, message: t('system.validate.menuPath.required') },
+      { maxLength: 100, message: t('menu.validate.menuPath.maxLength') },
     ],
     name: [
-      { required: true, message: '请输入菜单名称' },
-      { maxLength: 50, message: '菜单名称长度不能超过50个字符' },
+      { required: true, message: t('system.validate.menuEnName.required') },
+      { maxLength: 50, message: t('menu.validate.menuName.maxLength') },
     ],
     menuCnName: [
-      { required: true, message: '请输入菜单中文名称' },
-      { maxLength: 50, message: '菜单中文名称长度不能超过50个字符' },
+      { required: true, message: t('system.validate.menuCnName.required') },
+      { maxLength: 50, message: t('menu.validate.menuCnName.maxLength') },
     ],
-    icon: [{ maxLength: 50, message: '图标名称长度不能超过50个字符' }],
-    locale: [{ maxLength: 50, message: '本地化标识长度不能超过50个字符' }],
-    filePath: [{ maxLength: 100, message: '文件路径长度不能超过100个字符' }],
-    order: [{ type: 'number', min: 0, max: 999999, message: '排序值必须在0-999999之间' }],
+    icon: [{ maxLength: 50, message: t('menu.validate.menuIcon.maxLength') }],
+    locale: [{ maxLength: 50, message: t('menu.validate.locale.maxLength') }],
+    filePath: [{ maxLength: 100, message: t('menu.validate.filePath.maxLength') }],
+    order: [{ type: 'number', min: 0, max: 999999, message: t('menu.validate.menuSort.range') }],
   };
   // 提交成功
   const handleFinish = async (values: any) => {
@@ -157,13 +171,13 @@
       const res = await request.patch('admin/menu', params);
       visible.value = false;
       // console.log({ res });
-      Message.success('修改成功！');
+      Message.success(t('menu.message.updateSuccess'));
       resetForm();
     } else {
       // 新建
       const res = await request.post('admin/menu', params);
       visible.value = false;
-      Message.success('新建成功！');
+      Message.success(t('menu.message.createSuccess'));
       resetForm();
     }
     emits('success');

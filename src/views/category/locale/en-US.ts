@@ -1,0 +1,23 @@
+export default {
+  // Category Management
+  'category.query.title': 'Category Query',
+  'category.form.name': 'Category Name',
+  'category.form.placeholder.name': 'Please input category name',
+  'category.table.name': 'Category Name',
+  'category.table.color': 'Color',
+  'category.table.articleCount': 'Article Count',
+  'category.button.create': 'Create Category',
+  'category.message.deleteSuccess': 'Delete Successfully',
+  'category.message.createSuccess': 'Create Successfully',
+  'category.message.updateSuccess': 'Update Successfully!',
+  'category.validate.nameRequired': 'Please input name',
+  'category.validate.minLength': 'Name should be at least 2 characters!',
+  'category.modal.create': 'Create ',
+  'category.modal.edit': 'Edit ',
+  'category.button.cancel': 'Cancel',
+  'category.button.confirm': 'Confirm',
+  'category.form.placeholder.input': 'Please input ',
+  'category.form.nameSuffix': ' name',
+  'category.confirm.deleteTitle': 'Delete Category',
+  'category.confirm.deleteContent': 'Are you sure to delete this category?',
+};

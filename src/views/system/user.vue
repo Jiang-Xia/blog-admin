@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <!-- <Breadcrumb :items="['menu.list', 'menu.list.searchTable']" /> -->
-    <a-card class="general-card" title="用户查询">
+    <a-card class="general-card" :title="t('user.query.title')">
       <a-row>
         <a-col :flex="1">
           <a-form
@@ -12,18 +12,27 @@
           >
             <a-row :gutter="16">
               <a-col :span="6">
-                <a-form-item label="手机号">
-                  <a-input v-model="formModel.mobile" placeholder="请输入手机号" />
+                <a-form-item :label="t('user.form.mobile')">
+                  <a-input
+                    v-model="formModel.mobile"
+                    :placeholder="t('user.form.placeholder.mobile')"
+                  />
                 </a-form-item>
               </a-col>
               <a-col :span="6">
-                <a-form-item label="账号">
-                  <a-input v-model="formModel.username" placeholder="请输入账号" />
+                <a-form-item :label="t('user.form.username')">
+                  <a-input
+                    v-model="formModel.username"
+                    :placeholder="t('user.form.placeholder.username')"
+                  />
                 </a-form-item>
               </a-col>
               <a-col :span="6">
-                <a-form-item label="昵称">
-                  <a-input v-model="formModel.nickname" placeholder="请输入昵称" />
+                <a-form-item :label="t('user.form.nickname')">
+                  <a-input
+                    v-model="formModel.nickname"
+                    :placeholder="t('user.form.placeholder.nickname')"
+                  />
                 </a-form-item>
               </a-col>
               <a-col :span="4" style="text-align: right">
@@ -32,13 +41,13 @@
                     <template #icon>
                       <icon-search />
                     </template>
-                    {{ '搜索' }}
+                    {{ t('common.button.search') }}
                   </a-button>
                   <a-button @click="reset">
                     <template #icon>
                       <icon-refresh />
                     </template>
-                    {{ '重置' }}
+                    {{ t('common.button.reset') }}
                   </a-button>
                 </a-space>
               </a-col>
@@ -54,7 +63,7 @@
               <template #icon>
                 <icon-plus />
               </template>
-              {{ '新建' }}
+              {{ t('common.button.create') }}
             </a-button>
           </a-space>
         </a-col>
@@ -69,28 +78,36 @@
         @page-change="onPageChange"
       >
         <template #columns>
-          <a-table-column title="手机号" data-index="mobile" align="center" />
-          <a-table-column title="头像" data-index="url" align="center">
+          <a-table-column :title="t('user.table.mobile')" data-index="mobile" align="center" />
+          <a-table-column :title="t('system.table.avatar')" data-index="url" align="center">
             <template #cell="{ record }">
               <a-avatar>
                 <img :alt="record.avatar" :src="record.avatar" />
               </a-avatar>
             </template>
           </a-table-column>
-          <a-table-column title="账号" data-index="username" align="center" />
-          <a-table-column title="昵称" data-index="nickname" />
-          <a-table-column title="角色类型" data-index="role" />
-          <a-table-column title="创建时间" data-index="createTime" align="center">
+          <a-table-column :title="t('user.table.username')" data-index="username" align="center" />
+          <a-table-column :title="t('user.table.nickname')" data-index="nickname" />
+          <a-table-column :title="t('system.table.roleType')" data-index="role" />
+          <a-table-column
+            :title="t('user.table.createTime')"
+            data-index="createTime"
+            align="center"
+          >
             <template #cell="{ record }">
               {{ formatDate(record.createTime) }}
             </template>
           </a-table-column>
-          <a-table-column title="更新时间" data-index="updateTime" align="center">
+          <a-table-column
+            :title="t('system.table.updateTime')"
+            data-index="updateTime"
+            align="center"
+          >
             <template #cell="{ record }">
               {{ formatDate(record.updateTime) }}
             </template>
           </a-table-column>
-          <a-table-column title="锁定" data-index="status">
+          <a-table-column :title="t('system.table.locked')" data-index="status">
             <template #cell="{ record }">
               <!-- :disabled="record.agreed" -->
               <a-switch
@@ -111,7 +128,7 @@
               </a-switch>
             </template>
           </a-table-column>
-          <a-table-column title="操作" data-index="operations">
+          <a-table-column :title="t('user.table.operation')" data-index="operations">
             <template #cell="{ record }">
               <a-space :size="8">
                 <a-button
@@ -130,7 +147,7 @@
                   :disabled="record.role === 'super'"
                   @click="showModal('edit', record.id)"
                 >
-                  编辑
+                  {{ t('user.button.edit') }}
                   <icon-edit />
                 </a-button>
                 <a-button
@@ -140,7 +157,7 @@
                   :disabled="record.role === 'super'"
                   @click="resetHandle(record)"
                 >
-                  重置密码
+                  {{ t('user.button.resetPassword') }}
                   <icon-refresh />
                 </a-button>
               </a-space>
@@ -220,11 +237,11 @@
   const delHandle = async (id: any) => {
     const record = renderData.value.find((item) => item.id === id);
     Modal.confirm({
-      title: '删除用户',
+      title: t('user.confirm.delete'),
       content: `确定删除用户 ${record?.nickname || record?.mobile || '该用户'} 吗？`,
       onOk: async () => {
         const res = await request.delete('/user', { params: { id } });
-        Message.success('删除成功');
+        Message.success(t('user.message.deleteSuccess'));
         getTableListHandle();
       },
     });
@@ -232,7 +249,7 @@
   const onSwitchStatus = async (record: any) => {
     const { status, id } = record;
     const res = await request.patch(`/user/status`, { status, id });
-    Message.success('设置成功');
+    Message.success(t('common.message.setSuccess'));
   };
   const addRef = ref(addModal);
   const showModal = (type: string, id?: string) => {
@@ -240,11 +257,15 @@
   };
   const resetHandle = async (record: any) => {
     const { mobile, nickname } = record;
-    const res: any = await request.post(`/user/resetPassword`, {
-      mobile,
-      nickname,
+    const userName = record?.nickname || record?.mobile || t('user.label.thisUser');
+    Modal.confirm({
+      title: t('user.confirm.resetPassword'),
+      content: t('user.confirm.resetPasswordContent', { user: userName }),
+      onOk: async () => {
+        const res = await request.post('/user/resetPassword', { mobile, nickname });
+        Message.success(t('user.message.resetPasswordSuccess'));
+      },
     });
-    Message.success(res.message);
   };
 
   const formatDate = (date: string) => {

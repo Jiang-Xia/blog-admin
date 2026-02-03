@@ -5,9 +5,9 @@
       :header-style="{ paddingBottom: '0' }"
       :body-style="{ padding: '17px 20px 21px 20px' }"
     >
-      <template #title> 主要分类内容 </template>
+      <template #title> {{ t('workplace.mainCategoryContent') }} </template>
       <template #extra>
-        <a-link @click="router.push('/category/list')">查看更多</a-link>
+        <a-link @click="router.push('/category/list')">{{ t('workplace.viewMore') }}</a-link>
       </template>
       <a-space direction="vertical" fill>
         <a-radio-group v-model:model-value="type" type="button" @change="typeChange">
@@ -22,7 +22,7 @@
           :scroll="{ x: '100%', y: '264px' }"
         >
           <template #columns>
-            <a-table-column title="文章标题" data-index="title">
+            <a-table-column :title="t('workplace.articleTitle')" data-index="title">
               <template #cell="{ record }">
                 <a-typography-paragraph
                   :ellipsis="{
@@ -33,9 +33,9 @@
                 </a-typography-paragraph>
               </template>
             </a-table-column>
-            <a-table-column title="浏览量" data-index="views" :width="80" />
+            <a-table-column :title="t('workplace.views')" data-index="views" :width="80" />
 
-            <a-table-column title="点赞数" data-index="likes" :width="80" />
+            <a-table-column :title="t('workplace.likes')" data-index="likes" :width="80" />
           </template>
         </a-table>
       </a-space>
@@ -45,12 +45,15 @@
 
 <script lang="ts" setup>
   import { ref } from 'vue';
+  import { useI18n } from 'vue-i18n';
   import { useRouter } from 'vue-router';
   import useLoading from '@/hooks/loading';
   import type { TableData } from '@arco-design/web-vue/es/table/interface';
   import { getAllCategory } from '@/api/category';
   import { getArticleList } from '@/api/article';
   import type { ListState } from '@/types/global';
+
+  const { t } = useI18n();
 
   const router = useRouter();
   const type = ref('');

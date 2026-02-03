@@ -6,13 +6,13 @@
       :body-style="{
         paddingTop: '20px',
       }"
-      title="近14天网站访问量"
+      :title="t('workplace.websiteVisits')"
     >
       <template #extra>
         <a-link
           href="https://tongji.baidu.com/main/overview/10000484096/overview/index?siteId=18269632"
           target="_blank"
-          >查看更多</a-link
+          >{{ t('workplace.viewMore') }}</a-link
         >
       </template>
       <Chart height="289px" :option="chartOption" />
@@ -29,6 +29,9 @@
   import { ToolTipFormatterParams } from '@/types/echarts';
   import { AnyObject } from '@/types/global';
   import dayjs from 'dayjs';
+  import { useI18n } from 'vue-i18n';
+
+  const { t } = useI18n();
 
   const props = defineProps({
     chartData: {
@@ -122,10 +125,10 @@
       tooltip: {
         trigger: 'axis',
         formatter(params) {
-          const [firstElement] = params as ToolTipFormatterParams[];
+          const [firstElement]: any = params as ToolTipFormatterParams[];
           return `<div>
             <p class="tooltip-title">${firstElement.axisValueLabel}</p>
-            <div class="content-panel"><span>访问量</span><span class="tooltip-value">${Number(
+            <div class="content-panel"><span>${t('workplace.visits')}</span><span class="tooltip-value">${Number(
               firstElement.value,
             ).toLocaleString()}</span></div>
           </div>`;

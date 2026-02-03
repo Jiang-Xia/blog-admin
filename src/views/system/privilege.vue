@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <!-- <Breadcrumb :items="['menu.list', 'menu.list.searchTable']" /> -->
-    <a-card class="general-card" title="权限查询">
+    <a-card class="general-card" :title="t('privilege.query.title')">
       <a-row>
         <a-col :flex="1">
           <a-form
@@ -12,18 +12,28 @@
           >
             <a-row :gutter="16">
               <a-col :span="8">
-                <a-form-item label="权限名称">
-                  <a-input v-model="formModel.privilegeName" placeholder="请输入权限名称" />
+                <a-form-item :label="t('privilege.form.name')">
+                  <a-input
+                    v-model="formModel.privilegeName"
+                    :placeholder="t('privilege.form.placeholder.name')"
+                  />
                 </a-form-item>
               </a-col>
               <a-col :span="8">
-                <a-form-item label="路径模式">
-                  <a-input v-model="formModel.pathPattern" placeholder="请输入路径模式" />
+                <a-form-item :label="t('privilege.form.pathPattern')">
+                  <a-input
+                    v-model="formModel.pathPattern"
+                    :placeholder="t('privilege.form.placeholder.pathPattern')"
+                  />
                 </a-form-item>
               </a-col>
               <a-col :span="8">
-                <a-form-item label="HTTP方法">
-                  <a-select v-model="formModel.httpMethod" placeholder="请选择HTTP方法" allow-clear>
+                <a-form-item :label="t('privilege.form.method')">
+                  <a-select
+                    v-model="formModel.httpMethod"
+                    :placeholder="t('privilege.form.placeholder.method')"
+                    allow-clear
+                  >
                     <a-option value="GET">GET</a-option>
                     <a-option value="POST">POST</a-option>
                     <a-option value="PUT">PUT</a-option>
@@ -31,29 +41,33 @@
                     <a-option value="PATCH">PATCH</a-option>
                     <a-option value="HEAD">HEAD</a-option>
                     <a-option value="OPTIONS">OPTIONS</a-option>
-                    <a-option value="*">*(全部)</a-option>
+                    <a-option value="*">{{ t('privilege.method.all') }}</a-option>
                   </a-select>
                 </a-form-item>
               </a-col>
             </a-row>
             <a-row :gutter="16">
               <a-col :span="8">
-                <a-form-item label="是否公开接口">
+                <a-form-item :label="t('privilege.form.isPublic')">
                   <a-select
                     v-model="formModel.isPublic"
-                    placeholder="请选择是否公开接口"
+                    :placeholder="t('privilege.form.placeholder.isPublic')"
                     allow-clear
                   >
-                    <a-option :value="true">是</a-option>
-                    <a-option :value="false">否</a-option>
+                    <a-option :value="true">{{ t('common.form.yes') }}</a-option>
+                    <a-option :value="false">{{ t('common.form.no') }}</a-option>
                   </a-select>
                 </a-form-item>
               </a-col>
               <a-col :span="8">
-                <a-form-item label="是否可见">
-                  <a-select v-model="formModel.isVisible" placeholder="请选择是否可见" allow-clear>
-                    <a-option :value="true">是</a-option>
-                    <a-option :value="false">否</a-option>
+                <a-form-item :label="t('privilege.form.isVisible')">
+                  <a-select
+                    v-model="formModel.isVisible"
+                    :placeholder="t('privilege.form.placeholder.isVisible')"
+                    allow-clear
+                  >
+                    <a-option :value="true">{{ t('common.form.yes') }}</a-option>
+                    <a-option :value="false">{{ t('common.form.no') }}</a-option>
                   </a-select>
                 </a-form-item>
               </a-col>
@@ -63,13 +77,13 @@
                     <template #icon>
                       <icon-search />
                     </template>
-                    {{ '搜索' }}
+                    {{ t('common.button.search') }}
                   </a-button>
                   <a-button @click="reset">
                     <template #icon>
                       <icon-refresh />
                     </template>
-                    {{ '重置' }}
+                    {{ t('common.button.reset') }}
                   </a-button>
                 </a-space>
               </a-col>
@@ -85,7 +99,7 @@
               <template #icon>
                 <icon-plus />
               </template>
-              {{ '新建' }}
+              {{ t('privilege.button.create') }}
             </a-button>
           </a-space>
         </a-col>
@@ -102,57 +116,82 @@
         <template #columns>
           <a-table-column
             min-width="130"
-            title="权限名称"
+            :title="t('privilege.table.privilegeName')"
             data-index="privilegeName"
             align="center"
           />
           <a-table-column
             min-width="130"
-            title="权限识别码"
+            :title="t('privilege.table.privilegeCode')"
             data-index="privilegeCode"
             align="center"
           />
           <a-table-column
             min-width="130"
-            title="所属页面"
+            :title="t('privilege.table.privilegePage')"
             data-index="privilegePage"
             align="center"
           />
           <a-table-column
             min-width="130"
-            title="路径模式"
+            :title="t('privilege.table.pathPattern')"
             data-index="pathPattern"
             align="center"
           />
-          <a-table-column min-width="180" title="HTTP方法" data-index="httpMethod" align="center" />
-          <a-table-column min-width="100" title="是否公开接口" data-index="isPublic" align="center">
+          <a-table-column
+            min-width="180"
+            :title="t('privilege.table.httpMethod')"
+            data-index="httpMethod"
+            align="center"
+          />
+          <a-table-column
+            min-width="100"
+            :title="t('privilege.table.isPublic')"
+            data-index="isPublic"
+            align="center"
+          >
             <template #cell="{ record }">
               <a-tag :color="record.isPublic ? 'blue' : 'orange'">
-                {{ record.isPublic ? '是' : '否' }}
+                {{ record.isPublic ? t('common.form.yes') : t('common.form.no') }}
               </a-tag>
             </template>
           </a-table-column>
           <a-table-column
             min-width="140"
-            title="是否需要检查资源所有权"
+            :title="t('privilege.table.requireOwnership')"
             data-index="requireOwnership"
             align="center"
           >
             <template #cell="{ record }">
               <a-tag :color="record.requireOwnership ? 'purple' : 'gray'">
-                {{ record.requireOwnership ? '是' : '否' }}
+                {{ record.requireOwnership ? t('common.form.yes') : t('common.form.no') }}
               </a-tag>
             </template>
           </a-table-column>
-          <a-table-column min-width="100" title="是否可见" data-index="isVisible" align="center">
+          <a-table-column
+            min-width="100"
+            :title="t('privilege.table.isVisible')"
+            data-index="isVisible"
+            align="center"
+          >
             <template #cell="{ record }">
               <a-tag :color="record.isVisible ? 'green' : 'red'">
-                {{ record.isVisible ? '是' : '否' }}
+                {{ record.isVisible ? t('common.form.yes') : t('common.form.no') }}
               </a-tag>
             </template>
           </a-table-column>
-          <a-table-column min-width="150" title="描述" data-index="description" align="center" />
-          <a-table-column min-width="150" title="操作" data-index="operations" fixed="right">
+          <a-table-column
+            min-width="150"
+            :title="t('privilege.table.description')"
+            data-index="description"
+            align="center"
+          />
+          <a-table-column
+            min-width="150"
+            :title="t('privilege.table.operation')"
+            data-index="operations"
+            fixed="right"
+          >
             <template #cell="{ record }">
               <a-space :size="8">
                 <a-button
@@ -238,11 +277,11 @@
   };
   const delHandle = async (id: any) => {
     Modal.confirm({
-      title: '删除权限',
-      content: '确定删除该权限嘛？',
+      title: t('privilege.confirm.delete'),
+      content: t('privilege.confirm.delete'),
       onOk: async () => {
         const res = await delPrivilege(id);
-        Message.success('删除成功');
+        Message.success(t('privilege.message.deleteSuccess'));
         getTableListHandle();
       },
     });

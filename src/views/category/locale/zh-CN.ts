@@ -1,0 +1,23 @@
+export default {
+  // 分类管理
+  'category.query.title': '分类查询',
+  'category.form.name': '分类名',
+  'category.form.placeholder.name': '请输入分类名',
+  'category.table.name': '分类名',
+  'category.table.color': '颜色',
+  'category.table.articleCount': '分类文章数',
+  'category.button.create': '新建分类',
+  'category.message.deleteSuccess': '删除成功',
+  'category.message.createSuccess': '创建成功',
+  'category.validate.nameRequired': '请输入名称',
+  'category.validate.minLength': '字数要两个以上哦！',
+  'category.modal.create': '新增',
+  'category.modal.edit': '编辑',
+  'category.button.cancel': '取消',
+  'category.button.confirm': '确认',
+  'category.form.placeholder.input': '请输入',
+  'category.form.nameSuffix': '名',
+  'category.confirm.deleteTitle': '删除分类',
+  'category.confirm.deleteContent': '确定删除该分类嘛？',
+  'category.message.updateSuccess': '更新成功！',
+};

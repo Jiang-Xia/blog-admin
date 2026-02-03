@@ -1,24 +1,36 @@
 <template>
   <a-card
     class="general-card"
-    title="项目代码"
+    :title="t('workplace.projectCode')"
     :header-style="{ paddingBottom: 0 }"
     :body-style="{ paddingTop: 0 }"
     style="height: 166px"
   >
     <a-row>
       <a-col :span="12">
-        <a-link href="https://gitee.com/jiang-xia/blog-home-nuxt"> 博客前端项目 </a-link>
+        <a-link href="https://gitee.com/jiang-xia/blog-home-nuxt">
+          {{ t('workplace.projectCode.blogFrontend') }}
+        </a-link>
       </a-col>
       <a-col :span="12">
-        <a-link href="https://gitee.com/jiang-xia/blog-admin"> 博客后台管理 </a-link>
+        <a-link href="https://gitee.com/jiang-xia/blog-admin">
+          {{ t('workplace.projectCode.blogAdmin') }}
+        </a-link>
       </a-col>
       <a-col :span="18">
-        <a-link href="https://gitee.com/jiang-xia/blog-server"> 博客服务端项目 </a-link>
+        <a-link href="https://gitee.com/jiang-xia/blog-server">
+          {{ t('workplace.projectCode.blogServer') }}
+        </a-link>
       </a-col>
     </a-row>
   </a-card>
 </template>
+
+<script lang="ts" setup>
+  import { useI18n } from 'vue-i18n';
+
+  const { t } = useI18n();
+</script>
 
 <style lang="less" scoped>
   .arco-card-body .arco-link {

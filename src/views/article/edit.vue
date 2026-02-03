@@ -18,49 +18,58 @@
             @submit-success="handleFinish"
             @submit-failed="handleFinishFailed"
           >
-            <a-form-item label="标题" name="title" field="title">
-              <a-input v-model="formState.title" autocomplete="off" placeholder="标题" />
+            <a-form-item :label="t('article.form.title')" name="title" field="title">
+              <a-input
+                v-model="formState.title"
+                autocomplete="off"
+                :placeholder="t('article.form.title')"
+              />
             </a-form-item>
-            <a-form-item label="描述" name="description" field="description" placeholder="描述">
+            <a-form-item
+              :label="t('article.form.description')"
+              name="description"
+              field="description"
+              :placeholder="t('article.form.description')"
+            >
               <a-textarea
                 v-model="formState.description"
-                placeholder="描述"
+                :placeholder="t('article.form.description')"
                 :auto-size="{ minRows: 2, maxRows: 10 }"
               />
             </a-form-item>
 
-            <a-form-item label="封面" name="cover" field="cover">
+            <a-form-item :label="t('article.form.cover')" name="cover" field="cover">
               <a-input
                 v-model="formState.cover"
                 autocomplete="off"
-                placeholder="封面支持外链url或者base64(1M以内)"
+                :placeholder="t('article.form.placeholder.coverUrl')"
               />
             </a-form-item>
 
-            <a-form-item label="分类" name="category" field="category">
+            <a-form-item :label="t('article.form.category')" name="category" field="category">
               <a-select
                 v-model="formState.category"
                 style="width: 50%"
                 :options="categoryOptions"
-                placeholder="选择分类"
+                :placeholder="t('article.form.placeholder.selectCategory')"
                 :field-names="{ value: 'id', label: 'label' }"
               >
               </a-select>
             </a-form-item>
 
-            <a-form-item label="标签" name="tags" field="tags">
+            <a-form-item :label="t('article.form.tag')" name="tags" field="tags">
               <a-select
                 v-model="formState.tags"
                 style="width: 50%"
                 :options="tagsOptions"
-                placeholder="选择标签 "
+                :placeholder="t('article.form.placeholder.selectTag')"
                 :field-names="{ value: 'id', label: 'label' }"
                 multiple
                 class="tag-select"
               >
               </a-select>
             </a-form-item>
-            <a-form-item label="内容" name="content" field="content">
+            <a-form-item :label="t('article.form.content')" name="content" field="content">
               <md-editor
                 v-model="formState.content"
                 class="x-md-editor"
@@ -71,8 +80,12 @@
             </a-form-item>
 
             <a-form-item :wrapper-col-props="{ span: 13, offset: 7 }">
-              <a-button type="primary" html-type="submit">提交</a-button>
-              <a-button style="margin-left: 10px" @click="resetForm">重置</a-button>
+              <a-button type="primary" html-type="submit">{{
+                t('article.button.submit')
+              }}</a-button>
+              <a-button style="margin-left: 10px" @click="resetForm">{{
+                t('article.button.reset')
+              }}</a-button>
             </a-form-item>
           </a-form>
         </div>
@@ -83,6 +96,7 @@
 
 <script lang="ts" setup>
   import { computed, ref, reactive } from 'vue';
+  import { useI18n } from 'vue-i18n';
   import useLoading from '@/hooks/loading';
   import { staticUrl } from '@/config';
   import { getArticleInfo, createArticle, editArticle } from '@/api/article';
@@ -95,12 +109,13 @@
   import { useAppStore, useTabBarStore } from '@/store';
   import { useTableNoPageList } from '@/hooks/data';
 
+  const { t } = useI18n();
   const appStore = useAppStore();
   const router = useRouter();
   const route = useRoute();
   const { type } = route.query;
   const title = computed(() => {
-    return type === 'edit' ? '编辑文章' : '新增文章';
+    return type === 'edit' ? t('article.title.edit') : t('article.title.create');
   });
 
   interface FormState {
@@ -130,13 +145,13 @@
   const checkTitle = async (value: string, cb: (error?: string) => void) => {
     console.log(value);
     if (!value) {
-      cb('请输入标题！');
+      cb(t('article.validate.titleRequired'));
     }
     Promise.resolve();
   };
   const checkDescription = async (value: string, cb: (error?: string) => void) => {
     if (!value) {
-      cb('请输入描述！');
+      cb(t('article.validate.descriptionRequired'));
     }
     Promise.resolve();
   };
@@ -165,11 +180,11 @@
       // 编辑
       params.id = Number(route.query.id);
       const res = await editArticle(params);
-      Message.success('修改成功！');
+      Message.success(t('article.message.updateSuccess'));
     } else {
       // 新建
       const res = await createArticle(params);
-      Message.success('新建成功！');
+      Message.success(t('article.message.createSuccess'));
     }
     router.push('/article/list');
     const tabBarStore = useTabBarStore();

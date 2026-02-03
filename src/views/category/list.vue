@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <!-- <Breadcrumb :items="['menu.list', 'menu.list.searchTable']" /> -->
-    <a-card class="general-card" title="分类查询">
+    <a-card class="general-card" :title="t('category.query.title')">
       <a-row>
         <a-col :flex="1">
           <a-form
@@ -12,8 +12,11 @@
           >
             <a-row :gutter="16">
               <a-col :span="12">
-                <a-form-item label="分类名">
-                  <a-input v-model="formModel.title" placeholder="请输入分类名" />
+                <a-form-item :label="t('category.form.name')">
+                  <a-input
+                    v-model="formModel.title"
+                    :placeholder="t('category.form.placeholder.name')"
+                  />
                 </a-form-item>
               </a-col>
             </a-row>
@@ -25,13 +28,13 @@
               <template #icon>
                 <icon-search />
               </template>
-              {{ '搜索' }}
+              {{ t('common.button.search') }}
             </a-button>
             <a-button @click="reset">
               <template #icon>
                 <icon-refresh />
               </template>
-              {{ '重置' }}
+              {{ t('common.button.reset') }}
             </a-button>
           </a-space>
         </a-col>
@@ -46,7 +49,7 @@
               <template #icon>
                 <icon-plus />
               </template>
-              {{ '新建' }}
+              {{ t('category.button.create') }}
             </a-button>
           </a-space>
         </a-col>
@@ -60,23 +63,23 @@
         @page-change="onPageChange"
       >
         <template #columns>
-          <a-table-column title="分类名" data-index="label" />
-          <a-table-column title="分类文章数" data-index="articleCount">
+          <a-table-column :title="t('category.table.name')" data-index="label" />
+          <a-table-column :title="t('category.table.articleCount')" data-index="articleCount">
             <template #cell="{ record }">
               <a-tag :color="record.color" size="small">{{ record.articleCount }}</a-tag>
             </template>
           </a-table-column>
-          <a-table-column title="颜色" data-index="color">
+          <a-table-column :title="t('category.table.color')" data-index="color">
             <template #cell="{ record }">
               <a-tag :color="record.color" size="small">{{ record.color }}</a-tag>
             </template>
           </a-table-column>
-          <a-table-column title="创建时间" data-index="createAt">
+          <a-table-column :title="t('common.table.createTime')" data-index="createAt">
             <template #cell="{ record }">
               {{ formateDate(record.createAt) }}
             </template>
           </a-table-column>
-          <a-table-column title="操作" data-index="operations">
+          <a-table-column :title="t('common.table.operation')" data-index="operations">
             <template #cell="{ record }">
               <a-space :size="8">
                 <a-button
@@ -103,7 +106,7 @@
       </a-table>
       <CreateModal
         v-model:value="visibale"
-        type="分类"
+        :type="t('category.form.name')"
         @ok="
           ({ name, type }) => {
             ceateOkHandle({ name, type, cb: search });
@@ -112,7 +115,7 @@
       />
       <CreateModal
         v-model:value="editVisible"
-        type="分类"
+        :type="t('category.form.name')"
         :edit-data="editData"
         @ok="
           ({ name, type, id }) => {
@@ -126,6 +129,7 @@
 
 <script lang="ts" setup>
   import { ref, reactive } from 'vue';
+  import { useI18n } from 'vue-i18n';
   import type { Pagination } from '@/types/global';
   import { Message, Modal } from '@arco-design/web-vue';
   import { formateDate } from '@/utils';
@@ -140,6 +144,8 @@
   import CreateModal from './create-modal.vue';
   import { ceateOkHandle, delCategoryTag } from '../article/common';
   import { updateCategory } from '@/api/category';
+
+  const { t } = useI18n();
 
   const generateFormModel = () => {
     return {
@@ -185,11 +191,11 @@
   };
   const delHandle = async (id: string) => {
     Modal.confirm({
-      title: '删除分类',
-      content: '确定删除该分类嘛？',
+      title: t('category.confirm.deleteTitle'),
+      content: t('category.confirm.deleteContent'),
       onOk: async () => {
-        const res = await delCategoryTag('分类', id);
-        Message.success('删除成功');
+        const res = await delCategoryTag(t('category.form.name'), id);
+        Message.success(t('category.message.deleteSuccess'));
         search();
       },
     });
@@ -207,7 +213,7 @@
     cb: () => void;
   }) => {
     const res = await updateCategory({ id, label: name, value: name });
-    Message.success('更新成功！');
+    Message.success(t('category.message.updateSuccess'));
     cb();
   };
 </script>

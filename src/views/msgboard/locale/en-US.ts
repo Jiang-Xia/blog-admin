@@ -1,0 +1,23 @@
+export default {
+  // Message Board Management
+  'msgboard.query.title': 'Message Board Query',
+  'msgboard.form.commentContent': 'Comment Content',
+  'msgboard.form.replyContent': 'Reply Content',
+  'msgboard.form.email': 'Email',
+  'msgboard.form.nickname': 'Nickname',
+  'msgboard.form.placeholder.comment': 'Please input comment content',
+  'msgboard.form.placeholder.reply': 'Please input reply content',
+  'msgboard.form.placeholder.email': 'Please input email',
+  'msgboard.form.placeholder.nickname': 'Please input nickname',
+  'msgboard.table.nickname': 'Nickname',
+  'msgboard.table.avatar': 'Avatar',
+  'msgboard.table.comment': 'Comment Content',
+  'msgboard.table.address': 'Website',
+  'msgboard.button.search': 'Search',
+  'msgboard.button.reset': 'Reset',
+  'msgboard.table.operation': 'Operation',
+  'msgboard.confirm.delete': 'Delete Message',
+  'msgboard.confirm.deleteContent': 'Are you sure to delete this message?',
+  'msgboard.message.deleteSuccess': 'Deleted successfully',
+  'msgboard.message.setSuccess': 'Set successfully',
+};

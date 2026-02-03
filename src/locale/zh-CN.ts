@@ -1,9 +1,20 @@
 import localeMessageBox from '@/components/message-box/locale/zh-CN';
 import localeLogin from '@/views/login/locale/zh-CN';
+import localeArticle from '@/views/article/locale/zh-CN';
+import localeCategory from '@/views/category/locale/zh-CN';
+import localeTag from '@/views/tag/locale/zh-CN';
+import localeSystem from '@/views/system/locale/zh-CN';
+import localeUser from '@/views/user/locale/zh-CN';
+import localeComment from '@/views/comment/locale/zh-CN';
+import localeMsgboard from '@/views/msgboard/locale/zh-CN';
+import localeLink from '@/views/link/locale/zh-CN';
+import localeResource from '@/views/resource/locale/zh-CN';
 
 import localeWorkplace from '@/views/dashboard/workplace/locale/zh-CN';
+import localeDatascreen from '@/views/dashboard/datascreen/locale/zh-CN';
 
 import localeSettings from './zh-CN/settings';
+import localeCommon from './zh-CN/common';
 
 export default {
   // 'menu.dashboard': '仪表盘',
@@ -59,7 +70,18 @@ export default {
   'menu.server.commentList': '评论列表',
 
   ...localeSettings,
+  ...localeCommon,
   ...localeMessageBox,
   ...localeLogin,
+  ...localeArticle,
+  ...localeCategory,
+  ...localeTag,
+  ...localeSystem,
+  ...localeUser,
+  ...localeComment,
+  ...localeMsgboard,
+  ...localeLink,
+  ...localeResource,
   ...localeWorkplace,
+  ...localeDatascreen,
 };

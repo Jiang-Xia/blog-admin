@@ -2,7 +2,7 @@
   <div class="chart-card">
     <div class="chart-header">
       <icon-fire class="header-icon" />
-      <span class="chart-title">热门文章排行</span>
+      <span class="chart-title">{{ t('datascreen.chart.popularArticles') }}</span>
     </div>
     <a-spin :loading="loading" style="width: 100%">
       <div class="popular-list">
@@ -31,6 +31,9 @@
 
 <script lang="ts" setup>
   import { ref, onMounted, watch } from 'vue';
+  import { useI18n } from 'vue-i18n';
+
+  const { t } = useI18n();
 
   const props = defineProps({
     loading: {

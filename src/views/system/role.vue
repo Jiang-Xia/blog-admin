@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <!-- <Breadcrumb :items="['menu.list', 'menu.list.searchTable']" /> -->
-    <a-card class="general-card" title="角色查询">
+    <a-card class="general-card" :title="t('role.query.title')">
       <a-row>
         <a-col :flex="1">
           <a-form
@@ -12,8 +12,11 @@
           >
             <a-row :gutter="16">
               <a-col :span="12">
-                <a-form-item label="角色名称">
-                  <a-input v-model="formModel.roleName" placeholder="请输入角色名称" />
+                <a-form-item :label="t('role.form.name')">
+                  <a-input
+                    v-model="formModel.roleName"
+                    :placeholder="t('role.form.placeholder.name')"
+                  />
                 </a-form-item>
               </a-col>
               <a-col :span="5" style="text-align: right">
@@ -22,13 +25,13 @@
                     <template #icon>
                       <icon-search />
                     </template>
-                    {{ '搜索' }}
+                    {{ t('common.button.search') }}
                   </a-button>
                   <a-button @click="reset">
                     <template #icon>
                       <icon-refresh />
                     </template>
-                    {{ '重置' }}
+                    {{ t('common.button.reset') }}
                   </a-button>
                 </a-space>
               </a-col>
@@ -44,7 +47,7 @@
               <template #icon>
                 <icon-plus />
               </template>
-              {{ '新建' }}
+              {{ t('role.button.create') }}
             </a-button>
           </a-space>
         </a-col>
@@ -59,10 +62,14 @@
         @page-change="onPageChange"
       >
         <template #columns>
-          <a-table-column title="角色ID" data-index="id" align="center" />
-          <a-table-column title="角色名称" data-index="roleName" align="center" />
-          <a-table-column title="角色描述" data-index="roleDesc" />
-          <a-table-column title="操作" data-index="operations">
+          <a-table-column :title="t('system.table.roleId')" data-index="id" align="center" />
+          <a-table-column
+            :title="t('system.table.roleName')"
+            data-index="roleName"
+            align="center"
+          />
+          <a-table-column :title="t('system.table.roleDesc')" data-index="roleDesc" />
+          <a-table-column :title="t('role.table.operation')" data-index="operations">
             <template #cell="{ record }">
               <a-space :size="8">
                 <a-button
@@ -143,11 +150,11 @@
   };
   const delHandle = async (id: any) => {
     Modal.confirm({
-      title: '删除角色',
-      content: '确定删除该角色嘛？',
+      title: t('role.confirm.delete'),
+      content: t('role.confirm.delete'),
       onOk: async () => {
         const res = await delRole(id);
-        Message.success('删除成功');
+        Message.success(t('role.message.deleteSuccess'));
         getTableListHandle();
       },
     });

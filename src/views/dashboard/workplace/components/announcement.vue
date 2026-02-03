@@ -1,13 +1,13 @@
 <template>
   <a-card
     class="general-card"
-    title="最近文章"
+    :title="t('workplace.recentArticles')"
     :header-style="{ paddingBottom: '0' }"
     :body-style="{ padding: '15px 20px 13px 20px' }"
   >
     <template #extra>
       <a-link>
-        <router-link to="/article/list">查看更多</router-link>
+        <router-link to="/article/list">{{ t('workplace.viewMore') }}</router-link>
       </a-link>
     </template>
     <div>
@@ -25,6 +25,9 @@
   import { useUserStore } from '@/store';
   import { getArticleList } from '@/api/article';
   import { ref } from 'vue';
+  import { useI18n } from 'vue-i18n';
+
+  const { t } = useI18n();
 
   const { role } = useUserStore();
 

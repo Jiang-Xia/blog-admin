@@ -10,14 +10,14 @@
         </a-avatar>
         <!-- :precision="1" -->
         <a-statistic
-          title="近一年总访问量"
+          :title="t('workplace.totalVisits')"
           :value="countObj.allCount"
           :value-from="0"
           animation
           show-group-separator
         >
           <template #suffix>
-            <span class="unit">次</span>
+            <span class="unit">{{ t('workplace.unit.times') }}</span>
           </template>
         </a-statistic>
       </a-space>
@@ -31,14 +31,14 @@
           />
         </a-avatar>
         <a-statistic
-          title="昨日访问量"
+          :title="t('workplace.yesterdayVisits')"
           :value="countObj.yesterdayCount"
           :value-from="0"
           animation
           show-group-separator
         >
           <template #suffix>
-            <span class="unit">次</span>
+            <span class="unit">{{ t('workplace.unit.times') }}</span>
           </template>
         </a-statistic>
       </a-space>
@@ -52,14 +52,14 @@
           />
         </a-avatar>
         <a-statistic
-          title="今日访问量"
+          :title="t('workplace.todayVisits')"
           :value="countObj.todayCount"
           :value-from="0"
           animation
           show-group-separator
         >
           <template #suffix>
-            <span class="unit">次</span>
+            <span class="unit">{{ t('workplace.unit.times') }}</span>
           </template>
         </a-statistic>
       </a-space>
@@ -77,7 +77,7 @@
           />
         </a-avatar>
         <a-statistic
-          title="较昨日新增"
+          :title="t('workplace.compareYesterday')"
           :value="countObj.compareYesterday"
           :precision="1"
           :value-from="0"
@@ -97,6 +97,9 @@
 </template>
 
 <script lang="ts" setup>
+  import { useI18n } from 'vue-i18n';
+
+  const { t } = useI18n();
   defineProps({
     countObj: {
       type: Object,

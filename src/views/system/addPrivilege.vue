@@ -11,26 +11,45 @@
       name="custom-validation"
       :model="formState"
       :rules="rules"
-      :label-col-props="{ span: 6, offset: 0 }"
-      :wrapper-col-props="{ span: 18, offset: 0 }"
+      :label-col-props="{ span: 7, offset: 0 }"
+      :wrapper-col-props="{ span: 17, offset: 0 }"
       hide-cancel
       autocomplete="off"
       @submit-success="handleFinish"
       @submit-failed="handleFinishFailed"
     >
-      <a-form-item label="权限名称" name="privilegeName" field="privilegeName">
-        <a-input v-model="formState.privilegeName" :max-length="20" placeholder="权限名称" />
+      <a-form-item
+        :label="t('privilege.form.privilegeName')"
+        name="privilegeName"
+        field="privilegeName"
+      >
+        <a-input
+          v-model="formState.privilegeName"
+          :max-length="20"
+          :placeholder="t('privilege.form.placeholder.privilegeName')"
+        />
       </a-form-item>
-      <a-form-item label="权限识别码" name="privilegeCode" field="privilegeCode">
-        <a-input v-model="formState.privilegeCode" placeholder="权限识别码" />
+      <a-form-item
+        :label="t('privilege.form.privilegeCode')"
+        name="privilegeCode"
+        field="privilegeCode"
+      >
+        <a-input
+          v-model="formState.privilegeCode"
+          :placeholder="t('privilege.form.placeholder.privilegeCode')"
+        />
       </a-form-item>
-      <a-form-item label="所属页面" name="privilegePage" field="privilegePage">
+      <a-form-item
+        :label="t('privilege.form.privilegePage')"
+        name="privilegePage"
+        field="privilegePage"
+      >
         <a-tree-select
           v-model="formState.privilegePage"
           :data="treeData"
           :field-names="{ key: 'id', title: 'menuCnName', children: 'children' }"
           selectable="leaf"
-          placeholder="请选择所属页面"
+          :placeholder="t('privilege.form.placeholder.privilegePage')"
           allow-clear
           allow-search
           :size="'medium'"
@@ -38,11 +57,17 @@
           label-in-value
         />
       </a-form-item>
-      <a-form-item label="路径模式" name="pathPattern" field="pathPattern">
-        <a-input v-model="formState.pathPattern" placeholder="路径模式，如 /api/users/:id" />
+      <a-form-item :label="t('privilege.form.pathPattern')" name="pathPattern" field="pathPattern">
+        <a-input
+          v-model="formState.pathPattern"
+          :placeholder="t('privilege.form.placeholder.pathPatternDetail')"
+        />
       </a-form-item>
-      <a-form-item label="HTTP方法" name="httpMethod" field="httpMethod">
-        <a-select v-model="formState.httpMethod" placeholder="请选择HTTP方法">
+      <a-form-item :label="t('privilege.form.httpMethod')" name="httpMethod" field="httpMethod">
+        <a-select
+          v-model="formState.httpMethod"
+          :placeholder="t('privilege.form.placeholder.httpMethod')"
+        >
           <a-option value="GET">GET</a-option>
           <a-option value="POST">POST</a-option>
           <a-option value="PUT">PUT</a-option>
@@ -50,43 +75,53 @@
           <a-option value="PATCH">PATCH</a-option>
           <a-option value="HEAD">HEAD</a-option>
           <a-option value="OPTIONS">OPTIONS</a-option>
-          <a-option value="*">*(全部)</a-option>
+          <a-option value="*">{{ t('privilege.method.all') }}</a-option>
         </a-select>
       </a-form-item>
-      <a-form-item label="是否公开接口" name="isPublic" field="isPublic">
+      <a-form-item :label="t('privilege.form.isPublic')" name="isPublic" field="isPublic">
         <a-switch
           v-model="formState.isPublic"
           :checked-value="true"
           :unchecked-value="false"
-          checked-text="是"
-          unchecked-text="否"
+          :checked-text="t('privilege.form.yes')"
+          :unchecked-text="t('privilege.form.no')"
         />
       </a-form-item>
-      <a-form-item label="是否需要检查资源所有权" name="requireOwnership" field="requireOwnership">
+      <a-form-item
+        :label="t('privilege.form.requireOwnership')"
+        name="requireOwnership"
+        field="requireOwnership"
+      >
         <a-switch
           v-model="formState.requireOwnership"
           :checked-value="true"
           :unchecked-value="false"
-          checked-text="是"
-          unchecked-text="否"
+          :checked-text="t('privilege.form.yes')"
+          :unchecked-text="t('privilege.form.no')"
         />
       </a-form-item>
-      <a-form-item label="描述" name="description" field="description">
-        <a-textarea v-model="formState.description" placeholder="请输入描述" :max-length="500" />
+      <a-form-item :label="t('privilege.form.description')" name="description" field="description">
+        <a-textarea
+          v-model="formState.description"
+          :placeholder="t('system.form.placeholder.description')"
+          :max-length="500"
+        />
       </a-form-item>
-      <a-form-item label="是否可见" name="isVisible" field="isVisible">
+      <a-form-item :label="t('privilege.form.isVisible')" name="isVisible" field="isVisible">
         <a-switch
           v-model="formState.isVisible"
           :checked-value="true"
           :unchecked-value="false"
-          checked-text="是"
-          unchecked-text="否"
+          :checked-text="t('privilege.form.yes')"
+          :unchecked-text="t('privilege.form.no')"
         />
       </a-form-item>
 
       <a-form-item :wrapper-col-props="{ span: 13, offset: 7 }">
-        <a-button type="primary" html-type="submit">提交</a-button>
-        <a-button style="margin-left: 10px" @click="resetForm">重置</a-button>
+        <a-button type="primary" html-type="submit">{{ t('common.button.submit') }}</a-button>
+        <a-button style="margin-left: 10px" @click="resetForm">{{
+          t('common.button.reset')
+        }}</a-button>
       </a-form-item>
     </a-form>
     <template #footer><div> </div></template>
@@ -112,7 +147,7 @@
   const route = useRoute();
   const type = ref('add');
   const title = computed(() => {
-    return type.value === 'edit' ? '编辑权限' : '新增权限';
+    return type.value === 'edit' ? t('privilege.modal.edit') : t('privilege.modal.add');
   });
   interface stringKey {
     [propName: string]: string | number;
@@ -149,13 +184,13 @@
   const checkTitle = async (value: string, cb: (error?: string) => void) => {
     console.log(value);
     if (!value) {
-      cb('请输入标题！');
+      cb(t('system.validate.titleRequired'));
     }
     Promise.resolve();
   };
   const checkDescription = async (value: string, cb: (error?: string) => void) => {
     if (!value) {
-      cb('请输入描述！');
+      cb(t('system.validate.descriptionRequired'));
     }
     Promise.resolve();
   };
@@ -167,23 +202,23 @@
 
   const rules = {
     privilegeName: [
-      { required: true, message: '权限名称不能为空' },
-      { maxLength: 50, message: '权限名称不能超过50个字符' },
+      { required: true, message: t('privilege.validate.privilegeName.required') },
+      { maxLength: 50, message: t('privilege.validate.privilegeName.maxLength') },
     ],
     privilegeCode: [
-      { required: true, message: '权限识别码不能为空' },
-      { maxLength: 50, message: '权限识别码不能超过50个字符' },
+      { required: true, message: t('privilege.validate.privilegeCode.required') },
+      { maxLength: 50, message: t('privilege.validate.privilegeCode.maxLength') },
     ],
-    privilegePage: [{ required: true, message: '所属页面不能为空' }],
+    privilegePage: [{ required: true, message: t('privilege.validate.privilegePage.required') }],
     pathPattern: [
-      { required: true, message: '路径模式不能为空' },
-      { maxLength: 500, message: '路径模式不能超过500个字符' },
+      { required: true, message: t('privilege.validate.pathPattern.required') },
+      { maxLength: 500, message: t('privilege.validate.pathPattern.maxLength') },
     ],
     httpMethod: [
-      { required: true, message: 'HTTP方法不能为空' },
-      { maxLength: 10, message: 'HTTP方法不能超过10个字符' },
+      { required: true, message: t('privilege.validate.httpMethod.required') },
+      { maxLength: 10, message: t('privilege.validate.httpMethod.maxLength') },
     ],
-    description: [{ maxLength: 500, message: '描述不能超过500个字符' }],
+    description: [{ maxLength: 500, message: t('privilege.validate.description.maxLength') }],
   };
   // 提交成功
   const handleFinish = async (values: any) => {
@@ -201,13 +236,13 @@
       const res = await updatePrivilege(params);
       visible.value = false;
       // console.log({ res });
-      Message.success('修改成功！');
+      Message.success(t('privilege.message.updateSuccess'));
       resetForm();
     } else {
       // 新建
       const res = await createPrivilege(params);
       visible.value = false;
-      Message.success('新建成功！');
+      Message.success(t('privilege.message.createSuccess'));
       resetForm();
     }
     emits('success');

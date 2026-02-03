@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <!-- <Breadcrumb :items="['menu.list', 'menu.list.searchTable']" /> -->
-    <a-card class="general-card" title="机构查询">
+    <a-card class="general-card" :title="t('dept.query.title')">
       <a-row>
         <a-col :flex="1">
           <a-form
@@ -12,15 +12,22 @@
           >
             <a-row :gutter="16">
               <a-col :span="12">
-                <a-form-item label="部门名称">
-                  <a-input v-model="formModel.deptName" placeholder="请输入部门名称" />
+                <a-form-item :label="t('dept.form.name')">
+                  <a-input
+                    v-model="formModel.deptName"
+                    :placeholder="t('dept.form.placeholder.name')"
+                  />
                 </a-form-item>
               </a-col>
               <a-col :span="12">
-                <a-form-item label="状态">
-                  <a-select v-model="formModel.status" placeholder="请选择状态" allow-clear>
-                    <a-option :value="1">正常</a-option>
-                    <a-option :value="0">禁用</a-option>
+                <a-form-item :label="t('common.form.status')">
+                  <a-select
+                    v-model="formModel.status"
+                    :placeholder="t('common.form.placeholder.select')"
+                    allow-clear
+                  >
+                    <a-option :value="1">{{ t('common.status.normal') }}</a-option>
+                    <a-option :value="0">{{ t('common.status.disable') }}</a-option>
                   </a-select>
                 </a-form-item>
               </a-col>
@@ -32,13 +39,13 @@
                     <template #icon>
                       <icon-search />
                     </template>
-                    {{ '搜索' }}
+                    {{ t('common.button.search') }}
                   </a-button>
                   <a-button @click="reset">
                     <template #icon>
                       <icon-refresh />
                     </template>
-                    {{ '重置' }}
+                    {{ t('common.button.reset') }}
                   </a-button>
                 </a-space>
               </a-col>
@@ -54,14 +61,14 @@
               <template #icon>
                 <icon-plus />
               </template>
-              {{ '新建' }}
+              {{ t('dept.button.create') }}
             </a-button>
             <a-button @click="toggleViewMode">
               <template #icon>
                 <icon-apps v-if="viewMode === 'table'" />
                 <icon-list v-if="viewMode === 'tree'" />
               </template>
-              {{ viewMode === 'table' ? '树形视图' : '表格视图' }}
+              {{ viewMode === 'table' ? t('dept.view.tree') : t('dept.view.table') }}
             </a-button>
           </a-space>
         </a-col>
@@ -80,7 +87,8 @@
             <span class="tree-node-title">
               <span class="node-name">{{ nodeData.deptName }}</span>
               <span class="node-info">
-                (编码: {{ nodeData.deptCode || '-' }}, 负责人: {{ nodeData.leaderName || '-' }})
+                ({{ t('dept.tree.code') }}: {{ nodeData.deptCode || '-' }},
+                {{ t('dept.tree.leader') }}: {{ nodeData.leaderName || '-' }})
               </span>
               <a-space class="node-actions">
                 <a-button
@@ -128,7 +136,7 @@
               </template>
               <template v-else-if="column.dataIndex === 'status'">
                 <a-tag :color="record.status === 1 ? 'green' : 'red'">
-                  {{ record.status === 1 ? '正常' : '禁用' }}
+                  {{ record.status === 1 ? t('common.status.normal') : t('common.status.disable') }}
                 </a-tag>
               </template>
               <template v-else-if="column.dataIndex === 'operations'">
@@ -157,7 +165,7 @@
               </template>
             </template>
           </a-table-column>
-          <a-table-column title="操作">
+          <a-table-column :title="t('dept.table.operation')">
             <template #cell="{ record }">
               <a-space :size="8">
                 <a-button
@@ -225,32 +233,32 @@
   // 表格列定义
   const tableColumns = [
     {
-      title: '机构名称',
+      title: t('dept.table.name'),
       dataIndex: 'deptName',
       align: 'center',
     },
     {
-      title: '部门编码',
+      title: t('dept.table.code'),
       dataIndex: 'deptCode',
     },
     {
-      title: '父级部门ID',
+      title: t('dept.form.parentId'),
       dataIndex: 'parentId',
     },
     {
-      title: '部门负责人',
+      title: t('dept.table.leader'),
       dataIndex: 'leaderName',
     },
     {
-      title: '部门排序',
+      title: t('dept.table.sort'),
       dataIndex: 'orderNum',
     },
     {
-      title: '状态',
+      title: t('dept.table.status'),
       dataIndex: 'status',
     },
     {
-      title: '部门描述',
+      title: t('dept.form.description'),
       dataIndex: 'remark',
     },
   ];
@@ -268,7 +276,7 @@
       setLoading(false);
     } catch (error) {
       console.error('获取部门树失败:', error);
-      Message.error('获取部门树失败');
+      Message.error(t('dept.message.deleteFail'));
       setLoading(false);
     }
   };
@@ -314,11 +322,11 @@
   });
   const delHandle = async (id: any) => {
     Modal.confirm({
-      title: '删除机构',
-      content: '确定删除该机构嘛？',
+      title: t('dept.confirm.delete'),
+      content: t('dept.confirm.delete'),
       onOk: async () => {
         const res = await delDept(id);
-        Message.success('删除成功');
+        Message.success(t('dept.message.deleteSuccess'));
         // 根据当前视图模式刷新数据
         if (viewMode.value === 'table') {
           getTableListHandle();

@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <!-- <Breadcrumb :items="['menu.list', 'menu.list.searchTable']" /> -->
-    <a-card class="general-card" title="留言板查询">
+    <a-card class="general-card" :title="t('comment.query.title')">
       <a-row align="center">
         <a-col :flex="1">
           <a-form
@@ -12,11 +12,11 @@
           >
             <a-row :gutter="16">
               <a-col :span="12">
-                <a-form-item label="选择文章">
+                <a-form-item :label="t('comment.form.selectArticle')">
                   <a-select
                     v-model="formModel.articleId"
                     :options="articleOptions"
-                    placeholder="选择分类"
+                    :placeholder="t('comment.form.placeholder.selectArticle')"
                     :field-names="{ value: 'id', label: 'title' }"
                     allow-search
                   >
@@ -32,13 +32,13 @@
               <template #icon>
                 <icon-search />
               </template>
-              {{ '搜索' }}
+              {{ t('comment.button.search') }}
             </a-button>
             <a-button @click="reset">
               <template #icon>
                 <icon-refresh />
               </template>
-              {{ '重置' }}
+              {{ t('comment.button.reset') }}
             </a-button>
           </a-space>
         </a-col>
@@ -55,7 +55,7 @@
       >
         <template #columns>
           <a-table-column
-            title="评论人昵称"
+            :title="t('comment.table.nickname')"
             data-index="userInfo.nickname"
             align="center"
             :width="140"
@@ -64,7 +64,12 @@
               {{ record.userInfo.nickname }}
             </template>
           </a-table-column>
-          <a-table-column title="评论人头像" data-index="avatar" align="center" :width="140">
+          <a-table-column
+            :title="t('comment.table.avatar')"
+            data-index="avatar"
+            align="center"
+            :width="140"
+          >
             <template #cell="{ record }">
               <a-avatar>
                 <img :alt="record.title" :src="record.userInfo.avatar" />
@@ -72,7 +77,7 @@
             </template>
           </a-table-column>
           <a-table-column
-            title="被回复人昵称"
+            :title="t('comment.table.replyNickname')"
             data-index="userInfo.nickname"
             align="center"
             :width="140"
@@ -81,21 +86,48 @@
               <span v-if="record.tUserInfo">@{{ record.tUserInfo.nickname }}</span>
             </template>
           </a-table-column>
-          <a-table-column title="被回复人头像" data-index="avatar" align="center" :width="140">
+          <a-table-column
+            :title="t('comment.table.replyAvatar')"
+            data-index="avatar"
+            align="center"
+            :width="140"
+          >
             <template #cell="{ record }">
               <a-avatar v-if="record.tUserInfo">
                 <img :alt="record.title" :src="record.tUserInfo.avatar" />
               </a-avatar>
             </template>
           </a-table-column>
-          <a-table-column title="评论内容" data-index="content" :width="460" tooltip ellipsis />
-          <a-table-column title="回复数" data-index="allReplyCount" :width="160" tooltip ellipsis />
-          <a-table-column title="评论时间" data-index="updateTime" :width="200" tooltip>
+          <a-table-column
+            :title="t('comment.table.content')"
+            data-index="content"
+            :width="460"
+            tooltip
+            ellipsis
+          />
+          <a-table-column
+            :title="t('comment.table.replyCount')"
+            data-index="allReplyCount"
+            :width="160"
+            tooltip
+            ellipsis
+          />
+          <a-table-column
+            :title="t('comment.table.updateTime')"
+            data-index="updateTime"
+            :width="200"
+            tooltip
+          >
             <template #cell="{ record }">
               {{ $dayjs(record.updateTime).format('YYYY-MM-DD HH:mm:ss') }}
             </template>
           </a-table-column>
-          <a-table-column title="操作" data-index="operations" :width="100" fixed="right">
+          <a-table-column
+            :title="t('comment.table.operation')"
+            data-index="operations"
+            :width="100"
+            fixed="right"
+          >
             <template #cell="{ record }">
               <a-space :size="8">
                 <a-button size="mini" type="primary" status="danger" @click="delHandle(record)">
@@ -112,13 +144,15 @@
 
 <script lang="ts" setup>
   import { computed, ref, reactive, watch } from 'vue';
-  // import { useI18n } from 'vue-i18n';
+  import { useI18n } from 'vue-i18n';
   // import useLoading from '@/hooks/loading';
   import type { Pagination } from '@/types/global';
   import { Message, Modal } from '@arco-design/web-vue';
   import request from '@/api/request';
   import { useTableList } from '@/hooks/data';
   import { getArticleList } from '@/api/article';
+
+  const { t } = useI18n();
 
   const generateFormModel = () => {
     return {
@@ -191,11 +225,11 @@
       url = '/reply/delete';
     }
     Modal.confirm({
-      title: '删除评论',
-      content: '确定删除该评论嘛？',
+      title: t('comment.confirm.delete'),
+      content: t('comment.confirm.deleteContent'),
       onOk: async () => {
         const res = await request.post(url, [record.id]);
-        Message.success('删除成功');
+        Message.success(t('comment.message.deleteSuccess'));
         search();
       },
     });

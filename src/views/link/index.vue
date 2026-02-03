@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <!-- <Breadcrumb :items="['menu.list', 'menu.list.searchTable']" /> -->
-    <a-card class="general-card" title="友链查询">
+    <a-card class="general-card" :title="t('link.query.title')">
       <a-row style="margin-bottom: 16px">
         <a-col :span="16">
           <!-- <a-space>
@@ -9,7 +9,7 @@
               <template #icon>
                 <icon-plus />
               </template>
-              {{ '新建' }}
+              {{ t('link.button.add') }}
             </a-button>
           </a-space> -->
         </a-col>
@@ -23,21 +23,21 @@
         @page-change="onPageChange"
       >
         <template #columns>
-          <a-table-column title="标题" data-index="title" />
-          <a-table-column title="图标" data-index="url" align="center">
+          <a-table-column :title="t('link.table.title')" data-index="title" />
+          <a-table-column :title="t('link.table.icon')" data-index="url" align="center">
             <template #cell="{ record }">
               <a-avatar>
                 <img :alt="record.title" :src="record.icon" />
               </a-avatar>
             </template>
           </a-table-column>
-          <a-table-column title="描述" data-index="desp" />
-          <a-table-column title="网址" data-index="url">
+          <a-table-column :title="t('link.table.description')" data-index="desp" />
+          <a-table-column :title="t('link.table.website')" data-index="url">
             <template #cell="{ record }">
               <a-link :href="record.url" target="_blank">{{ record.url }}</a-link>
             </template>
           </a-table-column>
-          <a-table-column title="状态" data-index="url">
+          <a-table-column :title="t('link.table.status')" data-index="url">
             <template #cell="{ record }">
               <!-- :disabled="record.agreed" -->
               <a-switch v-model="record.agreed" @change="onSwitchChange(record)">
@@ -50,7 +50,7 @@
               </a-switch>
             </template>
           </a-table-column>
-          <a-table-column title="操作" data-index="operations">
+          <a-table-column :title="t('link.table.operation')" data-index="operations">
             <template #cell="{ record }">
               <a-space :size="8">
                 <a-button size="mini" type="primary" status="danger" @click="delHandle(record.id)">
@@ -69,7 +69,7 @@
   import { computed, ref, reactive } from 'vue';
   import { useI18n } from 'vue-i18n';
   import useLoading from '@/hooks/loading';
-  import { Pagination } from '@/types/global';
+  import type { Pagination } from '@/types/global';
   import { Message, Modal } from '@arco-design/web-vue';
   import request from '@/api/request';
 
@@ -117,11 +117,11 @@
   };
   const delHandle = async (id: number) => {
     Modal.confirm({
-      title: '删除友链',
-      content: '确定删除该友链嘛？',
+      title: t('link.confirm.delete'),
+      content: t('link.confirm.deleteContent'),
       onOk: async () => {
         const res = await request.delete('/link', { params: { id } });
-        Message.success('删除成功');
+        Message.success(t('link.message.deleteSuccess'));
         getListHandle();
       },
     });
@@ -129,7 +129,7 @@
   const onSwitchChange = async (record: any) => {
     const { agreed, id } = record;
     const res = await request.patch(`/link`, { agreed, id });
-    Message.success('设置成功');
+    Message.success(t('link.message.setSuccess'));
   };
 </script>
 

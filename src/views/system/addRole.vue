@@ -11,20 +11,24 @@
       name="custom-validation"
       :model="formState"
       :rules="rules"
-      :label-col-props="{ span: 4, offset: 0 }"
-      :wrapper-col-props="{ span: 18, offset: 0 }"
+      :label-col-props="{ span: 5, offset: 0 }"
+      :wrapper-col-props="{ span: 17, offset: 0 }"
       hide-cancel
       autocomplete="off"
       @submit-success="handleFinish"
       @submit-failed="handleFinishFailed"
     >
-      <a-form-item label="角色名" name="roleName" field="roleName">
-        <a-input v-model="formState.roleName" :max-length="11" placeholder="角色名" />
+      <a-form-item :label="t('role.form.roleName')" name="roleName" field="roleName">
+        <a-input
+          v-model="formState.roleName"
+          :max-length="11"
+          :placeholder="t('role.form.placeholder.roleName')"
+        />
       </a-form-item>
-      <a-form-item label="角色描述" name="roleDesc" field="roleDesc">
-        <a-input v-model="formState.roleDesc" placeholder="角色描述" />
+      <a-form-item :label="t('role.form.roleDesc')" name="roleDesc" field="roleDesc">
+        <a-input v-model="formState.roleDesc" :placeholder="t('role.form.placeholder.roleDesc')" />
       </a-form-item>
-      <a-form-item label="分配菜单" name="privileges" field="privileges">
+      <a-form-item :label="t('role.form.privileges')" name="privileges" field="privileges">
         <a-tree
           v-if="treeData.length > 0"
           style="max-height: 400px; overflow-y: auto; width: 100%"
@@ -45,8 +49,10 @@
       </a-form-item>
 
       <a-form-item :wrapper-col-props="{ span: 13, offset: 7 }">
-        <a-button type="primary" html-type="submit">提交</a-button>
-        <a-button style="margin-left: 10px" @click="resetForm">重置</a-button>
+        <a-button type="primary" html-type="submit">{{ t('common.button.submit') }}</a-button>
+        <a-button style="margin-left: 10px" @click="resetForm">{{
+          t('common.button.reset')
+        }}</a-button>
       </a-form-item>
     </a-form>
     <template #footer><div> </div></template>
@@ -72,7 +78,7 @@
   const route = useRoute();
   const type = ref('add');
   const title = computed(() => {
-    return type.value === 'edit' ? '编辑角色' : '新增角色';
+    return type.value === 'edit' ? t('role.modal.edit') : t('role.modal.add');
   });
   interface stringKey {
     [propName: string]: string | number;
@@ -97,13 +103,13 @@
   const checkTitle = async (value: string, cb: (error?: string) => void) => {
     console.log(value);
     if (!value) {
-      cb('请输入标题！');
+      cb(t('system.validate.titleRequired'));
     }
     Promise.resolve();
   };
   const checkDescription = async (value: string, cb: (error?: string) => void) => {
     if (!value) {
-      cb('请输入描述！');
+      cb(t('system.validate.descriptionRequired'));
     }
     Promise.resolve();
   };
@@ -141,11 +147,11 @@
 
   const rules = {
     roleName: [
-      { required: true, message: '角色名不能为空' },
-      { minLength: 2, message: '角色名至少2个字符' },
-      { maxLength: 11, message: '角色名不能超过11个字符' },
+      { required: true, message: t('role.validate.roleName.required') },
+      { minLength: 2, message: t('role.validate.roleName.minLength') },
+      { maxLength: 11, message: t('role.validate.roleName.maxLength') },
     ],
-    roleDesc: [{ maxLength: 100, message: '角色描述不能超过100个字符' }],
+    roleDesc: [{ maxLength: 100, message: t('role.validate.roleDesc.maxLength') }],
   };
   // 提交成功
   const handleFinish = async (values: any) => {
@@ -169,13 +175,13 @@
       const res = await updateRole(params);
       visible.value = false;
       // console.log({ res });
-      Message.success('修改成功！');
+      Message.success(t('role.message.updateSuccess'));
       resetForm();
     } else {
       // 新建
       const res = await createRole(params);
       visible.value = false;
-      Message.success('新建成功！');
+      Message.success(t('role.message.createSuccess'));
       resetForm();
     }
     emits('success');

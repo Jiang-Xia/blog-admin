@@ -7,17 +7,19 @@
         padding: '20px',
       }"
     >
-      <template #title> 主要分类内容占比 </template>
+      <template #title> {{ t('workplace.categoriesPercent') }} </template>
       <Chart height="310px" :option="chartOption" />
     </a-card>
   </a-spin>
 </template>
 
 <script lang="ts" setup>
+  import { useI18n } from 'vue-i18n';
+  const { t } = useI18n();
   import useLoading from '@/hooks/loading';
   import useChartOption from '@/hooks/chart-option';
   import { ref, computed } from 'vue';
-  import { ListState } from '@/types/global';
+  import type { ListState } from '@/types/global';
   import { getAllCategory } from '@/api/category';
 
   const categoryOptions = ref<ListState[]>();
@@ -77,7 +79,7 @@
             left: 'center',
             top: '40%',
             style: {
-              text: '文章数',
+              text: t('workplace.articleCount'),
               textAlign: 'center',
               fill: isDark ? '#ffffffb3' : '#4E5969',
               fontSize: 14,

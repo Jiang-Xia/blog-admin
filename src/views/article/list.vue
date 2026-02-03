@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <!-- <Breadcrumb :items="['menu.list', 'menu.list.searchTable']" /> -->
-    <a-card class="general-card" title="文章查询">
+    <a-card class="general-card" :title="t('article.query.title')">
       <a-row>
         <a-col :flex="1">
           <a-form
@@ -12,28 +12,28 @@
           >
             <a-row :gutter="16">
               <a-col :span="8">
-                <a-form-item label="标题">
+                <a-form-item :label="t('article.form.title')">
                   <a-input
                     v-model="formModel.title"
-                    placeholder="请输入关键字"
+                    :placeholder="t('article.form.placeholder.title')"
                     @press-enter="search()"
                   />
                 </a-form-item>
               </a-col>
               <a-col :span="8">
-                <a-form-item label="描述">
+                <a-form-item :label="t('article.form.description')">
                   <a-input
                     v-model="formModel.description"
-                    placeholder="请输入描述"
+                    :placeholder="t('article.form.placeholder.description')"
                     @press-enter="search()"
                   />
                 </a-form-item>
               </a-col>
               <a-col :span="8">
-                <a-form-item label="内容">
+                <a-form-item :label="t('article.form.content')">
                   <a-input
                     v-model="formModel.content"
-                    placeholder="请输入文章内容"
+                    :placeholder="t('article.form.placeholder.content')"
                     @press-enter="search()"
                   />
                 </a-form-item>
@@ -47,13 +47,13 @@
               <template #icon>
                 <icon-search />
               </template>
-              {{ '搜索' }}
+              {{ t('common.button.search') }}
             </a-button>
             <a-button @click="reset">
               <template #icon>
                 <icon-refresh />
               </template>
-              {{ '重置' }}
+              {{ t('common.button.reset') }}
             </a-button>
           </a-space>
         </a-col>
@@ -72,13 +72,13 @@
               <template #icon>
                 <icon-plus />
               </template>
-              {{ '新建' }}
+              {{ t('article.button.create') }}
             </a-button>
             <a-button type="primary" @click="exportToExcel" :loading="exportLoading">
               <template #icon>
                 <icon-download />
               </template>
-              {{ '导出Excel' }}
+              {{ t('article.button.export') }}
             </a-button>
           </a-space>
         </a-col>
@@ -92,7 +92,12 @@
         @page-change="onPageChange"
       >
         <template #columns>
-          <a-table-column title="标题" data-index="title" :width="260" ellipsis>
+          <a-table-column
+            :title="t('article.table.title')"
+            data-index="title"
+            :width="260"
+            ellipsis
+          >
             <template #cell="{ record }">
               <a-popover title="">
                 <span>{{ record.title }}</span>
@@ -107,8 +112,14 @@
               </a-popover>
             </template>
           </a-table-column>
-          <a-table-column title="描述" data-index="description" :width="140" ellipsis tooltip />
-          <a-table-column title="封面" data-index="category" :width="100">
+          <a-table-column
+            :title="t('article.table.description')"
+            data-index="description"
+            :width="140"
+            ellipsis
+            tooltip
+          />
+          <a-table-column :title="t('article.table.cover')" data-index="category" :width="100">
             <template #cell="{ record }">
               <a-popover title="">
                 <a-image width="40" height="40" :src="record.cover" />
@@ -118,25 +129,29 @@
               </a-popover>
             </template>
           </a-table-column>
-          <a-table-column title="分类" data-index="category" :width="120">
+          <a-table-column :title="t('article.table.category')" data-index="category" :width="120">
             <template #cell="{ record }">
               <span :style="{ color: record.category?.color }">
                 {{ record.category?.label }}
               </span>
             </template>
           </a-table-column>
-          <a-table-column title="标签" data-index="tag" :width="120">
+          <a-table-column :title="t('article.table.tag')" data-index="tag" :width="120">
             <template #cell="{ record }">
               <span :style="{ color: record.tagColor }">
                 {{ record.tag }}
               </span>
             </template>
           </a-table-column>
-          <a-table-column title="查看" data-index="views" :width="80" />
-          <a-table-column title="点赞" data-index="likes" :width="80" />
-          <a-table-column title="评论" data-index="commentCount" :width="80" />
-          <a-table-column title="更新时间" data-index="uTime" :width="200" />
-          <a-table-column title="置顶" :width="60" fixed="right">
+          <a-table-column :title="t('article.table.views')" data-index="views" :width="80" />
+          <a-table-column :title="t('article.table.likes')" data-index="likes" :width="80" />
+          <a-table-column
+            :title="t('article.table.commentCount')"
+            data-index="commentCount"
+            :width="80"
+          />
+          <a-table-column :title="t('article.table.updateTime')" data-index="uTime" :width="200" />
+          <a-table-column :title="t('article.table.topping')" :width="60" fixed="right">
             <template #cell="{ record }">
               <!-- :disabled="record.agreed" -->
               <a-switch
@@ -154,7 +169,7 @@
               </a-switch>
             </template>
           </a-table-column>
-          <a-table-column title="禁用" :width="60" fixed="right">
+          <a-table-column :title="t('article.table.disabled')" :width="60" fixed="right">
             <template #cell="{ record }">
               <!-- :disabled="record.agreed" -->
               <a-switch
@@ -172,7 +187,12 @@
               </a-switch>
             </template>
           </a-table-column>
-          <a-table-column title="操作" data-index="operations" :width="120" fixed="right">
+          <a-table-column
+            :title="t('article.table.operation')"
+            data-index="operations"
+            :width="120"
+            fixed="right"
+          >
             <template #cell="{ record }">
               <a-space :size="8">
                 <a-button
@@ -287,11 +307,11 @@
   };
   const delArticleHandle = async (id: string | number) => {
     Modal.confirm({
-      title: '删除文章',
-      content: '确定删除该文章嘛？',
+      title: t('article.confirm.delete'),
+      content: t('article.confirm.deleteContent'),
       onOk: async () => {
         const res = await delArticle({ id });
-        Message.success('删除成功');
+        Message.success(t('article.message.deleteSuccess'));
         getArticleListHandle();
       },
     });
@@ -300,13 +320,13 @@
   const onSwitchChange = async (record: { isDelete: boolean; id: string | number }) => {
     const { isDelete, id } = record;
     const res = await request.patch(`/article/disabled`, { isDelete, id });
-    Message.success('设置成功');
+    Message.success(t('article.message.publishSuccess'));
   };
   // 文章置顶
   const onSwitchTopping = async (record: { topping: boolean; id: string | number }) => {
     const { topping, id } = record;
     const res = await request.patch(`/article/topping`, { topping, id });
-    Message.success('设置成功');
+    Message.success(t('article.message.publishSuccess'));
   };
 
   // 导出Excel
@@ -340,17 +360,21 @@
           [k: string]: unknown;
         }) => {
           return {
-            文章ID: v.id,
-            标题: v.title,
-            描述: v.description,
-            分类: v.category?.label || '',
-            标签: v.tags.map((it) => it.label).join(', '),
-            查看数: v.views || 0,
-            点赞数: v.likes || 0,
-            评论数: v.commentCount || 0,
-            更新时间: v.uTime || '',
-            置顶状态: v.topping ? '是' : '否',
-            禁用状态: v.isDelete ? '是' : '否',
+            [t('article.excel.id')]: v.id,
+            [t('article.excel.title')]: v.title,
+            [t('article.excel.description')]: v.description,
+            [t('article.excel.category')]: v.category?.label || '',
+            [t('article.excel.tag')]: v.tags.map((it) => it.label).join(', '),
+            [t('article.excel.views')]: v.views || 0,
+            [t('article.excel.likes')]: v.likes || 0,
+            [t('article.excel.commentCount')]: v.commentCount || 0,
+            [t('article.excel.updateTime')]: v.uTime || '',
+            [t('article.excel.toppingStatus')]: v.topping
+              ? t('article.excel.yes')
+              : t('article.excel.no'),
+            [t('article.excel.disabledStatus')]: v.isDelete
+              ? t('article.excel.yes')
+              : t('article.excel.no'),
           };
         },
       );
@@ -376,20 +400,20 @@
       ws['!cols'] = colWidths;
 
       // 添加工作表到工作簿
-      XLSX.utils.book_append_sheet(wb, ws, '文章列表');
+      XLSX.utils.book_append_sheet(wb, ws, t('article.excel.sheetName'));
 
       // 生成文件名
       const now = new Date();
       const timestamp = `${now.getFullYear()}${(now.getMonth() + 1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}_${now.getHours().toString().padStart(2, '0')}${now.getMinutes().toString().padStart(2, '0')}${now.getSeconds().toString().padStart(2, '0')}`;
-      const fileName = `文章列表_${timestamp}.xlsx`;
+      const fileName = `${t('article.excel.sheetName')}_${timestamp}.xlsx`;
 
       // 下载文件
       XLSX.writeFile(wb, fileName);
 
-      Message.success('导出成功！');
+      Message.success(t('article.message.exportSuccess'));
     } catch (error) {
       console.error('导出失败:', error);
-      Message.error('导出失败，请重试');
+      Message.error(t('article.message.exportFail'));
     } finally {
       exportLoading.value = false;
     }

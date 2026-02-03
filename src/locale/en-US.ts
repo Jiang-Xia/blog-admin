@@ -1,9 +1,20 @@
 import localeMessageBox from '@/components/message-box/locale/en-US';
 import localeLogin from '@/views/login/locale/en-US';
+import localeArticle from '@/views/article/locale/en-US';
+import localeCategory from '@/views/category/locale/en-US';
+import localeTag from '@/views/tag/locale/en-US';
+import localeSystem from '@/views/system/locale/en-US';
+import localeUser from '@/views/user/locale/en-US';
+import localeComment from '@/views/comment/locale/en-US';
+import localeMsgboard from '@/views/msgboard/locale/en-US';
+import localeLink from '@/views/link/locale/en-US';
+import localeResource from '@/views/resource/locale/en-US';
 
 import localeWorkplace from '@/views/dashboard/workplace/locale/en-US';
+import localeDatascreen from '@/views/dashboard/datascreen/locale/en-US';
 
 import localeSettings from './en-US/settings';
+import localeCommon from './en-US/common';
 
 export default {
   // 'menu.dashboard': 'Dashboard',
@@ -60,7 +71,18 @@ export default {
   'menu.server.commentList': 'CommentList',
 
   ...localeSettings,
+  ...localeCommon,
   ...localeMessageBox,
   ...localeLogin,
+  ...localeArticle,
+  ...localeCategory,
+  ...localeTag,
+  ...localeSystem,
+  ...localeUser,
+  ...localeComment,
+  ...localeMsgboard,
+  ...localeLink,
+  ...localeResource,
   ...localeWorkplace,
+  ...localeDatascreen,
 };

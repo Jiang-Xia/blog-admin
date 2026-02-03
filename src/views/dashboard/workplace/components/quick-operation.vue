@@ -20,7 +20,7 @@
           <component :is="link.icon" />
         </div>
         <a-typography-paragraph class="text">
-          {{ link.text }}
+          {{ t(link.i18n) }}
         </a-typography-paragraph>
       </a-col>
     </a-row>
@@ -35,10 +35,10 @@
   const router = useRouter();
   const { t } = useI18n();
   const links = [
-    { text: '文件管理', icon: 'icon-file', url: '/resource/list' },
-    { text: '文章列表.', icon: 'icon-storage', url: '/article/list' },
-    { text: '菜单设置', icon: 'icon-settings', url: '/system/userManage' },
-    { text: '用户管理', icon: 'icon-user', url: '/system/menuManage' },
+    { i18n: 'workplace.fileManagement', icon: 'icon-file', url: '/resource/list' },
+    { i18n: 'workplace.articleList', icon: 'icon-storage', url: '/article/list' },
+    { i18n: 'workplace.menuSettings', icon: 'icon-settings', url: '/system/userManage' },
+    { i18n: 'workplace.userManagement', icon: 'icon-user', url: '/system/menuManage' },
   ];
 </script>
 

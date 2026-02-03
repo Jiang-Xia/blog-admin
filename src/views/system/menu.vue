@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <!-- <Breadcrumb :items="['menu.list', 'menu.list.searchTable']" /> -->
-    <a-card class="general-card" title="菜单查询">
+    <a-card class="general-card" :title="t('menu.query.title')">
       <a-row>
         <a-col :flex="1">
           <a-form
@@ -12,8 +12,12 @@
           >
             <a-row :gutter="16">
               <a-col :span="10">
-                <a-form-item label="路由name">
-                  <a-input v-model="formModel.content" placeholder="请输入路由name" disabled />
+                <a-form-item :label="t('system.form.routeName')">
+                  <a-input
+                    v-model="formModel.content"
+                    :placeholder="t('system.form.placeholder.routeName')"
+                    disabled
+                  />
                 </a-form-item>
               </a-col>
               <a-col :span="5" style="text-align: right">
@@ -22,13 +26,13 @@
                     <template #icon>
                       <icon-search />
                     </template>
-                    {{ '搜索' }}
+                    {{ t('common.button.search') }}
                   </a-button>
                   <a-button @click="reset">
                     <template #icon>
                       <icon-refresh />
                     </template>
-                    {{ '重置' }}
+                    {{ t('common.button.reset') }}
                   </a-button>
                 </a-space>
               </a-col>
@@ -44,7 +48,7 @@
               <template #icon>
                 <icon-plus />
               </template>
-              {{ '新建' }}
+              {{ t('menu.button.create') }}
             </a-button>
           </a-space>
         </a-col>
@@ -59,17 +63,29 @@
         @page-change="onPageChange"
       >
         <template #columns>
-          <a-table-column min-width="100" title="菜单id" data-index="id" />
-          <a-table-column min-width="120" title="菜单英文名称" data-index="name" />
-          <a-table-column min-width="120" title="菜单中文名称" data-index="menuCnName" />
-          <a-table-column min-width="120" title="菜单路径" data-index="path" />
-          <a-table-column min-width="120" title="菜单文件路径" data-index="filePath" />
-          <a-table-column min-width="120" title="菜单图标" data-index="meta">
+          <a-table-column min-width="100" :title="t('system.table.menuId')" data-index="id" />
+          <a-table-column min-width="120" :title="t('system.table.menuEnName')" data-index="name" />
+          <a-table-column
+            min-width="120"
+            :title="t('system.table.menuCnName')"
+            data-index="menuCnName"
+          />
+          <a-table-column min-width="120" :title="t('system.table.menuPath')" data-index="path" />
+          <a-table-column
+            min-width="120"
+            :title="t('system.table.menuFilePath')"
+            data-index="filePath"
+          />
+          <a-table-column min-width="120" :title="t('system.table.menuIcon')" data-index="meta">
             <template #cell="{ record }">
               <DynamicIcon v-if="record?.meta?.icon" :icon="record?.meta?.icon" />
             </template>
           </a-table-column>
-          <a-table-column min-width="120" title="菜单禁用状态" data-index="isDelete">
+          <a-table-column
+            min-width="120"
+            :title="t('system.table.menuDisabled')"
+            data-index="isDelete"
+          >
             <template #cell="{ record }">
               <a-switch
                 v-model="record.isDelete"
@@ -88,7 +104,12 @@
               </a-switch>
             </template>
           </a-table-column>
-          <a-table-column min-width="100" title="操作" data-index="operations" fixed="right">
+          <a-table-column
+            min-width="100"
+            :title="t('menu.table.operation')"
+            data-index="operations"
+            fixed="right"
+          >
             <template #cell="{ record }">
               <a-space :size="8">
                 <a-button size="mini" type="primary" @click="showModal('edit', record.id)">
@@ -162,11 +183,11 @@
   };
   const delHandle = async (id: any) => {
     Modal.confirm({
-      title: '删除用户',
-      content: '确定删除该用户嘛？',
+      title: t('menu.confirm.delete'),
+      content: t('menu.confirm.delete'),
       onOk: async () => {
         const res = await request.delete('/admin/menu', { params: { id } });
-        Message.success('删除成功');
+        Message.success(t('menu.message.deleteSuccess'));
         getTableListHandle();
       },
     });
@@ -178,7 +199,7 @@
       [type]: record[type],
       id,
     });
-    Message.success('设置成功');
+    Message.success(t('common.message.setSuccess'));
   };
   const showModal = (type: string, id?: string) => {
     // console.log(addMenuRef);

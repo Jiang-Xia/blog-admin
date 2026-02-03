@@ -1,5 +1,6 @@
 <script setup lang="ts">
   import { h, ref } from 'vue';
+  import { useI18n } from 'vue-i18n';
   import { baseUrl, staticUrl } from '@/config';
   import { useUserStore } from '@/store';
   import request from '@/api/request';
@@ -10,6 +11,7 @@
   import useLoading from '@/hooks/loading';
   import FileAside from './file-aside.vue';
 
+  const { t } = useI18n();
   const { loading, setLoading } = useLoading();
 
   /* 文件上传web是无法实现刷新续传的 */
@@ -57,7 +59,7 @@
   const delHandle = async (id: string) => {
     // request.delete(`/resources/file/${id}`);
     const res = await request.delete(`/resources/file`, { params: { id } });
-    Message.success('删除成功');
+    Message.success(t('resource.message.deleteSuccess'));
     seachHandle();
   };
   // 移动文件
@@ -70,13 +72,13 @@
     const [list, total] = res.data;
 
     Modal.confirm({
-      title: '新建文件夹',
+      title: t('resource.modal.moveFile'),
       content: () =>
         h(Select, {
           onChange: (value) => {
-            targetPid.value = value as string;
+            targetPid.value = String(value);
           },
-          placeholder: '请选择文件夹',
+          placeholder: t('resource.placeholder.selectFolder'),
           options: list
             .filter((v: any) => v.isFolder)
             .map((v: any) => {
@@ -91,7 +93,7 @@
           id,
           pid: targetPid.value,
         });
-        Message.success('移动完成');
+        Message.success(t('resource.message.moveSuccess'));
         seachHandle();
       },
     });
@@ -109,7 +111,7 @@
     console.log(v);
     if (v === '1') {
       await copy(item.url);
-      Message.success('复制成功');
+      Message.success(t('resource.message.copySuccess'));
     } else if (v === '2') {
     } else if (v === '3') {
       delHandle(item.id);
@@ -139,17 +141,17 @@
   // 新建文件夹
   const addFolder = () => {
     Modal.confirm({
-      title: '新建文件夹',
+      title: t('resource.modal.newFolder'),
       content: () =>
         h(Input, {
           onChange: (value) => {
-            folderName.value = value;
+            folderName.value = String(value);
           },
-          placeholder: '请输入文件夹名',
+          placeholder: t('resource.placeholder.folderName'),
         }),
       async onOk() {
         await request.post('/resources/folder', { name: folderName.value });
-        Message.success('新建完成');
+        Message.success(t('resource.message.createSuccess'));
         seachHandle();
       },
     });
@@ -177,25 +179,29 @@
 <template>
   <div id="file-manage" class="file-manage">
     <FileAside @menu-select="menuSelect"></FileAside>
-    <!-- 文件管理 -->
+    <!-- {{ t('resource.title') }} -->
     <div class="file-main">
       <div class="header-tool">
         <a-space>
           <a-breadcrumb>
             <a-breadcrumb-item>
               <a-button type="text" @click="clearFolderId">{{
-                !xAdminStore.folderId ? '全部文件' : '返回根目录'
+                !xAdminStore.folderId
+                  ? t('resource.breadcrumb.allFiles')
+                  : t('resource.breadcrumb.backToRoot')
               }}</a-button>
             </a-breadcrumb-item>
             <a-breadcrumb-item>{{ currentFolder }}</a-breadcrumb-item>
           </a-breadcrumb>
         </a-space>
         <a-space>
-          <a-button type="primary" @click="showVisible = !showVisible">上传</a-button>
+          <a-button type="primary" @click="showVisible = !showVisible">{{
+            t('resource.button.upload')
+          }}</a-button>
           <a-input-search
             v-model="searchForm.originalname"
             :style="{ width: '320px', marginLeft: '40px' }"
-            placeholder="输入文件名搜索"
+            :placeholder="t('resource.placeholder.search')"
             search-button
             allow-clear
             @search="seachHandle()"
@@ -207,7 +213,9 @@
             </template>
           </a-input-search>
 
-          <a-button type="primary" @click="addFolder">新建文件夹</a-button>
+          <a-button type="primary" @click="addFolder">{{
+            t('resource.button.newFolder')
+          }}</a-button>
         </a-space>
       </div>
       <section class="file-content">
@@ -253,23 +261,24 @@
               <template #icon>
                 <x-icon icon="icon-lianjie1" />
               </template>
-              复制链接
+              {{ t('resource.menu.copyLink') }}
             </a-doption>
             <!-- <a-doption value="2">
-              <template #icon><x-icon icon="icon-bianji1" /></template> 重命名
+              <template #icon><x-icon icon="icon-bianji1" /></template> {{ t('resource.menu.rename') }}
             </a-doption> -->
             <a-doption v-if="!item.isFolder" value="4">
               <template #icon>
                 <x-icon icon="icon-yidongwenjian" />
               </template>
-              移动到
+              {{ t('resource.menu.moveTo') }}
             </a-doption>
             <a-doption value="3">
-              <template #icon><x-icon icon="icon-qingchu" /></template> 删除
+              <template #icon><x-icon icon="icon-qingchu" /></template>
+              {{ t('resource.menu.delete') }}
             </a-doption>
           </template>
         </a-dropdown>
-        <a-empty v-if="!imageList.length">空空如也</a-empty>
+        <a-empty v-if="!imageList.length">{{ t('resource.empty') }}</a-empty>
       </section>
 
       <a-pagination
@@ -284,12 +293,12 @@
     <a-modal
       v-model:visible="showVisible"
       hide-cancel
-      ok-text="完成"
+      :ok-text="t('resource.modal.complete')"
       modal-class="upload-modal"
       @ok="handleOk"
       @cancel="handleOk"
     >
-      <template #title> 上传文件 </template>
+      <template #title> {{ t('resource.modal.uploadFile') }} </template>
       <div class="upload-container">
         <a-upload
           :action="baseUrl + '/resources/uploadFile'"

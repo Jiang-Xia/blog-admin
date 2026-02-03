@@ -5,21 +5,47 @@ export interface fileTypeListItem {
   value: number;
   type: string;
   icon: string;
+  i18nKey: string; // 国际化key
 }
 
 // 文件分类
 export const fileTypeList: fileTypeListItem[] = [
-  { name: '全部', value: 0, type: '', icon: 'icon-wenjianjia' },
+  { name: '全部', value: 0, type: '', icon: 'icon-wenjianjia', i18nKey: 'resource.fileType.all' },
   {
     name: '图片',
     value: 1,
     type: 'image',
     icon: 'icon-tupian',
+    i18nKey: 'resource.fileType.image',
   },
-  { name: '文档', value: 2, type: 'text', icon: 'icon-wenzhang1' },
-  { name: '视频', value: 3, type: 'video', icon: 'icon-shipin' },
-  { name: '音频', value: 4, type: 'audio', icon: 'icon-yinpin' },
-  { name: '其他', value: 5, type: 'application', icon: 'icon-baocun' },
+  {
+    name: '文档',
+    value: 2,
+    type: 'text',
+    icon: 'icon-wenzhang1',
+    i18nKey: 'resource.fileType.document',
+  },
+  {
+    name: '视频',
+    value: 3,
+    type: 'video',
+    icon: 'icon-shipin',
+    i18nKey: 'resource.fileType.video',
+  },
+  {
+    name: '音频',
+    value: 4,
+    type: 'audio',
+    icon: 'icon-yinpin',
+    i18nKey: 'resource.fileType.audio',
+  },
+  {
+    name: '其他',
+    value: 5,
+    type: 'application',
+    icon: 'icon-baocun',
+    i18nKey: 'resource.fileType.application',
+  },
 ];
 
 export interface FileExtendNameIconMap {

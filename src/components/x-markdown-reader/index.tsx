@@ -3,6 +3,7 @@ import './index.less';
 // import hljs from 'highlight.js'
 // import dayjs from 'dayjs'
 import { copy } from '@/utils/index';
+import { useI18n } from 'vue-i18n';
 
 const XMarkdownReader = defineComponent({
   name: 'XMarkdownReader',
@@ -13,6 +14,7 @@ const XMarkdownReader = defineComponent({
     },
   },
   setup(props: { content: string }) {
+    const { t } = useI18n();
     const markdownRef = ref<HTMLElement | null>(null);
     onMounted(() => {
       // console.log(markdownRef.value)
@@ -21,16 +23,16 @@ const XMarkdownReader = defineComponent({
       }
       if (markdownRef.value) {
         const blocks = markdownRef.value.querySelectorAll('pre code');
-        blocks.forEach((block: HTMLElement) => {
+        blocks.forEach((block) => {
           const span = document.createElement('span');
           const i = document.createElement('i');
           span.className = 'code-left-bar';
           i.className = 'copy-btn pointer';
-          i.innerText = '复制';
-          span.innerText = block.className.toLowerCase();
+          i.innerText = t('common.button.copy');
+          span.innerText = (block as HTMLElement).className.toLowerCase();
           span.appendChild(i);
-          block.parentElement?.insertBefore(span, block);
-          i.onclick = () => copy(block.innerText);
+          (block as HTMLElement).parentElement?.insertBefore(span, block as HTMLElement);
+          i.onclick = () => copy((block as HTMLElement).innerText);
           // hljs.highlightBlock(block)
         });
       }
