@@ -80,16 +80,36 @@
               </template>
               {{ t('article.button.export') }}
             </a-button>
+            <a-button v-if="selectedRowKeys.length > 0" type="outline" @click="clearSelection">
+              <template #icon>
+                <icon-close />
+              </template>
+              {{ t('article.button.clearSelection') }}
+            </a-button>
+          </a-space>
+        </a-col>
+        <a-col :span="8" style="text-align: right">
+          <a-space>
+            <span v-if="selectedRowKeys.length > 0" style="color: #165dff; font-weight: 500">
+              {{ t('article.message.selectedCount', { count: selectedRowKeys.length }) }}
+            </span>
           </a-space>
         </a-col>
       </a-row>
       <a-table
         :loading="loading"
         row-key="id"
-        :pagination="pagination"
+        :pagination="false"
         :data="renderData"
         :bordered="false"
-        @page-change="onPageChange"
+        :row-selection="rowSelection"
+        @selection-change="onSelectionChange"
+        v-model:selected-row-keys="selectedRowKeys"
+        scrollbar
+        :scroll="{
+          x: 600,
+          y: 600,
+        }"
       >
         <template #columns>
           <a-table-column
@@ -221,6 +241,16 @@
           </a-table-column>
         </template>
       </a-table>
+      <a-space style="width: 100%; padding-top: 16px; justify-content: flex-end">
+        <a-pagination
+          @change="onPageChange"
+          @page-size-change="onPageSizeChange"
+          :total="pagination.total"
+          show-total
+          show-jumper
+          show-page-size
+        />
+      </a-space>
     </a-card>
   </div>
 </template>
@@ -231,7 +261,7 @@
   import { useRouter } from 'vue-router';
   import useLoading from '@/hooks/loading';
   import type { Pagination } from '@/types/global';
-  import { getArticleInfo, getArticleList, delArticle } from '@/api/article';
+  import { getArticleList, delArticle } from '@/api/article';
   import { Message, Modal } from '@arco-design/web-vue';
   import request from '@/api/request';
   import { useUserStore } from '@/store';
@@ -257,9 +287,21 @@
   const renderData = ref([{}]);
   const formModel = ref(generateFormModel());
   const exportLoading = ref(false);
+
+  // 跨页勾选功能
+  const selectedRowKeys = ref<(string | number)[]>([]);
+  const selectedRows = ref<any[]>([]);
+
+  // 表格行选择配置
+  const rowSelection = reactive({
+    type: 'checkbox',
+    showCheckedAll: true,
+    onlyCurrent: false,
+  });
   const basePagination: Pagination = {
     current: 1,
     pageSize: 10,
+    total: 0,
   };
   const pagination = reactive({
     ...basePagination,
@@ -274,6 +316,7 @@
       ...formModel.value,
     };
     const res = await getArticleList(params);
+    pagination.total = res.pagination.total;
     renderData.value = res.list.map(
       (v: {
         tags: Array<{ label: string; color?: string }>;
@@ -300,6 +343,32 @@
   };
   const onPageChange = (current: number) => {
     getArticleListHandle(current);
+  };
+  const onPageSizeChange = (pageSize: number) => {
+    pagination.current = 1;
+    pagination.pageSize = pageSize;
+    formModel.value.pageSize = pageSize;
+    getArticleListHandle(pagination.current);
+  };
+  const onSelectionChange = (rowKeys: (string | number)[]) => {
+    selectedRowKeys.value = rowKeys;
+
+    // 获取当前页新选中的数据
+    const currentPageSelectedRows = renderData.value.filter((row: any) => rowKeys.includes(row.id));
+
+    // 移除当前页已取消选择的数据
+    selectedRows.value = selectedRows.value.filter(
+      (row: any) =>
+        !renderData.value.some((currentRow: any) => currentRow.id === row.id) ||
+        rowKeys.includes(row.id),
+    );
+
+    // 添加当前页新选中的数据(避免重复)
+    currentPageSelectedRows.forEach((row: any) => {
+      if (!selectedRows.value.some((existingRow: any) => existingRow.id === row.id)) {
+        selectedRows.value.push(row);
+      }
+    });
   };
   getArticleListHandle();
   const reset = () => {
@@ -329,55 +398,44 @@
     Message.success(t('article.message.publishSuccess'));
   };
 
-  // 导出Excel
+  // 清空选择
+  const clearSelection = () => {
+    selectedRowKeys.value = [];
+    selectedRows.value = [];
+    Message.info(t('article.message.selectionCleared'));
+  };
+
+  // 导出Excel - 仅导出勾选的数据
   const exportToExcel = async () => {
     try {
+      // 检查是否有勾选数据
+      if (selectedRows.value.length === 0) {
+        Message.warning(t('article.message.noSelectedData'));
+        return;
+      }
+
       exportLoading.value = true;
 
-      // 获取所有文章数据（使用最大pageSize）
-      const onlyMy = role === 'author';
-      const exportParams = {
-        onlyMy,
-        page: 1,
-        pageSize: 999999, // 设置一个很大的值来获取所有数据
-        title: formModel.value.title,
-        description: formModel.value.description,
-        content: formModel.value.content,
-        category: formModel.value.category,
-        tags: formModel.value.tags,
-        uid: formModel.value.uid,
-      };
-
-      const res = await getArticleList(exportParams);
-      const articles = res.list.map(
-        (v: {
-          tags: Array<{ label: string; color?: string }>;
-          id: string | number;
-          cover: string;
-          title: string;
-          description: string;
-          category?: { label: string; color?: string };
-          [k: string]: unknown;
-        }) => {
-          return {
-            [t('article.excel.id')]: v.id,
-            [t('article.excel.title')]: v.title,
-            [t('article.excel.description')]: v.description,
-            [t('article.excel.category')]: v.category?.label || '',
-            [t('article.excel.tag')]: v.tags.map((it) => it.label).join(', '),
-            [t('article.excel.views')]: v.views || 0,
-            [t('article.excel.likes')]: v.likes || 0,
-            [t('article.excel.commentCount')]: v.commentCount || 0,
-            [t('article.excel.updateTime')]: v.uTime || '',
-            [t('article.excel.toppingStatus')]: v.topping
-              ? t('article.excel.yes')
-              : t('article.excel.no'),
-            [t('article.excel.disabledStatus')]: v.isDelete
-              ? t('article.excel.yes')
-              : t('article.excel.no'),
-          };
-        },
-      );
+      // 使用勾选的数据进行导出
+      const articles = selectedRows.value.map((v: any) => {
+        return {
+          [t('article.excel.id')]: v.id,
+          [t('article.excel.title')]: v.title,
+          [t('article.excel.description')]: v.description,
+          [t('article.excel.category')]: v.category?.label || '',
+          [t('article.excel.tag')]: v.tags?.map((it: any) => it.label).join(', ') || v.tag || '',
+          [t('article.excel.views')]: v.views || 0,
+          [t('article.excel.likes')]: v.likes || 0,
+          [t('article.excel.commentCount')]: v.commentCount || 0,
+          [t('article.excel.updateTime')]: v.uTime || '',
+          [t('article.excel.toppingStatus')]: v.topping
+            ? t('article.excel.yes')
+            : t('article.excel.no'),
+          [t('article.excel.disabledStatus')]: v.isDelete
+            ? t('article.excel.yes')
+            : t('article.excel.no'),
+        };
+      });
 
       // 创建工作簿
       const wb = XLSX.utils.book_new();
@@ -410,7 +468,10 @@
       // 下载文件
       XLSX.writeFile(wb, fileName);
 
-      Message.success(t('article.message.exportSuccess'));
+      Message.success(
+        t('article.message.exportSuccess') +
+          ` (${selectedRows.value.length}${t('article.message.items')})`,
+      );
     } catch (error) {
       console.error('导出失败:', error);
       Message.error(t('article.message.exportFail'));
