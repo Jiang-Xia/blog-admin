@@ -38,16 +38,16 @@ export default {
   'menu.server.workplace': 'Workplace',
 
   'menu.server.article': 'Article',
-  'menu.server.articleList': 'List',
-  'menu.server.articleEdit': 'Edit',
+  'menu.server.articleList': 'ArticleList',
+  'menu.server.articleEdit': 'ArticleEdit',
 
   'menu.server.category': 'Category',
-  'menu.server.categoryList': 'List',
+  'menu.server.categoryList': 'CategoryList',
 
   'menu.server.tag': 'Tag',
-  'menu.server.tagList': 'List',
+  'menu.server.tagList': 'TagList',
 
-  'menu.server.user': 'Me',
+  'menu.server.user': 'Person',
   'menu.server.userSet': 'UserSet',
   'menu.server.menuSet': 'MenuSet',
 
