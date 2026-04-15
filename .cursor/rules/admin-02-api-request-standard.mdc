@@ -1,0 +1,15 @@
+---
+description: blog-admin axios 请求层与响应处理规范
+globs: src/{api,utils}/**/*.ts
+alwaysApply: false
+---
+
+# Admin API Request Standard
+
+- 请求默认使用 `src/api/request.ts`，避免新增第三套 axios 实例。
+- token 请求头统一 `Authorization: Bearer <token>`，保持与后端及前台一致。
+- 响应按 `{ code, data, message }` 处理，`code !== 200` 走统一错误提示链路。
+- 401 必须触发重新登录流程，不允许业务页面局部吞掉登录过期错误。
+- 错误提示统一通过 Arco `Message`/`Modal`，避免控制台报错但界面无反馈。
+- 加密开关启用时，保持加密和解密对称，不对普通接口误加密。
+- 修改拦截器时同时验证登录、刷新、权限不足、断网四类典型路径。

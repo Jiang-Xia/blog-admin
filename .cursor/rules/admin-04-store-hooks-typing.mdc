@@ -1,0 +1,14 @@
+---
+description: blog-admin Store/Hooks 类型与状态管理规范
+globs: src/{store,hooks,types}/**/*.ts
+alwaysApply: false
+---
+
+# Store Hooks Typing Rules
+
+- Pinia store 的 state/getters/actions 要有明确类型，避免 `unknown as` 链式逃逸。
+- hooks 返回值保持稳定结构（`loading/data/error` 等），避免调用方猜字段。
+- 请求结果写入 store 前做最小归一化，减少页面层重复兼容逻辑。
+- 登录态更新必须同步 token、用户信息、权限集合，防止状态不一致。
+- 公共类型优先在 `src/types` 声明并复用，不在多个页面重复定义。
+- 新增 hooks 前先检查是否已有同类能力，避免“同功能不同命名”。

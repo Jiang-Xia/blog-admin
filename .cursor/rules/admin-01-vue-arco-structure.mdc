@@ -1,0 +1,14 @@
+---
+description: blog-admin Vue3 + Arco 项目结构规范
+globs: src/**/*.{vue,ts}
+alwaysApply: false
+---
+
+# Admin Vue Arco Structure
+
+- 页面放 `src/views`，可复用组件放 `src/components`，接口定义放 `src/api`。
+- 业务实现优先 Composition API + TypeScript，避免新代码回退为弱类型写法。
+- Arco 组件优先复用，表格/表单/弹窗遵循统一交互，不重复封装同类组件。
+- 路由、权限、菜单三者改动需保持一致，避免“有菜单无权限”或“有权限无路由”。
+- 公共工具与 hooks 优先沉淀在 `src/utils` 与 `src/hooks`，减少页面内重复代码。
+- 文件命名和导出命名保持语义一致，避免缩写命名降低可维护性。
