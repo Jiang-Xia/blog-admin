@@ -124,6 +124,7 @@
             :placeholder="t('login.form.emailAuthCode.placeholder')"
             :max-length="6"
             search-button
+            :disabled="emailCaptchaDisabled"
             :loading="emailLoading"
             @search="getEmailCaptcha"
           >
@@ -140,11 +141,11 @@
       <a-space :size="16" direction="vertical">
         <div class="login-form-password-actions">
           <a-checkbox
-            checked="rememberPassword"
-            :model-value="loginConfig.rememberPassword"
-            @change="setRememberPassword as any"
+            checked="rememberAccount"
+            :model-value="loginConfig.rememberAccount"
+            @change="setRememberAccount as any"
           >
-            {{ t('login.form.rememberPassword') }}
+            {{ t('login.form.rememberAccount') }}
           </a-checkbox>
           <a-link>{{ t('login.form.forgetPassword') }}</a-link>
         </div>
@@ -161,7 +162,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref, reactive } from 'vue';
+  import { ref, reactive, onUnmounted } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
   import { Message } from '@arco-design/web-vue';
   import type { ValidatedError } from '@arco-design/web-vue/es/form/interface';
@@ -184,19 +185,24 @@
   const loginType = ref<'mobile' | 'email'>('mobile');
 
   const loginConfig = useStorage('login-config', {
-    rememberPassword: true,
+    rememberAccount: true,
     username: '', // 演示默认值
-    password: '', // demo default value
     email: '',
-    emailPassword: '',
   });
+  // 清理历史版本遗留的明文密码字段，避免继续持久化敏感信息。
+  if ('password' in loginConfig.value) {
+    delete (loginConfig.value as Record<string, unknown>).password;
+  }
+  if ('emailPassword' in loginConfig.value) {
+    delete (loginConfig.value as Record<string, unknown>).emailPassword;
+  }
 
   const userInfo = reactive({
     username: loginConfig.value.username,
-    password: loginConfig.value.password,
+    password: '',
     authCode: '',
     email: loginConfig.value.email,
-    emailPassword: loginConfig.value.emailPassword,
+    emailPassword: '',
     emailAuthCode: '',
   });
 
@@ -247,15 +253,13 @@
           },
         });
         Message.success(t('login.form.login.success'));
-        const { rememberPassword } = loginConfig.value;
+        const { rememberAccount } = loginConfig.value;
 
         // 保存登录信息
         if (loginType.value === 'mobile') {
-          loginConfig.value.username = rememberPassword ? values.username : '';
-          loginConfig.value.password = rememberPassword ? values.password : '';
+          loginConfig.value.username = rememberAccount ? values.username : '';
         } else {
-          loginConfig.value.email = rememberPassword ? values.email : '';
-          loginConfig.value.emailPassword = rememberPassword ? values.emailPassword : '';
+          loginConfig.value.email = rememberAccount ? values.email : '';
         }
       } catch (err) {
         errorMessage.value = (err as Error).message;
@@ -265,8 +269,8 @@
     }
   };
 
-  const setRememberPassword = (value: boolean) => {
-    loginConfig.value.rememberPassword = value;
+  const setRememberAccount = (value: boolean) => {
+    loginConfig.value.rememberAccount = value;
   };
 
   // 图片验证码
@@ -281,6 +285,8 @@
   const emailCaptchaDisabled = ref(false);
   const countdown = ref(60);
   const emailLoading = ref(false);
+  // 保存倒计时定时器句柄，便于重复触发和组件卸载时统一清理。
+  const emailCaptchaTimer = ref<number | null>(null);
 
   const getEmailCaptcha = () => {
     if (!userInfo.email) {
@@ -301,11 +307,18 @@
     countdown.value = 60;
     emailCaptchaText.value = `${countdown.value}s`;
 
-    const timer = setInterval(() => {
+    if (emailCaptchaTimer.value) {
+      clearInterval(emailCaptchaTimer.value);
+    }
+
+    emailCaptchaTimer.value = window.setInterval(() => {
       countdown.value--;
       emailCaptchaText.value = `${countdown.value}s`;
       if (countdown.value <= 0) {
-        clearInterval(timer);
+        if (emailCaptchaTimer.value) {
+          clearInterval(emailCaptchaTimer.value);
+          emailCaptchaTimer.value = null;
+        }
         emailCaptchaDisabled.value = false;
         emailCaptchaText.value = t('login.form.getEmailCaptcha');
       }
@@ -316,6 +329,13 @@
         emailLoading.value = false;
       })
       .catch(() => {
+        emailCaptchaDisabled.value = false;
+        if (emailCaptchaTimer.value) {
+          clearInterval(emailCaptchaTimer.value);
+          emailCaptchaTimer.value = null;
+        }
+        emailCaptchaText.value = t('login.form.getEmailCaptcha');
+        countdown.value = 60;
         emailLoading.value = false;
       });
   };
@@ -323,6 +343,13 @@
   const register = () => {
     window.open('https://jiang-xia.top/register');
   };
+
+  onUnmounted(() => {
+    if (emailCaptchaTimer.value) {
+      clearInterval(emailCaptchaTimer.value);
+      emailCaptchaTimer.value = null;
+    }
+  });
 </script>
 
 <style lang="less" scoped>

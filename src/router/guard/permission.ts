@@ -8,7 +8,7 @@ import { appRoutes } from '../routes';
 import { WHITE_LIST, NOT_FOUND } from '../constants';
 
 export default function setupPermissionGuard(router: Router) {
-  router.beforeEach(async (to, from, next) => {
+  router.beforeEach(async (to) => {
     const appStore = useAppStore();
     const userStore = useUserStore();
     // console.log({ uid: userStore.id });
@@ -16,15 +16,16 @@ export default function setupPermissionGuard(router: Router) {
     const permissionsAllow = Permission.accessRouter(to);
     const hasToken = getToken();
 
-    // 自定义
+    // 使用 return 风格守卫，避免 next() 过时告警。
     if (!hasToken) {
       // 未登录 访问登录页或白名单直接next
       if (WHITE_LIST.some((v) => v.name === to.name)) {
-        next();
-      } else {
-        // 访问其他页跳转login
-        next({ name: 'login' });
+        NProgress.done();
+        return true;
       }
+      // 访问其他页跳转login
+      NProgress.done();
+      return { name: 'login' };
     } else if (appStore.menuFromServer) {
       // 针对来自服务端的菜单配置进行处理
       // Handle routing configuration from the server
@@ -60,16 +61,20 @@ export default function setupPermissionGuard(router: Router) {
       // console.log({ fullPath: to.fullPath });
 
       if (exist && permissionsAllow) {
-        next();
-      } else next(NOT_FOUND);
-    } else {
-      if (permissionsAllow) next();
-      else {
-        const destination =
-          Permission.findFirstPermissionRoute(appRoutes, userStore.role) || NOT_FOUND;
-        next(destination);
+        NProgress.done();
+        return true;
       }
+      NProgress.done();
+      return NOT_FOUND;
+    } else {
+      if (permissionsAllow) {
+        NProgress.done();
+        return true;
+      }
+      const destination =
+        Permission.findFirstPermissionRoute(appRoutes, userStore.role) || NOT_FOUND;
+      NProgress.done();
+      return destination;
     }
-    NProgress.done();
   });
 }

@@ -67,9 +67,6 @@ export default defineConfig({
     ],
     extensions: ['.ts', '.js', '.tsx', '.jsx'],
   },
-  define: {
-    'process.env': {},
-  },
   css: {
     preprocessorOptions: {
       less: {

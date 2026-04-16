@@ -1,5 +1,6 @@
 import type { DirectiveBinding } from 'vue';
 import { useUserStore } from '@/store';
+import { hasAnyRole } from '@/utils/role';
 
 /**
  * 权限指令，支持两种模式：
@@ -36,8 +37,12 @@ function checkPermission(el: HTMLElement, binding: DirectiveBinding) {
     // 权限码模式：检查用户是否拥有任意一个权限码
     hasPermission = permissionValues.some((code) => privileges.includes(code));
   } else {
-    // 角色模式：检查用户角色是否匹配
-    hasPermission = permissionValues.includes(role);
+    // 角色模式：与路由鉴权共用同一角色判断逻辑。
+    hasPermission = hasAnyRole(
+      permissionValues as string[],
+      role,
+      userStore.roles as Array<Record<string, unknown>>,
+    );
   }
 
   // 如果没有权限，移除元素

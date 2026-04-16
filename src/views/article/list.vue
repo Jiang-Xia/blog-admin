@@ -284,13 +284,30 @@
   };
   const { loading, setLoading } = useLoading(true);
   const { t } = useI18n();
-  const renderData = ref([{}]);
+  interface ArticleRow {
+    id: string | number;
+    tags: Array<{ label: string; color?: string }>;
+    cover: string;
+    title: string;
+    description: string;
+    category?: { label: string; color?: string };
+    views?: number;
+    likes?: number;
+    commentCount?: number;
+    uTime?: string;
+    topping?: boolean;
+    isDelete?: boolean;
+    tag?: string;
+    tagColor?: string;
+    [k: string]: unknown;
+  }
+  const renderData = ref<ArticleRow[]>([]);
   const formModel = ref(generateFormModel());
   const exportLoading = ref(false);
 
   // 跨页勾选功能
   const selectedRowKeys = ref<(string | number)[]>([]);
-  const selectedRows = ref<any[]>([]);
+  const selectedRows = ref<ArticleRow[]>([]);
 
   // 表格行选择配置
   const rowSelection = reactive({
@@ -306,36 +323,35 @@
   const pagination = reactive({
     ...basePagination,
   });
+  // 仅保留最后一次查询结果，防止快速筛选/翻页时数据回跳。
+  let listRequestId = 0;
   const getArticleListHandle = async (val = 1) => {
+    const requestId = ++listRequestId;
     setLoading(true);
-    const onlyMy = role === 'author'; // 作者只返回自身文章
-    formModel.value.page = val;
-    pagination.current = val;
-    const params = {
-      onlyMy,
-      ...formModel.value,
-    };
-    const res = await getArticleList(params);
-    pagination.total = res.pagination.total;
-    renderData.value = res.list.map(
-      (v: {
-        tags: Array<{ label: string; color?: string }>;
-        id: string | number;
-        cover: string;
-        title: string;
-        description: string;
-        category?: { label: string; color?: string };
-        [k: string]: unknown;
-      }) => {
-        // v.category = v.category.label;
+    try {
+      const onlyMy = role === 'author'; // 作者只返回自身文章
+      formModel.value.page = val;
+      pagination.current = val;
+      const params = {
+        onlyMy,
+        ...formModel.value,
+      };
+      const res = await getArticleList(params);
+      if (requestId !== listRequestId) {
+        return;
+      }
+      pagination.total = res.pagination.total;
+      renderData.value = (res.list as ArticleRow[]).map((v) => {
         v.tag = v.tags.map((it) => it.label).join();
         v.tagColor = v.tags[0]?.color;
-        // console.log(v.category);
         return v;
-      },
-    );
-    pagination.total = res.pagination.total;
-    setLoading(false);
+      });
+      pagination.total = res.pagination.total;
+    } finally {
+      if (requestId === listRequestId) {
+        setLoading(false);
+      }
+    }
   };
   const search = () => {
     pagination.current = 1;
@@ -354,18 +370,18 @@
     selectedRowKeys.value = rowKeys;
 
     // 获取当前页新选中的数据
-    const currentPageSelectedRows = renderData.value.filter((row: any) => rowKeys.includes(row.id));
+    const currentPageSelectedRows = renderData.value.filter((row) => rowKeys.includes(row.id));
 
     // 移除当前页已取消选择的数据
     selectedRows.value = selectedRows.value.filter(
-      (row: any) =>
-        !renderData.value.some((currentRow: any) => currentRow.id === row.id) ||
+      (row) =>
+        !renderData.value.some((currentRow) => currentRow.id === row.id) ||
         rowKeys.includes(row.id),
     );
 
     // 添加当前页新选中的数据(避免重复)
-    currentPageSelectedRows.forEach((row: any) => {
-      if (!selectedRows.value.some((existingRow: any) => existingRow.id === row.id)) {
+    currentPageSelectedRows.forEach((row) => {
+      if (!selectedRows.value.some((existingRow) => existingRow.id === row.id)) {
         selectedRows.value.push(row);
       }
     });
@@ -373,6 +389,7 @@
   getArticleListHandle();
   const reset = () => {
     formModel.value = generateFormModel();
+    search();
   };
   const delArticleHandle = async (id: string | number) => {
     Modal.confirm({
@@ -417,13 +434,13 @@
       exportLoading.value = true;
 
       // 使用勾选的数据进行导出
-      const articles = selectedRows.value.map((v: any) => {
+      const articles = selectedRows.value.map((v) => {
         return {
           [t('article.excel.id')]: v.id,
           [t('article.excel.title')]: v.title,
           [t('article.excel.description')]: v.description,
           [t('article.excel.category')]: v.category?.label || '',
-          [t('article.excel.tag')]: v.tags?.map((it: any) => it.label).join(', ') || v.tag || '',
+          [t('article.excel.tag')]: v.tags?.map((it) => it.label).join(', ') || v.tag || '',
           [t('article.excel.views')]: v.views || 0,
           [t('article.excel.likes')]: v.likes || 0,
           [t('article.excel.commentCount')]: v.commentCount || 0,

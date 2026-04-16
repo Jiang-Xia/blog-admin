@@ -19,7 +19,7 @@ export default {
       meta: {
         locale: 'menu.dashboard.workplace',
         requiresAuth: true,
-        roles: ['*'],
+        roles: ['1', '2', '3'],
       },
     },
   ],

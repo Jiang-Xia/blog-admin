@@ -18,7 +18,7 @@ export default {
       meta: {
         locale: 'menu.server.commentList', // 服务端menu时用不上
         requiresAuth: true,
-        roles: ['*'],
+        roles: ['1', '2', '3'],
       },
     },
   ],

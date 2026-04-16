@@ -1,10 +1,12 @@
-import { useShepherd } from 'vue-shepherd';
+import Shepherd from 'shepherd.js';
 import 'shepherd.js/dist/css/shepherd.css';
 
-const tour = useShepherd({
+// 直接使用 shepherd.js，避免 vue-shepherd 在浏览器端读取 process。
+const tour = new Shepherd.Tour({
   useModalOverlay: true,
 });
 const shepherd = () => {
+  // 已引导过则不重复弹窗。
   const bool = localStorage.getItem('guidanced');
   if (bool) {
     return;

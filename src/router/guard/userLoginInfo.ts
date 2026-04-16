@@ -6,43 +6,41 @@ import { isLogin } from '@/utils/auth';
 import { WHITE_LIST } from '../constants';
 
 export default function setupUserLoginInfoGuard(router: Router) {
-  router.beforeEach(async (to, from, next) => {
+  router.beforeEach(async (to) => {
     NProgress.start();
     const userStore = useUserStore();
     if (isLogin()) {
       if (userStore.role) {
-        next();
+        return true;
       } else {
         try {
           await userStore.getInfo();
-          next();
+          return true;
         } catch (error) {
-          next({
+          return {
             name: 'login',
             query: {
               redirect: to.name,
               ...to.query,
             } as LocationQueryRaw,
-          });
+          };
         }
       }
     } else {
       // 检查是否在白名单中
       if (WHITE_LIST.some((item) => item.name === to.name)) {
-        next();
-        return;
+        return true;
       }
       if (to.name === 'login') {
-        next();
-        return;
+        return true;
       }
-      next({
+      return {
         name: 'login',
         query: {
           redirect: to.name,
           ...to.query,
         } as LocationQueryRaw,
-      });
+      };
     }
   });
 }

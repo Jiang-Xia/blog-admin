@@ -56,6 +56,13 @@ const useUserStore = defineStore('user', {
     // Set user's information
     setInfo(partial: Partial<UserState>) {
       this.$patch(partial);
+      // 严格模式下仅以 roles[].id 鉴权，role 字段仅做展示保留。
+      if (Array.isArray(partial.roles) && partial.roles.length > 0) {
+        const firstRole = partial.roles[0];
+        this.role = String((firstRole as any).id ?? '').trim();
+      } else if (partial.role !== undefined) {
+        this.role = String(partial.role ?? '').trim();
+      }
     },
     // Reset user's information
     resetInfo() {

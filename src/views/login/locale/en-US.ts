@@ -8,7 +8,7 @@ export default {
   'login.form.userName.placeholder': 'Username',
   'login.form.password.placeholder': 'Password',
   'login.form.imageCode.placeholder': 'ImageCode',
-  'login.form.rememberPassword': 'remember pwd',
+  'login.form.rememberAccount': 'Remember account',
   'login.form.forgetPassword': 'forgot pwd',
   'login.form.login': 'login',
   'login.form.register': 'register account',

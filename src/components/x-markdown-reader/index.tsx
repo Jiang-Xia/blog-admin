@@ -1,9 +1,17 @@
-import { defineAsyncComponent, defineComponent, type Component, onMounted, ref } from 'vue';
+import {
+  defineAsyncComponent,
+  defineComponent,
+  type Component,
+  onMounted,
+  ref,
+  computed,
+} from 'vue';
 import './index.less';
 // import hljs from 'highlight.js'
 // import dayjs from 'dayjs'
 import { copy } from '@/utils/index';
 import { useI18n } from 'vue-i18n';
+import DOMPurify from 'dompurify';
 
 const XMarkdownReader = defineComponent({
   name: 'XMarkdownReader',
@@ -16,6 +24,7 @@ const XMarkdownReader = defineComponent({
   setup(props: { content: string }) {
     const { t } = useI18n();
     const markdownRef = ref<HTMLElement | null>(null);
+    const sanitizedContent = computed(() => DOMPurify.sanitize(props.content));
     onMounted(() => {
       // console.log(markdownRef.value)
       if (!markdownRef.value) {
@@ -38,7 +47,9 @@ const XMarkdownReader = defineComponent({
       }
     });
     // 坑点 tsx中 ref要写对应的变量，字符串没用
-    return () => <div ref={markdownRef} class={'x-markdown-reader'} v-html={props.content}></div>;
+    return () => (
+      <div ref={markdownRef} class={'x-markdown-reader'} v-html={sanitizedContent.value}></div>
+    );
   },
 });
 

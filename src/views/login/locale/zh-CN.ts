@@ -8,7 +8,7 @@ export default {
   'login.form.userName.placeholder': '用户名',
   'login.form.password.placeholder': '密码',
   'login.form.imageCode.placeholder': '图片验证码',
-  'login.form.rememberPassword': '记住密码',
+  'login.form.rememberAccount': '记住账号',
   'login.form.forgetPassword': '忘记密码',
   'login.form.login': '登录',
   'login.form.register': '注册账号',

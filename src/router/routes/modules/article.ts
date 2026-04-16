@@ -18,7 +18,7 @@ export default {
       meta: {
         locale: 'menu.server.articleList', // 服务端menu时用不上
         requiresAuth: true,
-        roles: ['*'],
+        roles: ['1', '2', '3'],
       },
     },
     {

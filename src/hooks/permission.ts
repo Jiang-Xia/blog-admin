@@ -1,25 +1,29 @@
 import type { RouteLocationNormalized, RouteRecordRaw } from 'vue-router';
 import { useUserStore } from '@/store';
+import { hasAnyRole, normalizeRole } from '@/utils/role';
 
 export default function usePermission() {
   const userStore = useUserStore();
   return {
     accessRouter(route: RouteLocationNormalized | RouteRecordRaw) {
+      // 路由鉴权统一走角色工具，避免各处判断规则不一致。
       return (
         !route.meta?.requiresAuth ||
         !route.meta?.roles ||
-        route.meta?.roles?.includes('*') ||
-        route.meta?.roles?.includes(userStore.role)
+        hasAnyRole(
+          route.meta?.roles as string[] | undefined,
+          userStore.roles as Array<Record<string, unknown>>,
+        )
       );
     },
-    findFirstPermissionRoute(_routers: RouteRecordRaw[], role = 'admin') {
+    findFirstPermissionRoute(_routers: RouteRecordRaw[], role = '1') {
       const cloneRouters: RouteRecordRaw[] = [..._routers];
 
       while (cloneRouters.length) {
         const firstElement = cloneRouters.shift() as RouteRecordRaw | undefined;
         if (
-          firstElement?.meta?.roles?.find((el: string[]) => {
-            return el.includes('*') || el.includes(role);
+          firstElement?.meta?.roles?.find((el: string) => {
+            return normalizeRole(el) === '*' || normalizeRole(el) === normalizeRole(role);
           })
         )
           return { name: firstElement.name };

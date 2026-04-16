@@ -11,7 +11,9 @@ let imgUrl: string;
 // let url2: string;
 const mode = import.meta.env.MODE;
 const metaEnv = import.meta.env;
-console.log({ 当前环境变量: metaEnv });
+if (mode === 'development') {
+  console.log({ 当前环境变量: { MODE: metaEnv.MODE } });
+}
 // x-api 后端服务
 if (mode === 'production') {
   url = metaEnv.VITE_API_BASE_URL;

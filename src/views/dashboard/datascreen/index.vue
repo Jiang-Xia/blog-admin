@@ -140,10 +140,22 @@
   };
 
   // 加载统计数据
+  // 请求序号 + in-flight 锁：避免轮询重入和旧响应覆盖新数据。
+  let latestRequestId = 0;
+  let overviewRequesting = false;
+
   const loadOverviewData = async () => {
+    if (overviewRequesting) {
+      return;
+    }
+    overviewRequesting = true;
+    const requestId = ++latestRequestId;
     loading.value = true;
     try {
       const res = await getBlogOverview();
+      if (requestId !== latestRequestId) {
+        return;
+      }
       if (res.data) {
         // 保存完整数据供子组件使用
         chartData.value = res.data;
@@ -168,12 +180,17 @@
     } catch (error) {
       console.error('加载统计数据失败:', error);
     } finally {
+      overviewRequesting = false;
       loading.value = false;
     }
   };
 
   let timer: any = null;
   let refreshTimer: any = null;
+  // 使用具名函数，确保组件卸载时可正确移除监听。
+  const handleFullscreenChange = () => {
+    isFullscreen.value = !!document.fullscreenElement;
+  };
 
   onMounted(() => {
     updateTime();
@@ -188,9 +205,7 @@
     }, 30000);
 
     // 监听全屏变化
-    document.addEventListener('fullscreenchange', () => {
-      isFullscreen.value = !!document.fullscreenElement;
-    });
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
   });
 
   onUnmounted(() => {
@@ -200,6 +215,7 @@
     if (refreshTimer) {
       clearInterval(refreshTimer);
     }
+    document.removeEventListener('fullscreenchange', handleFullscreenChange);
   });
 </script>
 

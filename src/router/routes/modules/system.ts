@@ -18,7 +18,7 @@ export default {
       meta: {
         locale: 'menu.server.userManage',
         requiresAuth: true,
-        roles: ['*'],
+        roles: ['1', '2'],
       },
     },
     {
@@ -28,7 +28,7 @@ export default {
       meta: {
         locale: 'menu.server.userManage',
         requiresAuth: true,
-        roles: ['*'],
+        roles: ['1', '2'],
       },
     },
     {
@@ -38,7 +38,7 @@ export default {
       meta: {
         locale: 'menu.server.roleManage',
         requiresAuth: true,
-        roles: ['*'],
+        roles: ['1', '2'],
       },
     },
     {
@@ -48,7 +48,7 @@ export default {
       meta: {
         locale: 'menu.server.privilegeManage',
         requiresAuth: true,
-        roles: ['*'],
+        roles: ['1', '2'],
       },
     },
     {
@@ -58,7 +58,7 @@ export default {
       meta: {
         locale: 'menu.server.deptManage',
         requiresAuth: true,
-        roles: ['*'],
+        roles: ['1', '2'],
       },
     },
   ],

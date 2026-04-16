@@ -1,4 +1,4 @@
-import axios, { type AxiosRequestConfig, type AxiosResponse } from 'axios';
+import axios, { type AxiosResponse, type InternalAxiosRequestConfig } from 'axios';
 import { Message, Modal } from '@arco-design/web-vue';
 import { useUserStore } from '@/store';
 import { getToken } from '@/utils/auth';
@@ -40,6 +40,14 @@ export interface HttpResponse<T = unknown> {
   code: number;
   data: T;
 }
+
+export interface AppRequestError {
+  code: number | string;
+  message: string;
+  status?: number;
+  requestId?: string;
+  cause?: unknown;
+}
 function errorMsg(msg: string) {
   Message.error(msg);
 }
@@ -50,16 +58,13 @@ if (openEncrypt) {
   request.defaults.baseURL = `${baseUrl}/encrypt`;
 }
 request.interceptors.request.use(
-  (config: AxiosRequestConfig) => {
+  (config: InternalAxiosRequestConfig) => {
     // let each request carry token
     // this example using the JWT token
     // Authorization is a custom headers key
     // please modify it according to the actual situation
     const token = getToken();
     if (token) {
-      if (!config.headers) {
-        config.headers = {};
-      }
       config.headers.Authorization = `Bearer ${token}`;
       // console.log('token2: ', config.headers.Authorization);
     }
@@ -89,10 +94,21 @@ request.interceptors.response.use(
   (error) => {
     console.error('error: ', error);
     const data = error.response && error.response.data;
+    // 统一错误结构，方便调用方按 code/status/requestId 做精细化处理。
+    const requestId =
+      error.response?.headers?.['x-request-id'] || error.response?.headers?.['request-id'];
+    const requestError: AppRequestError = {
+      code: data?.code ?? error.response?.status ?? 'UNKNOWN_ERROR',
+      message: data?.message || error.message || '请求失败',
+      status: error.response?.status,
+      requestId,
+      cause: error,
+    };
+
     if (error.response) {
       switch (error.response.status) {
         case 401:
-          errorMsg(data.message || '权限不足');
+          errorMsg(requestError.message || '权限不足');
           Modal.error({
             title: '确认退出',
             content: '您的登录超时了，您可以重新登录。',
@@ -105,17 +121,18 @@ request.interceptors.response.use(
           });
           break;
         case 404:
-          errorMsg(data.message || '网络请求不存在');
+          errorMsg(requestError.message || '网络请求不存在');
           break;
         default:
-          errorMsg((data && data.message) || '请求失败');
+          errorMsg(requestError.message || '请求失败');
       }
     } else if (error.message.includes('timeout')) {
       // 请求超时或者网络有问题
+      errorMsg('请求超时，请稍后重试');
     } else {
       errorMsg('请求失败，请检查网络是否已连接');
     }
-    return Promise.reject(data);
+    return Promise.reject(requestError);
   },
 );
 

@@ -18,7 +18,7 @@ export default {
       meta: {
         locale: 'menu.server.resourceList',
         requiresAuth: true,
-        roles: ['*'],
+        roles: ['1', '2', '3'],
       },
     },
   ],
