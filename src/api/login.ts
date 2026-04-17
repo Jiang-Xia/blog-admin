@@ -43,6 +43,7 @@ export const getAuthCode = async () => {
   const res = await request({
     url: '/user/authCode',
     method: 'get',
+    withCredentials: true,
   });
   return res.data;
 };

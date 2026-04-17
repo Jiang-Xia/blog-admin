@@ -5,7 +5,23 @@ import { getToken } from '@/utils/auth';
 import { baseUrl } from '@/config';
 import { aesEncrypt, aesDecrypt } from '@/utils/crypto';
 
-const openEncrypt = import.meta.env.VITE_NUXT_OPEN_ENCRYPT === 'true';
+// 线上“紧急开关”：本地缓存有值则关闭加密（key 需尽量隐晦，避免被随意调试）
+// 规则：长一些 + 含项目指纹（admin）但不直白暴露项目名/用途
+const DISABLE_ENCRYPT_STORAGE_KEY = '__bxp__spa_admin__k3Y9p2__fuse__v1';
+const openEncryptByEnv = import.meta.env.VITE_NUXT_OPEN_ENCRYPT === 'true';
+const openEncrypt =
+  openEncryptByEnv &&
+  (() => {
+    // 线上部署时支持通过本地缓存一键关闭加密（有值即关闭）
+    if (import.meta.env.MODE !== 'production') {
+      return true;
+    }
+    try {
+      return !localStorage.getItem(DISABLE_ENCRYPT_STORAGE_KEY);
+    } catch {
+      return true;
+    }
+  })();
 // 加密请求 body
 const encryptMsg = (body: any, url: string) => {
   const bool = url.includes('encrypt');
@@ -38,11 +54,13 @@ export interface HttpResponse<T = unknown> {
   status: number;
   message: string;
   code: number;
+  bizCode: number;
   data: T;
 }
 
 export interface AppRequestError {
   code: number | string;
+  bizCode: number | string;
   message: string;
   status?: number;
   requestId?: string;
@@ -93,12 +111,23 @@ request.interceptors.response.use(
   },
   (error) => {
     console.error('error: ', error);
-    const data = error.response && error.response.data;
+    const base = error.response?.config?.baseURL as string | undefined;
+    const rawData = error.response && error.response.data;
+    // 开启加密时，后端异常也可能是加密包裹的 { content }，这里需要同步解密才能拿到真实 message/bizCode
+    let data: any = rawData;
+    try {
+      if (base && typeof base === 'string') {
+        data = decryptMsg(rawData, base);
+      }
+    } catch {
+      data = rawData;
+    }
     // 统一错误结构，方便调用方按 code/status/requestId 做精细化处理。
     const requestId =
       error.response?.headers?.['x-request-id'] || error.response?.headers?.['request-id'];
     const requestError: AppRequestError = {
       code: data?.code ?? error.response?.status ?? 'UNKNOWN_ERROR',
+      bizCode: data?.bizCode ?? error.response?.status ?? 'UNKNOWN_ERROR',
       message: data?.message || error.message || '请求失败',
       status: error.response?.status,
       requestId,

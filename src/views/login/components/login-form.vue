@@ -68,13 +68,23 @@
             :max-length="6"
           >
             <template #suffix>
-              <a-image
-                height="30"
-                :src="authCodeUrl"
-                style="margin-right: -12px"
-                :preview="false"
-                @click="changeAuthCodeUrl"
-              />
+              <template v-if="authCodeUrl && !authCodeLoadError">
+                <img
+                  class="captcha-img"
+                  :src="authCodeUrl"
+                  alt="验证码"
+                  @click="changeAuthCodeUrlDebounced"
+                  @error="authCodeLoadError = true"
+                />
+              </template>
+              <button
+                v-else
+                class="captcha-placeholder"
+                type="button"
+                @click="changeAuthCodeUrlDebounced"
+              >
+                点击获取
+              </button>
             </template>
           </a-input>
         </a-form-item>
@@ -163,6 +173,7 @@
 
 <script lang="ts" setup>
   import { ref, reactive, onUnmounted } from 'vue';
+  import { useDebounceFn } from '@vueuse/core';
   import { useRoute, useRouter } from 'vue-router';
   import { Message } from '@arco-design/web-vue';
   import type { ValidatedError } from '@arco-design/web-vue/es/form/interface';
@@ -171,8 +182,8 @@
   import { useUserStore } from '@/store';
   import useLoading from '@/hooks/loading';
   import type { LoginData } from '@/api/user';
-  import { baseUrl } from '@/config';
-  import { getEmailAuthCode } from '@/api/login';
+  import { getAuthCode, getEmailAuthCode } from '@/api/login';
+  import { shouldRefreshGraphicCaptcha } from '@/constants/graphic-captcha-error';
 
   const router = useRouter();
   const { t } = useI18n();
@@ -261,8 +272,12 @@
         } else {
           loginConfig.value.email = rememberAccount ? values.email : '';
         }
-      } catch (err) {
-        errorMessage.value = (err as Error).message;
+      } catch (err: any) {
+        errorMessage.value = err?.message || '';
+        if (loginType.value === 'mobile' && shouldRefreshGraphicCaptcha(err?.bizCode)) {
+          void changeAuthCodeUrl();
+          userInfo.authCode = '';
+        }
       } finally {
         setLoading(false);
       }
@@ -275,10 +290,22 @@
 
   // 图片验证码
   const authCodeUrl = ref('');
-  const changeAuthCodeUrl = () => {
-    authCodeUrl.value = `${baseUrl}/user/authCode?t=${new Date().getTime()}`;
+  const changeAuthCodeUrl = async () => {
+    try {
+      const res = await getAuthCode();
+      authCodeUrl.value = `data:image/svg+xml;base64,${res.captchaBase64}`;
+      authCodeLoadError.value = false;
+    } catch {
+      authCodeUrl.value = '';
+      authCodeLoadError.value = true;
+      // 错误提示由 axios 全局拦截器统一处理
+    }
   };
-  changeAuthCodeUrl();
+  const authCodeLoadError = ref(false);
+  const changeAuthCodeUrlDebounced = useDebounceFn(() => {
+    void changeAuthCodeUrl();
+  }, 300);
+  void changeAuthCodeUrl();
 
   // 邮箱验证码相关
   const emailCaptchaText = ref(t('login.form.getEmailCaptcha'));
@@ -398,5 +425,29 @@
       background: linear-gradient(left, rgb(0 168 255 / 50%), rgb(185 0 255 / 50%)) no-repeat;
       border-radius: 5px;
     }
+  }
+
+  .captcha-img {
+    height: 30px;
+    width: 86px;
+    margin-right: -12px;
+    cursor: pointer;
+    border-radius: 4px;
+    user-select: none;
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  .captcha-placeholder {
+    height: 30px;
+    width: 86px;
+    margin-right: -12px;
+    cursor: pointer;
+    border-radius: 4px;
+    border: 1px dashed var(--color-border-2);
+    color: var(--color-text-3);
+    background: transparent;
+    padding: 0 8px;
+    font-size: 12px;
+    line-height: 28px;
   }
 </style>
