@@ -170,6 +170,25 @@
             data-index="commentCount"
             :width="80"
           />
+          <a-table-column :title="t('article.table.status')" data-index="status" :width="120">
+            <template #cell="{ record }">
+              <a-tag v-if="record.status === 'publish'" color="green">
+                {{ t('article.status.publish') }}
+              </a-tag>
+              <a-tag v-else-if="record.status === 'draft'" color="gray">
+                {{ t('article.status.draft') }}
+              </a-tag>
+              <a-tooltip
+                v-else-if="record.status === 'scheduled'"
+                :content="record.scheduledPublishAt"
+              >
+                <a-tag color="orangered">
+                  {{ t('article.status.scheduled') }}
+                </a-tag>
+              </a-tooltip>
+              <a-tag v-else color="blue">{{ record.status }}</a-tag>
+            </template>
+          </a-table-column>
           <a-table-column :title="t('article.table.updateTime')" data-index="uTime" :width="200" />
           <a-table-column :title="t('article.table.topping')" :width="60" fixed="right">
             <template #cell="{ record }">
@@ -297,6 +316,8 @@
     uTime?: string;
     topping?: boolean;
     isDelete?: boolean;
+    status?: string;
+    scheduledPublishAt?: string;
     tag?: string;
     tagColor?: string;
     [k: string]: unknown;

@@ -60,4 +60,17 @@ export default {
   'article.excel.sheetName': '文章列表',
   'article.message.exportSuccess': '导出成功！',
   'article.message.exportFail': '导出失败，请重试',
+  // 状态相关
+  'article.table.status': '状态',
+  'article.status.publish': '已发布',
+  'article.status.draft': '草稿',
+  'article.status.scheduled': '定时发布',
+  'article.form.publishStatus': '发布方式',
+  'article.form.scheduledTime': '发布时间',
+  'article.form.placeholder.scheduledTime': '请选择定时发布时间',
+  'article.validate.scheduledTimeRequired': '请选择定时发布时间！',
+  'article.button.publish': '发布',
+  'article.button.saveDraft': '保存草稿',
+  'article.button.schedulePublish': '设置定时发布',
+  'article.message.draftSuccess': '草稿保存成功！',
 };

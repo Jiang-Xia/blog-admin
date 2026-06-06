@@ -60,4 +60,17 @@ export default {
   'article.excel.sheetName': 'Article List',
   'article.message.exportSuccess': 'Export Successfully!',
   'article.message.exportFail': 'Export Failed, Please Try Again',
+  // Status related
+  'article.table.status': 'Status',
+  'article.status.publish': 'Published',
+  'article.status.draft': 'Draft',
+  'article.status.scheduled': 'Scheduled',
+  'article.form.publishStatus': 'Publish Method',
+  'article.form.scheduledTime': 'Scheduled Time',
+  'article.form.placeholder.scheduledTime': 'Please select scheduled publish time',
+  'article.validate.scheduledTimeRequired': 'Please select scheduled publish time!',
+  'article.button.publish': 'Publish',
+  'article.button.saveDraft': 'Save Draft',
+  'article.button.schedulePublish': 'Schedule Publish',
+  'article.message.draftSuccess': 'Draft saved successfully!',
 };

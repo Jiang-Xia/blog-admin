@@ -79,9 +79,39 @@
               />
             </a-form-item>
 
+            <!-- 发布状态选择 -->
+            <a-form-item :label="t('article.form.publishStatus')" field="status">
+              <a-radio-group v-model="formState.status" type="button">
+                <a-radio value="publish">{{ t('article.status.publish') }}</a-radio>
+                <a-radio value="draft">{{ t('article.status.draft') }}</a-radio>
+                <a-radio value="scheduled">{{ t('article.status.scheduled') }}</a-radio>
+              </a-radio-group>
+            </a-form-item>
+
+            <!-- 定时发布时间选择器 -->
+            <a-form-item
+              v-if="formState.status === 'scheduled'"
+              :label="t('article.form.scheduledTime')"
+              field="scheduledPublishAt"
+              :rules="[{ required: true, message: t('article.validate.scheduledTimeRequired') }]"
+            >
+              <a-date-picker
+                v-model="formState.scheduledPublishAt"
+                show-time
+                :time-picker-props="{ defaultValue: '12:00:00' }"
+                format="YYYY-MM-DD HH:mm:ss"
+                :placeholder="t('article.form.placeholder.scheduledTime')"
+                style="width: 280px"
+              />
+            </a-form-item>
+
             <a-form-item :wrapper-col-props="{ span: 13, offset: 7 }">
               <a-button type="primary" html-type="submit">{{
-                t('article.button.submit')
+                formState.status === 'draft'
+                  ? t('article.button.saveDraft')
+                  : formState.status === 'scheduled'
+                    ? t('article.button.schedulePublish')
+                    : t('article.button.publish')
               }}</a-button>
               <a-button style="margin-left: 10px" @click="resetForm">{{
                 t('article.button.reset')
@@ -126,6 +156,8 @@
     category: string;
     cover: string;
     tags: number[];
+    status: string;
+    scheduledPublishAt: string;
   }
   const defaultForm = {
     title: '',
@@ -135,6 +167,8 @@
     category: '',
     cover: '',
     tags: [],
+    status: 'publish',
+    scheduledPublishAt: '',
   };
   // 分类和标签
   const { list: categoryOptions } = useTableNoPageList('/category', {});
@@ -171,6 +205,8 @@
       ...values,
       content: formState.content,
       contentHtml: formState.contentHtml,
+      status: formState.status,
+      scheduledPublishAt: formState.status === 'scheduled' ? formState.scheduledPublishAt : null,
       id: 0,
       // cover: formState.cover
     };
@@ -210,6 +246,8 @@
       category: { id: string };
       cover: string;
       tags: Array<{ id: number }>;
+      status: string;
+      scheduledPublishAt: string;
     } = res.info as any;
     formState.title = info.title;
     formState.description = info.description;
@@ -217,6 +255,8 @@
     formState.category = info.category.id;
     formState.cover = info.cover;
     formState.tags = info.tags.map((v) => v.id);
+    formState.status = info.status || 'publish';
+    formState.scheduledPublishAt = info.scheduledPublishAt || '';
     // console.log(formState);
   };
   if (type === 'edit') {
