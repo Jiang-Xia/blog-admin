@@ -9,6 +9,7 @@ import localeComment from '@/views/comment/locale/zh-CN';
 import localeMsgboard from '@/views/msgboard/locale/zh-CN';
 import localeLink from '@/views/link/locale/zh-CN';
 import localeResource from '@/views/resource/locale/zh-CN';
+import localeSensitiveWord from '@/views/sensitive-word/locale/zh-CN';
 
 import localeWorkplace from '@/views/dashboard/workplace/locale/zh-CN';
 import localeDatascreen from '@/views/dashboard/datascreen/locale/zh-CN';
@@ -69,6 +70,10 @@ export default {
   'menu.server.comment': '评论管理',
   'menu.server.commentList': '评论列表',
 
+  'menu.server.sensitiveWord': '敏感词管理',
+  'menu.server.sensitiveWordList': '敏感词列表',
+  'menu.server.sensitiveWordReview': '审核管理',
+
   ...localeSettings,
   ...localeCommon,
   ...localeMessageBox,
@@ -84,4 +89,5 @@ export default {
   ...localeResource,
   ...localeWorkplace,
   ...localeDatascreen,
+  ...localeSensitiveWord,
 };
