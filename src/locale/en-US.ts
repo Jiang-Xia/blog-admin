@@ -10,6 +10,7 @@ import localeMsgboard from '@/views/msgboard/locale/en-US';
 import localeLink from '@/views/link/locale/en-US';
 import localeResource from '@/views/resource/locale/en-US';
 import localeSensitiveWord from '@/views/sensitive-word/locale/en-US';
+import localeOperationLog from '@/views/operation-log/locale/en-US';
 
 import localeWorkplace from '@/views/dashboard/workplace/locale/en-US';
 import localeDatascreen from '@/views/dashboard/datascreen/locale/en-US';
@@ -75,6 +76,9 @@ export default {
   'menu.server.sensitiveWordList': 'SensitiveWordList',
   'menu.server.sensitiveWordReview': 'ReviewManagement',
 
+  'menu.server.operationLog': 'OperationLog',
+  'menu.server.operationLogList': 'LogList',
+
   ...localeSettings,
   ...localeCommon,
   ...localeMessageBox,
@@ -91,4 +95,5 @@ export default {
   ...localeWorkplace,
   ...localeDatascreen,
   ...localeSensitiveWord,
+  ...localeOperationLog,
 };
