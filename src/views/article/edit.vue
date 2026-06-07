@@ -222,7 +222,7 @@
       const res = await createArticle(params);
       Message.success(t('article.message.createSuccess'));
     }
-    router.push('/article/list');
+    router.push({ name: 'ArticleList' });
     const tabBarStore = useTabBarStore();
     tabBarStore.deleteCurrentTag(route);
   };

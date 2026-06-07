@@ -67,7 +67,7 @@
             <a-button
               v-permission="'article:create'"
               type="primary"
-              @click="router.push('/article/edit?type=add')"
+              @click="router.push({ name: 'ArticleEdit', query: { type: 'add' } })"
             >
               <template #icon>
                 <icon-plus />
@@ -240,7 +240,7 @@
                   type="primary"
                   @click="
                     () => {
-                      router.push(`/article/edit?type=edit&id=${record.id}`);
+                      router.push({ name: 'ArticleEdit', query: { type: 'edit', id: record.id } });
                     }
                   "
                 >

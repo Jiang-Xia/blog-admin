@@ -7,7 +7,9 @@
     >
       <template #title> {{ t('workplace.mainCategoryContent') }} </template>
       <template #extra>
-        <a-link @click="router.push('/category/list')">{{ t('workplace.viewMore') }}</a-link>
+        <a-link @click="router.push({ name: 'CategoryList' })">{{
+          t('workplace.viewMore')
+        }}</a-link>
       </template>
       <a-space direction="vertical" fill>
         <a-radio-group v-model:model-value="type" type="button" @change="typeChange">

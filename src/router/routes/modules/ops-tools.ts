@@ -1,11 +1,11 @@
 import { DEFAULT_LAYOUT } from '@/router/constants';
 
 export default {
-  path: '/admin-tools',
-  name: 'AdminTools',
+  path: '/ops-tools',
+  name: 'OpsTools',
   component: DEFAULT_LAYOUT,
   meta: {
-    locale: 'menu.server.adminTools',
+    locale: 'menu.server.opsTools',
     requiresAuth: true,
     icon: 'icon-tool',
     order: 0,

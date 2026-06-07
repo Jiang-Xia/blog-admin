@@ -13,6 +13,7 @@ import localeSensitiveWord from '@/views/sensitive-word/locale/zh-CN';
 import localeOperationLog from '@/views/operation-log/locale/zh-CN';
 import localeScheduledTask from '@/views/scheduled-task/locale/zh-CN';
 import localeTaskManage from '@/views/task-manage/locale/zh-CN';
+import localePayOrder from '@/views/pay-order/locale/zh-CN';
 
 import localeWorkplace from '@/views/dashboard/workplace/locale/zh-CN';
 import localeDatascreen from '@/views/dashboard/datascreen/locale/zh-CN';
@@ -40,6 +41,10 @@ export default {
   // 自定义
   'menu.server.dashboard': '仪表盘',
   'menu.server.workplace': '工作台',
+
+  'menu.server.content': '内容管理',
+  'menu.server.interaction': '互动管理',
+  'menu.server.security': '安全管理',
 
   'menu.server.article': '文章管理',
   'menu.server.articleList': '文章列表',
@@ -80,11 +85,14 @@ export default {
   'menu.server.operationLog': '操作日志',
   'menu.server.operationLogList': '日志列表',
 
-  'menu.server.adminTools': '管理工具',
+  'menu.server.opsTools': '运维工具',
 
   'menu.server.scheduledTask': '定时任务',
   'menu.server.taskLog': '任务日志',
   'menu.server.taskManage': '任务管理',
+
+  'menu.server.extApps': '扩展应用',
+  'menu.server.payOrder': '支付管理',
 
   ...localeSettings,
   ...localeCommon,
@@ -105,4 +113,5 @@ export default {
   ...localeOperationLog,
   ...localeScheduledTask,
   ...localeTaskManage,
+  ...localePayOrder,
 };

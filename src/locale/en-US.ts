@@ -13,6 +13,7 @@ import localeSensitiveWord from '@/views/sensitive-word/locale/en-US';
 import localeOperationLog from '@/views/operation-log/locale/en-US';
 import localeScheduledTask from '@/views/scheduled-task/locale/en-US';
 import localeTaskManage from '@/views/task-manage/locale/en-US';
+import localePayOrder from '@/views/pay-order/locale/en-US';
 
 import localeWorkplace from '@/views/dashboard/workplace/locale/en-US';
 import localeDatascreen from '@/views/dashboard/datascreen/locale/en-US';
@@ -40,6 +41,10 @@ export default {
   // 自定义
   'menu.server.dashboard': 'Dashboard',
   'menu.server.workplace': 'Workplace',
+
+  'menu.server.content': 'Content',
+  'menu.server.interaction': 'Interaction',
+  'menu.server.security': 'Security',
 
   'menu.server.article': 'Article',
   'menu.server.articleList': 'ArticleList',
@@ -81,11 +86,14 @@ export default {
   'menu.server.operationLog': 'OperationLog',
   'menu.server.operationLogList': 'LogList',
 
-  'menu.server.adminTools': 'Admin Tools',
+  'menu.server.opsTools': 'Ops Tools',
 
   'menu.server.scheduledTask': 'Scheduled Tasks',
   'menu.server.taskLog': 'Task Log',
   'menu.server.taskManage': 'Task Management',
+
+  'menu.server.extApps': 'Extended Apps',
+  'menu.server.payOrder': 'Payment',
 
   ...localeSettings,
   ...localeCommon,
@@ -106,4 +114,5 @@ export default {
   ...localeOperationLog,
   ...localeScheduledTask,
   ...localeTaskManage,
+  ...localePayOrder,
 };
