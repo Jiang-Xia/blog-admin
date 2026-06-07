@@ -69,7 +69,7 @@
           <a-table-column
             :title="t('payOrder.table.tradeNo')"
             data-index="tradeNo"
-            :width="180"
+            :width="220"
             :ellipsis="true"
           />
           <a-table-column
@@ -103,11 +103,13 @@
               <span v-else>-</span>
             </template>
           </a-table-column>
-          <a-table-column
-            :title="t('payOrder.table.createTime')"
-            data-index="createTime"
-            :width="170"
-          />
+          <a-table-column :title="t('payOrder.table.createTime')" :width="170">
+            <template #cell="{ record }">
+              {{
+                record.createTime ? $dayjs(record.createTime).format('YYYY-MM-DD HH:mm:ss') : '-'
+              }}
+            </template>
+          </a-table-column>
           <a-table-column :title="t('payOrder.table.action')" :width="220" fixed="right">
             <template #cell="{ record }">
               <a-space>
@@ -147,7 +149,7 @@
       </a-table>
     </a-card>
 
-    <!-- 退款弹窗 -->
+    <!-- 退款弹窗（支持部分退款） -->
     <a-modal
       v-model:visible="refundVisible"
       :title="t('payOrder.refund.title')"
@@ -156,15 +158,37 @@
       @ok="submitRefund"
     >
       <a-form :model="refundForm" layout="vertical">
+        <!-- 订单金额与已退款信息 -->
+        <a-descriptions :column="2" size="small" style="margin-bottom: 16px">
+          <a-descriptions-item label="订单金额">
+            <span style="font-weight: 600; color: #165dff">
+              ¥{{ Number(currentOrder?.totalAmount || 0).toFixed(2) }}
+            </span>
+          </a-descriptions-item>
+          <a-descriptions-item label="已退款金额">
+            <span style="font-weight: 600; color: #f53f3f">
+              ¥{{ Number(currentOrder?.refundAmount || 0).toFixed(2) }}
+            </span>
+          </a-descriptions-item>
+        </a-descriptions>
+        <a-alert
+          v-if="Number(currentOrder?.refundAmount || 0) > 0"
+          type="info"
+          style="margin-bottom: 16px"
+        >
+          当前剩余可退金额：
+          <span style="font-weight: 600; color: #ff7d00"> ¥{{ maxRefundAmount.toFixed(2) }} </span>
+        </a-alert>
         <a-form-item :label="t('payOrder.refund.amount')" required>
           <a-input-number
             v-model="refundForm.refundAmount"
             :placeholder="t('payOrder.refund.placeholder.amount')"
             :min="0.01"
             :precision="2"
-            :max="currentOrder?.totalAmount"
+            :max="maxRefundAmount"
             style="width: 100%"
           />
+          <template #extra> 最多可退 ¥{{ maxRefundAmount.toFixed(2) }} </template>
         </a-form-item>
         <a-form-item :label="t('payOrder.refund.reason')">
           <a-textarea
@@ -179,7 +203,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref, reactive, onMounted } from 'vue';
+  import { ref, reactive, computed, onMounted } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { Message, Modal } from '@arco-design/web-vue';
   import { getPayOrderList, refundPayOrder, closePayOrder, queryPayOrder } from '@/api/pay-order';
@@ -220,6 +244,14 @@
   const refundForm = reactive({
     refundAmount: 0,
     refundReason: '',
+  });
+
+  /** 当前订单剩余可退金额 */
+  const maxRefundAmount = computed(() => {
+    if (!currentOrder.value) return 0;
+    const total = Number(currentOrder.value.totalAmount) || 0;
+    const refunded = Number(currentOrder.value.refundAmount) || 0;
+    return Number((total - refunded).toFixed(2));
   });
 
   /** 加载订单列表 */
@@ -268,28 +300,41 @@
     loadData();
   };
 
-  /** 退款 */
+  /** 退款（支持部分退款） */
   const handleRefund = (record: any) => {
     currentOrder.value = record;
-    refundForm.refundAmount = record.totalAmount;
+    // 默认填入剩余可退金额（全额退款场景）
+    const total = Number(record.totalAmount) || 0;
+    const refunded = Number(record.refundAmount) || 0;
+    refundForm.refundAmount = Number((total - refunded).toFixed(2));
     refundForm.refundReason = '';
     refundVisible.value = true;
   };
 
   const submitRefund = async () => {
+    const remaining = maxRefundAmount.value;
     if (!refundForm.refundAmount || refundForm.refundAmount <= 0) {
       Message.warning('请输入退款金额');
       return;
     }
+    if (refundForm.refundAmount > remaining) {
+      Message.warning(`退款金额不能超过剩余可退金额 ¥${remaining.toFixed(2)}`);
+      return;
+    }
     refundLoading.value = true;
     try {
-      await refundPayOrder({
+      const res = (await refundPayOrder({
         out_trade_no: currentOrder.value.outTradeNo,
         refund_amount: String(refundForm.refundAmount),
         refund_reason: refundForm.refundReason || '用户申请退款',
-      });
-      Message.success(t('payOrder.refund.success'));
-      refundVisible.value = false;
+      })) as any;
+      const data = res?.data || res;
+      if (data?.alipaySuccess === false || data?.localSuccess === false) {
+        Message.warning(data?.message || '退款操作未完成');
+      } else {
+        Message.success(data?.message || t('payOrder.refund.success'));
+        refundVisible.value = false;
+      }
       loadData();
     } catch (err) {
       console.error('退款失败', err);
@@ -305,8 +350,13 @@
       content: t('payOrder.close.confirm'),
       async onOk() {
         try {
-          await closePayOrder({ out_trade_no: record.outTradeNo });
-          Message.success(t('payOrder.close.success'));
+          const res = (await closePayOrder({ out_trade_no: record.outTradeNo })) as any;
+          const data = res?.data || res;
+          if (data?.alipaySuccess === false || data?.localSuccess === false) {
+            Message.warning(data?.message || '关单操作未完成');
+          } else {
+            Message.success(data?.message || t('payOrder.close.success'));
+          }
           loadData();
         } catch (err) {
           console.error('关单失败', err);
@@ -319,8 +369,13 @@
   const handleQuery = async (record: any) => {
     try {
       const res = (await queryPayOrder({ out_trade_no: record.outTradeNo })) as any;
-      const orderData = res?.data || res;
-      Message.success(`${t('payOrder.query.success')}${t(`payOrder.status.${orderData.status}`)}`);
+      const data = res?.data || res;
+      if (data?.alipaySuccess === false || data?.localSuccess === false) {
+        Message.warning(data?.message || '查询操作未完成');
+      } else {
+        const statusText = data?.status ? t(`payOrder.status.${data.status}`) : '';
+        Message.success(data?.message || `${t('payOrder.query.success')}${statusText}`);
+      }
       loadData();
     } catch (err) {
       console.error('查询状态失败', err);
