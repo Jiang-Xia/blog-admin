@@ -27,5 +27,11 @@ export default {
   'scheduledTask.result.emailSent': '邮件发送',
   'scheduledTask.result.emailSent.yes': '已发送',
   'scheduledTask.result.emailSent.no': '未发送',
-  'scheduledTask.taskName.daily_interaction_notify': '每日互动通知',
+  'scheduledTask.taskCard.title': '任务列表',
+  'scheduledTask.taskCard.trigger': '手动执行',
+  'scheduledTask.taskCard.cron': '执行频率',
+  'scheduledTask.taskCard.running': '执行中...',
+  'scheduledTask.taskCard.success': '执行成功',
+  'scheduledTask.taskCard.failed': '执行失败',
+  'scheduledTask.result.publishedCount': '已发布文章数',
 };

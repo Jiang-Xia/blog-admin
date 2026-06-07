@@ -17,8 +17,8 @@
                     :placeholder="t('scheduledTask.form.placeholder.taskName')"
                     allow-clear
                   >
-                    <a-option value="daily_interaction_notify">
-                      {{ t('scheduledTask.taskName.daily_interaction_notify') }}
+                    <a-option v-for="task in taskOptions" :key="task.value" :value="task.value">
+                      {{ task.label }}
                     </a-option>
                   </a-select>
                 </a-form-item>
@@ -73,7 +73,7 @@
           >
             <template #cell="{ record }">
               <a-tag color="arcoblue">
-                {{ t(`scheduledTask.taskName.${record.taskName}`) || record.taskName }}
+                {{ taskNameMap[record.taskName] || record.taskName }}
               </a-tag>
             </template>
           </a-table-column>
@@ -149,7 +149,13 @@
       :footer="false"
       :width="600"
     >
-      <a-descriptions :column="2" bordered size="small" v-if="parsedResult">
+      <!-- 每日互动通知详情 -->
+      <a-descriptions
+        v-if="parsedResult && currentRecord?.taskName === 'daily_interaction_notify'"
+        :column="2"
+        bordered
+        size="small"
+      >
         <a-descriptions-item :label="t('scheduledTask.result.commentCount')">
           {{ parsedResult.commentCount ?? '-' }}
         </a-descriptions-item>
@@ -178,6 +184,25 @@
           </a-tag>
         </a-descriptions-item>
       </a-descriptions>
+      <!-- 文章定时发布详情 -->
+      <a-descriptions
+        v-else-if="parsedResult && currentRecord?.taskName === 'scheduled_publish'"
+        :column="1"
+        bordered
+        size="small"
+      >
+        <a-descriptions-item :label="t('scheduledTask.result.publishedCount')">
+          <a-tag :color="parsedResult.publishedCount > 0 ? 'green' : 'orange'">
+            {{ parsedResult.publishedCount ?? '-' }}
+          </a-tag>
+        </a-descriptions-item>
+      </a-descriptions>
+      <!-- 其他任务直接显示 JSON -->
+      <pre
+        v-else-if="parsedResult"
+        style="background: #f5f5f5; padding: 12px; border-radius: 4px"
+        >{{ JSON.stringify(parsedResult, null, 2) }}</pre
+      >
       <a-empty v-else />
     </a-modal>
   </div>
@@ -188,11 +213,36 @@
   import { useI18n } from 'vue-i18n';
   import type { Pagination } from '@/types/global';
   import { IconSearch, IconRefresh, IconEye } from '@arco-design/web-vue/es/icon';
-  import { getScheduledTaskList } from '@/api/scheduled-task';
+  import { getScheduledTaskList, getTaskList } from '@/api/scheduled-task';
   import useLoading from '@/hooks/loading';
 
   const { t } = useI18n();
   const { loading, setLoading } = useLoading(true);
+
+  // 任务名称选项（从后端API获取任务定义）
+  const taskOptions = ref<{ value: string; label: string }[]>([]);
+
+  const loadTaskOptions = async () => {
+    try {
+      const res: any = await getTaskList();
+      taskOptions.value = (res.data || []).map((item: any) => ({
+        value: item.name,
+        label: item.description || item.name,
+      }));
+    } catch {
+      // ignore
+    }
+  };
+  loadTaskOptions();
+
+  /** 任务 name → 中文描述 的映射 */
+  const taskNameMap = computed(() => {
+    const map: Record<string, string> = {};
+    for (const opt of taskOptions.value) {
+      map[opt.value] = opt.label;
+    }
+    return map;
+  });
 
   const generateFormModel = () => ({
     taskName: undefined as string | undefined,

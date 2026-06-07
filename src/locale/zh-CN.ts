@@ -12,6 +12,7 @@ import localeResource from '@/views/resource/locale/zh-CN';
 import localeSensitiveWord from '@/views/sensitive-word/locale/zh-CN';
 import localeOperationLog from '@/views/operation-log/locale/zh-CN';
 import localeScheduledTask from '@/views/scheduled-task/locale/zh-CN';
+import localeTaskManage from '@/views/task-manage/locale/zh-CN';
 
 import localeWorkplace from '@/views/dashboard/workplace/locale/zh-CN';
 import localeDatascreen from '@/views/dashboard/datascreen/locale/zh-CN';
@@ -79,10 +80,11 @@ export default {
   'menu.server.operationLog': '操作日志',
   'menu.server.operationLogList': '日志列表',
 
-  'menu.server.log': '日志',
+  'menu.server.adminTools': '管理工具',
 
-  'menu.server.scheduledTask': '任务日志',
-  'menu.server.scheduledTaskList': '执行记录',
+  'menu.server.scheduledTask': '定时任务',
+  'menu.server.taskLog': '任务日志',
+  'menu.server.taskManage': '任务管理',
 
   ...localeSettings,
   ...localeCommon,
@@ -102,4 +104,5 @@ export default {
   ...localeSensitiveWord,
   ...localeOperationLog,
   ...localeScheduledTask,
+  ...localeTaskManage,
 };

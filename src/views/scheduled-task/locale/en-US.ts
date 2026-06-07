@@ -27,5 +27,11 @@ export default {
   'scheduledTask.result.emailSent': 'Email Sent',
   'scheduledTask.result.emailSent.yes': 'Sent',
   'scheduledTask.result.emailSent.no': 'Not Sent',
-  'scheduledTask.taskName.daily_interaction_notify': 'Daily Interaction Notify',
+  'scheduledTask.taskCard.title': 'Task List',
+  'scheduledTask.taskCard.trigger': 'Run Now',
+  'scheduledTask.taskCard.cron': 'Frequency',
+  'scheduledTask.taskCard.running': 'Running...',
+  'scheduledTask.taskCard.success': 'Success',
+  'scheduledTask.taskCard.failed': 'Failed',
+  'scheduledTask.result.publishedCount': 'Published Count',
 };

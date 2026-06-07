@@ -12,6 +12,7 @@ import localeResource from '@/views/resource/locale/en-US';
 import localeSensitiveWord from '@/views/sensitive-word/locale/en-US';
 import localeOperationLog from '@/views/operation-log/locale/en-US';
 import localeScheduledTask from '@/views/scheduled-task/locale/en-US';
+import localeTaskManage from '@/views/task-manage/locale/en-US';
 
 import localeWorkplace from '@/views/dashboard/workplace/locale/en-US';
 import localeDatascreen from '@/views/dashboard/datascreen/locale/en-US';
@@ -80,10 +81,11 @@ export default {
   'menu.server.operationLog': 'OperationLog',
   'menu.server.operationLogList': 'LogList',
 
-  'menu.server.log': 'Log',
+  'menu.server.adminTools': 'Admin Tools',
 
-  'menu.server.scheduledTask': 'TaskLog',
-  'menu.server.scheduledTaskList': 'ExecutionLog',
+  'menu.server.scheduledTask': 'Scheduled Tasks',
+  'menu.server.taskLog': 'Task Log',
+  'menu.server.taskManage': 'Task Management',
 
   ...localeSettings,
   ...localeCommon,
@@ -103,4 +105,5 @@ export default {
   ...localeSensitiveWord,
   ...localeOperationLog,
   ...localeScheduledTask,
+  ...localeTaskManage,
 };

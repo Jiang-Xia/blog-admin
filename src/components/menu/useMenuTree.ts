@@ -43,8 +43,8 @@ export default function useMenuTree() {
           element.children = subItem;
           return element;
         }
-        // the else logic
-        if (layer > 1) {
+        // 非顶层（layer >= 1）的叶子节点保留为菜单项
+        if (layer >= 1) {
           element.children = subItem as RouteRecordRaw[];
           return element;
         }

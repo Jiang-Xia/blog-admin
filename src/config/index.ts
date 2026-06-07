@@ -3,7 +3,7 @@ interface configState {
 }
 const config: configState = {
   // 阿里巴巴图标库链接，新添加图标需要重新生成 css 改成js
-  iconfonrUrl: '//at.alicdn.com/t/c/font_3574965_sif4fphy7o9.js',
+  iconfonrUrl: '//at.alicdn.com/t/c/font_3574965_ijn1348xfc9.js',
 };
 
 let url: string;
