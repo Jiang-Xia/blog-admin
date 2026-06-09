@@ -44,13 +44,13 @@
         </a-col>
       </a-row>
       <a-table
+        :key="tableKey"
         :loading="loading"
-        row-key="id"
+        row-key="rowKey"
         :pagination="pagination"
         :data="renderData"
         :bordered="false"
         stripe
-        :load-more="loadTableDataMore"
         @page-change="onPageChange"
       >
         <template #columns>
@@ -148,9 +148,8 @@
   // import useLoading from '@/hooks/loading';
   import type { Pagination } from '@/types/global';
   import { Message, Modal } from '@arco-design/web-vue';
-  import request from '@/api/request';
   import { useTableList } from '@/hooks/data';
-  import { getArticleList } from '@/api/article';
+  import { delComment, delReply, getArticleList } from '@/api/article';
 
   const { t } = useI18n();
 
@@ -177,16 +176,23 @@
     loadMore,
   } = useTableList('/comment/findAll', formModel.value, undefined, false);
   const articleOptions: any = ref([]);
+  const tableKey = ref(0);
   const renderData = computed(() => {
-    const list = commentData.value.map((v: any) => {
-      v.isLeaf = !v.replys.length;
-      v.replys.map((v2: any) => {
-        v2.isLeaf = true;
-        return v2;
-      });
-      return v;
+    return commentData.value.map((v: any) => {
+      const replys = v.replys || [];
+      return {
+        ...v,
+        rowKey: `comment-${v.id}`,
+        isLeaf: replys.length === 0,
+        children: replys.length
+          ? replys.map((v2: any) => ({
+              ...v2,
+              rowKey: `reply-${v2.id}`,
+              isLeaf: true,
+            }))
+          : undefined,
+      };
     });
-    return list;
   });
   watch(
     () => commentData.value,
@@ -202,11 +208,15 @@
   }).then((res) => {
     articleOptions.value = res.list;
     formModel.value.articleId = res.list[0]?.id;
-    loadMore();
+    refreshList();
   });
+  const refreshList = async () => {
+    await loadMore();
+    tableKey.value += 1;
+  };
   const search = () => {
     action.value = formModel.value;
-    loadMore();
+    refreshList();
   };
   const onPageChange = (current: number) => {
     formModel.value.page = current;
@@ -220,22 +230,20 @@
     search();
   };
   const delHandle = async (record: any) => {
-    let url = '/comment/delete';
-    if (record.tUserInfo) {
-      url = '/reply/delete';
-    }
+    const isReply = !!record.tUserInfo;
     Modal.confirm({
       title: t('comment.confirm.delete'),
       content: t('comment.confirm.deleteContent'),
       onOk: async () => {
-        const res = await request.post(url, [record.id]);
+        if (isReply) {
+          await delReply(record.id);
+        } else {
+          await delComment(record.id);
+        }
         Message.success(t('comment.message.deleteSuccess'));
-        search();
+        await refreshList();
       },
     });
-  };
-  const loadTableDataMore = (record: any, done: any) => {
-    done(record.replys);
   };
 </script>
 

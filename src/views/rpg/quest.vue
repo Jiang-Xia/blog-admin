@@ -83,7 +83,8 @@
           <a-table-column
             :title="t('rpgQuest.table.description')"
             data-index="description"
-            :ellipsis="{ showTooltip: true }"
+            ellipsis
+            tooltip
           />
           <a-table-column :title="t('rpgQuest.table.type')" data-index="type" :width="80">
             <template #cell="{ record }">
