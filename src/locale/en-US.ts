@@ -101,6 +101,10 @@ export default {
   'menu.server.rpgQuest': 'Daily Quests',
   'menu.server.rpgLottery': 'Lottery Pool',
   'menu.server.rpgUser': 'User RPG Data',
+  'menu.server.rpgItemConfig': 'Item Config',
+  'menu.server.rpgActivity': 'Activities',
+  'menu.server.rpgGuild': 'Guilds',
+  'menu.server.rpgSocialLog': 'Tip & Social Logs',
 
   ...localeSettings,
   ...localeCommon,

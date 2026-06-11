@@ -70,6 +70,46 @@ export default {
             roles: ['1', '2'],
           },
         },
+        {
+          path: 'item-config',
+          name: 'RpgItemConfig',
+          component: () => import('@/views/rpg/item-config.vue'),
+          meta: {
+            locale: 'menu.server.rpgItemConfig',
+            requiresAuth: true,
+            roles: ['1', '2'],
+          },
+        },
+        {
+          path: 'activity',
+          name: 'RpgActivity',
+          component: () => import('@/views/rpg/activity.vue'),
+          meta: {
+            locale: 'menu.server.rpgActivity',
+            requiresAuth: true,
+            roles: ['1', '2'],
+          },
+        },
+        {
+          path: 'guild',
+          name: 'RpgGuild',
+          component: () => import('@/views/rpg/guild.vue'),
+          meta: {
+            locale: 'menu.server.rpgGuild',
+            requiresAuth: true,
+            roles: ['1', '2'],
+          },
+        },
+        {
+          path: 'social-log',
+          name: 'RpgSocialLog',
+          component: () => import('@/views/rpg/social-log.vue'),
+          meta: {
+            locale: 'menu.server.rpgSocialLog',
+            requiresAuth: true,
+            roles: ['1', '2'],
+          },
+        },
       ],
     },
   ],

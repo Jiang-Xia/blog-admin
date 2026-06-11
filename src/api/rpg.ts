@@ -148,3 +148,59 @@ export const getRpgStats = () => {
     method: 'get',
   });
 };
+
+// ========== 系统物品管理 ==========
+
+export const getItemConfigList = (params: Record<string, any>) => {
+  return request({ url: '/admin/rpg/items', method: 'get', params });
+};
+
+export const createItemConfig = (data: Record<string, any>) => {
+  return request({ url: '/admin/rpg/items', method: 'post', data });
+};
+
+export const updateItemConfig = (id: number, data: Record<string, any>) => {
+  return request({ url: `/admin/rpg/items/${id}`, method: 'patch', data });
+};
+
+export const deleteItemConfig = (id: number) => {
+  return request({ url: `/admin/rpg/items/${id}`, method: 'delete' });
+};
+
+// ========== 活动/赛季管理 ==========
+
+export const getActivityList = (params: Record<string, any>) => {
+  return request({ url: '/admin/rpg/activities', method: 'get', params });
+};
+
+export const createActivity = (data: Record<string, any>) => {
+  return request({ url: '/admin/rpg/activities', method: 'post', data });
+};
+
+export const updateActivity = (id: number, data: Record<string, any>) => {
+  return request({ url: `/admin/rpg/activities/${id}`, method: 'patch', data });
+};
+
+export const deleteActivity = (id: number) => {
+  return request({ url: `/admin/rpg/activities/${id}`, method: 'delete' });
+};
+
+// ========== 公会管理 ==========
+
+export const getGuildList = (params: Record<string, any>) => {
+  return request({ url: '/admin/rpg/guilds', method: 'get', params });
+};
+
+export const deleteGuild = (id: number) => {
+  return request({ url: `/admin/rpg/guilds/${id}`, method: 'delete' });
+};
+
+// ========== 打赏/社交流水 ==========
+
+export const getTipLogList = (params: Record<string, any>) => {
+  return request({ url: '/admin/rpg/tips', method: 'get', params });
+};
+
+export const getSocialLogList = (params: Record<string, any>) => {
+  return request({ url: '/admin/rpg/social-logs', method: 'get', params });
+};

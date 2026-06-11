@@ -100,6 +100,10 @@ export default {
   'menu.server.rpgQuest': '每日任务',
   'menu.server.rpgLottery': '抽奖奖池',
   'menu.server.rpgUser': '用户RPG数据',
+  'menu.server.rpgItemConfig': '系统物品',
+  'menu.server.rpgActivity': '活动赛季',
+  'menu.server.rpgGuild': '公会管理',
+  'menu.server.rpgSocialLog': '打赏社交流水',
 
   ...localeSettings,
   ...localeCommon,
