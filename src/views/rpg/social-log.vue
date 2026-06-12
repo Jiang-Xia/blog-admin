@@ -13,11 +13,28 @@
             <template #columns>
               <a-table-column title="ID" data-index="id" />
               <a-table-column title="文章ID" data-index="articleId" />
-              <a-table-column title="打赏者" data-index="fromUid" />
-              <a-table-column title="作者" data-index="toUid" />
+              <a-table-column title="打赏者" data-index="fromUid" :width="140">
+                <template #cell="{ record }">
+                  <div>{{ record.fromUid }}</div>
+                  <div class="user-name">{{ formatUserName(record, 'from') }}</div>
+                </template>
+              </a-table-column>
+              <a-table-column title="作者" data-index="toUid" :width="140">
+                <template #cell="{ record }">
+                  <div>{{ record.toUid }}</div>
+                  <div class="user-name">{{ formatUserName(record, 'to') }}</div>
+                </template>
+              </a-table-column>
               <a-table-column title="碎片" data-index="amount" />
-              <a-table-column title="留言" data-index="message" ellipsis />
-              <a-table-column title="时间" data-index="createTime" />
+              <a-table-column title="时间" data-index="createTime" :width="170">
+                <template #cell="{ record }">
+                  {{
+                    record.createTime
+                      ? $dayjs(record.createTime).format('YYYY-MM-DD HH:mm:ss')
+                      : '-'
+                  }}
+                </template>
+              </a-table-column>
             </template>
           </a-table>
         </a-tab-pane>
@@ -31,12 +48,34 @@
           >
             <template #columns>
               <a-table-column title="ID" data-index="id" />
-              <a-table-column title="发起者" data-index="fromUid" />
-              <a-table-column title="目标" data-index="toUid" />
-              <a-table-column title="动作" data-index="action" />
+              <a-table-column title="发起者" data-index="fromUid" :width="140">
+                <template #cell="{ record }">
+                  <div>{{ record.fromUid }}</div>
+                  <div class="user-name">{{ formatUserName(record, 'from') }}</div>
+                </template>
+              </a-table-column>
+              <a-table-column title="目标" data-index="toUid" :width="140">
+                <template #cell="{ record }">
+                  <div>{{ record.toUid }}</div>
+                  <div class="user-name">{{ formatUserName(record, 'to') }}</div>
+                </template>
+              </a-table-column>
+              <a-table-column title="动作" data-index="action">
+                <template #cell="{ record }">
+                  <a-tag>{{ socialActionLabel(record.action) }}</a-tag>
+                </template>
+              </a-table-column>
               <a-table-column title="消耗碎片" data-index="costFragments" />
-              <a-table-column title="HP变化" data-index="hpDelta" />
-              <a-table-column title="时间" data-index="createTime" />
+              <a-table-column title="生命变化" data-index="hpDelta" />
+              <a-table-column title="时间" data-index="createTime" :width="170">
+                <template #cell="{ record }">
+                  {{
+                    record.createTime
+                      ? $dayjs(record.createTime).format('YYYY-MM-DD HH:mm:ss')
+                      : '-'
+                  }}
+                </template>
+              </a-table-column>
             </template>
           </a-table>
         </a-tab-pane>
@@ -50,6 +89,19 @@
   import type { Pagination } from '@/types/global';
   import { getTipLogList, getSocialLogList } from '@/api/rpg';
   import useLoading from '@/hooks/loading';
+
+  const SOCIAL_ACTION_LABELS: Record<string, string> = {
+    cheer: '加油',
+    egg: '扔鸡蛋',
+    flower: '送鲜花',
+  };
+  const socialActionLabel = (action: string) => SOCIAL_ACTION_LABELS[action] || action;
+
+  const formatUserName = (record: any, prefix: 'from' | 'to') => {
+    const nickname = record[`${prefix}Nickname`];
+    const username = record[`${prefix}Username`];
+    return nickname || username || '-';
+  };
 
   const { loading, setLoading } = useLoading(true);
   const activeTab = ref('tips');
@@ -100,3 +152,13 @@
     loadSocial();
   };
 </script>
+
+<style scoped lang="less">
+  .container {
+    padding: 20px;
+  }
+  .user-name {
+    color: var(--color-text-3);
+    font-size: 12px;
+  }
+</style>

@@ -23,9 +23,20 @@
           <a-table-column title="ID" data-index="id" />
           <a-table-column title="名称" data-index="name" />
           <a-table-column title="成员数" data-index="memberCount" />
-          <a-table-column title="会长UID" data-index="leaderUid" />
+          <a-table-column title="会长" data-index="leaderUid" :width="140">
+            <template #cell="{ record }">
+              <div>{{ record.leaderUid }}</div>
+              <div class="user-name">{{ formatLeaderName(record) }}</div>
+            </template>
+          </a-table-column>
           <a-table-column title="公告" data-index="announcement" ellipsis />
-          <a-table-column title="创建时间" data-index="createTime" />
+          <a-table-column title="创建时间" data-index="createTime" :width="170">
+            <template #cell="{ record }">
+              {{
+                record.createTime ? $dayjs(record.createTime).format('YYYY-MM-DD HH:mm:ss') : '-'
+              }}
+            </template>
+          </a-table-column>
           <a-table-column title="操作">
             <template #cell="{ record }">
               <a-button type="text" size="small" status="danger" @click="handleDelete(record)">
@@ -52,6 +63,8 @@
   const tableData = ref<any[]>([]);
   const basePagination: Pagination = { current: 1, pageSize: 20, total: 0 };
   const pagination = reactive({ ...basePagination });
+
+  const formatLeaderName = (record: any) => record.leaderNickname || record.leaderUsername || '-';
 
   const loadData = async () => {
     setLoading(true);
@@ -93,3 +106,13 @@
     });
   };
 </script>
+
+<style scoped lang="less">
+  .container {
+    padding: 20px;
+  }
+  .user-name {
+    color: var(--color-text-3);
+    font-size: 12px;
+  }
+</style>

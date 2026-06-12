@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <a-card class="general-card" :title="t('rpgAchievement.query.title')">
+    <a-card class="general-card" title="成就管理">
       <a-row>
         <a-col :flex="1">
           <a-form
@@ -11,44 +11,30 @@
           >
             <a-row :gutter="16">
               <a-col :span="8">
-                <a-form-item :label="t('rpgAchievement.form.keyword')">
+                <a-form-item label="关键词">
                   <a-input
                     v-model="formModel.keyword"
-                    :placeholder="t('rpgAchievement.form.placeholder.keyword')"
+                    placeholder="请输入成就名称"
                     @press-enter="search"
                   />
                 </a-form-item>
               </a-col>
               <a-col :span="8">
-                <a-form-item :label="t('rpgAchievement.form.category')">
-                  <a-select
-                    v-model="formModel.category"
-                    :placeholder="t('rpgAchievement.form.placeholder.category')"
-                    allow-clear
-                  >
-                    <a-option value="creation">{{
-                      t('rpgAchievement.table.category.creation')
-                    }}</a-option>
-                    <a-option value="social">{{
-                      t('rpgAchievement.table.category.social')
-                    }}</a-option>
-                    <a-option value="exploration">{{
-                      t('rpgAchievement.table.category.exploration')
-                    }}</a-option>
-                    <a-option value="sign">{{ t('rpgAchievement.table.category.sign') }}</a-option>
-                    <a-option value="special">{{
-                      t('rpgAchievement.table.category.special')
-                    }}</a-option>
+                <a-form-item label="分类">
+                  <a-select v-model="formModel.category" placeholder="请选择分类" allow-clear>
+                    <a-option value="creation">创作</a-option>
+                    <a-option value="social">社交</a-option>
+                    <a-option value="exploration">探索</a-option>
+                    <a-option value="sign">签到</a-option>
+                    <a-option value="special">特殊</a-option>
                   </a-select>
                 </a-form-item>
               </a-col>
               <a-col :span="8">
-                <a-form-item :label="t('rpgAchievement.form.status')">
+                <a-form-item label="状态">
                   <a-select v-model="formModel.active" allow-clear>
-                    <a-option value="true">{{ t('rpgAchievement.table.active.enabled') }}</a-option>
-                    <a-option value="false">{{
-                      t('rpgAchievement.table.active.disabled')
-                    }}</a-option>
+                    <a-option value="true">启用</a-option>
+                    <a-option value="false">禁用</a-option>
                   </a-select>
                 </a-form-item>
               </a-col>
@@ -59,11 +45,11 @@
           <a-space :size="8">
             <a-button type="primary" @click="search">
               <template #icon><icon-search /></template>
-              {{ t('rpgAchievement.button.search') }}
+              搜索
             </a-button>
             <a-button @click="reset">
               <template #icon><icon-refresh /></template>
-              {{ t('rpgAchievement.button.reset') }}
+              重置
             </a-button>
           </a-space>
         </a-col>
@@ -76,7 +62,7 @@
           <a-space>
             <a-button type="primary" @click="showCreateModal">
               <template #icon><icon-plus /></template>
-              {{ t('rpgAchievement.button.create') }}
+              新增成就
             </a-button>
           </a-space>
         </a-col>
@@ -91,62 +77,33 @@
         @page-change="onPageChange"
       >
         <template #columns>
-          <a-table-column :title="t('rpgAchievement.table.code')" data-index="code" :width="140" />
-          <a-table-column :title="t('rpgAchievement.table.name')" data-index="name" :width="120" />
-          <a-table-column
-            :title="t('rpgAchievement.table.description')"
-            data-index="description"
-            ellipsis
-            tooltip
-          />
-          <a-table-column
-            :title="t('rpgAchievement.table.category')"
-            data-index="category"
-            :width="90"
-          >
+          <a-table-column title="编码" data-index="code" :width="140" />
+          <a-table-column title="名称" data-index="name" :width="120" />
+          <a-table-column title="描述" data-index="description" ellipsis tooltip />
+          <a-table-column title="分类" data-index="category" :width="90">
             <template #cell="{ record }">
-              <a-tag>{{ t(`rpgAchievement.table.category.${record.category}`) }}</a-tag>
+              <a-tag>{{ categoryLabel(record.category) }}</a-tag>
             </template>
           </a-table-column>
-          <a-table-column :title="t('rpgAchievement.table.icon')" data-index="icon" :width="110" />
-          <a-table-column
-            :title="t('rpgAchievement.table.maxProgress')"
-            data-index="maxProgress"
-            :width="90"
-            align="center"
-          />
-          <a-table-column
-            :title="t('rpgAchievement.table.expReward')"
-            data-index="expReward"
-            :width="90"
-            align="center"
-          >
+          <a-table-column title="图标" data-index="icon" :width="110" />
+          <a-table-column title="达成条件" data-index="maxProgress" :width="90" align="center" />
+          <a-table-column title="经验奖励" data-index="expReward" :width="90" align="center">
             <template #cell="{ record }">
               <span style="color: #f59e0b; font-weight: 600">+{{ record.expReward }}</span>
             </template>
           </a-table-column>
-          <a-table-column
-            :title="t('rpgAchievement.table.sort')"
-            data-index="sort"
-            :width="60"
-            align="center"
-          />
-          <a-table-column :title="t('rpgAchievement.table.active')" data-index="active" :width="80">
+          <a-table-column title="隐藏" data-index="isHidden" :width="60">
+            <template #cell="{ record }">{{ record.isHidden ? '是' : '否' }}</template>
+          </a-table-column>
+          <a-table-column title="排序" data-index="sort" :width="60" align="center" />
+          <a-table-column title="状态" data-index="active" :width="80">
             <template #cell="{ record }">
               <a-tag :color="record.active !== false ? 'green' : 'red'">
-                {{
-                  record.active !== false
-                    ? t('rpgAchievement.table.active.enabled')
-                    : t('rpgAchievement.table.active.disabled')
-                }}
+                {{ record.active !== false ? '启用' : '禁用' }}
               </a-tag>
             </template>
           </a-table-column>
-          <a-table-column
-            :title="t('rpgAchievement.table.operation')"
-            data-index="operations"
-            :width="120"
-          >
+          <a-table-column title="操作" data-index="operations" :width="120">
             <template #cell="{ record }">
               <a-space :size="8">
                 <a-button size="mini" type="primary" @click="showEditModal(record)"
@@ -162,10 +119,9 @@
       </a-table>
     </a-card>
 
-    <!-- 新增/编辑弹窗 -->
     <a-modal
       v-model:visible="modalVisible"
-      :title="isEdit ? t('rpgAchievement.modal.edit') : t('rpgAchievement.modal.create')"
+      :title="isEdit ? '编辑成就' : '新增成就'"
       :width="720"
       @ok="handleModalOk"
       @cancel="modalVisible = false"
@@ -173,91 +129,76 @@
       <a-form :model="modalForm" :label-col-props="{ span: 7 }" :wrapper-col-props="{ span: 17 }">
         <a-row :gutter="16">
           <a-col :span="12">
-            <a-form-item :label="t('rpgAchievement.form.codeLabel')" required>
+            <a-form-item label="编码" required>
               <a-input
                 v-model="modalForm.code"
-                :placeholder="t('rpgAchievement.form.placeholder.code')"
+                placeholder="唯一编码，如 first_article"
                 :disabled="isEdit"
               />
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item :label="t('rpgAchievement.form.nameLabel')" required>
-              <a-input
-                v-model="modalForm.name"
-                :placeholder="t('rpgAchievement.form.placeholder.name')"
-              />
+            <a-form-item label="名称" required>
+              <a-input v-model="modalForm.name" placeholder="成就显示名称" />
             </a-form-item>
           </a-col>
         </a-row>
         <a-row :gutter="16">
           <a-col :span="12">
-            <a-form-item :label="t('rpgAchievement.form.descLabel')">
-              <a-input
-                v-model="modalForm.description"
-                :placeholder="t('rpgAchievement.form.placeholder.desc')"
-              />
+            <a-form-item label="描述">
+              <a-input v-model="modalForm.description" placeholder="成就描述" />
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item :label="t('rpgAchievement.form.categoryLabel')">
+            <a-form-item label="分类">
               <a-select v-model="modalForm.category">
-                <a-option value="creation">{{
-                  t('rpgAchievement.table.category.creation')
-                }}</a-option>
-                <a-option value="social">{{ t('rpgAchievement.table.category.social') }}</a-option>
-                <a-option value="exploration">{{
-                  t('rpgAchievement.table.category.exploration')
-                }}</a-option>
-                <a-option value="sign">{{ t('rpgAchievement.table.category.sign') }}</a-option>
-                <a-option value="special">{{
-                  t('rpgAchievement.table.category.special')
-                }}</a-option>
+                <a-option value="creation">创作</a-option>
+                <a-option value="social">社交</a-option>
+                <a-option value="exploration">探索</a-option>
+                <a-option value="sign">签到</a-option>
+                <a-option value="special">特殊</a-option>
               </a-select>
             </a-form-item>
           </a-col>
         </a-row>
         <a-row :gutter="16">
           <a-col :span="12">
-            <a-form-item :label="t('rpgAchievement.form.iconLabel')">
-              <a-input
-                v-model="modalForm.icon"
-                :placeholder="t('rpgAchievement.form.placeholder.icon')"
-              />
+            <a-form-item label="图标">
+              <a-input v-model="modalForm.icon" placeholder="图标ID" />
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item :label="t('rpgAchievement.form.maxProgressLabel')">
-              <a-input-number
-                v-model="modalForm.maxProgress"
-                :min="1"
-                :placeholder="t('rpgAchievement.form.placeholder.maxProgress')"
-              />
+            <a-form-item label="达成次数">
+              <a-input-number v-model="modalForm.maxProgress" :min="1" placeholder="达成所需次数" />
             </a-form-item>
           </a-col>
         </a-row>
         <a-row :gutter="16">
           <a-col :span="12">
-            <a-form-item :label="t('rpgAchievement.form.expRewardLabel')">
-              <a-input-number
-                v-model="modalForm.expReward"
-                :min="0"
-                :placeholder="t('rpgAchievement.form.placeholder.expReward')"
-              />
+            <a-form-item label="经验奖励">
+              <a-input-number v-model="modalForm.expReward" :min="0" placeholder="完成奖励经验值" />
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item :label="t('rpgAchievement.form.sortLabel')">
+            <a-form-item label="排序">
               <a-input-number v-model="modalForm.sort" :min="0" />
             </a-form-item>
           </a-col>
         </a-row>
         <a-row :gutter="16">
           <a-col :span="12">
-            <a-form-item :label="t('rpgAchievement.form.activeLabel')">
+            <a-form-item label="状态">
               <a-radio-group v-model="modalForm.active">
-                <a-radio :value="true">{{ t('rpgAchievement.table.active.enabled') }}</a-radio>
-                <a-radio :value="false">{{ t('rpgAchievement.table.active.disabled') }}</a-radio>
+                <a-radio :value="true">启用</a-radio>
+                <a-radio :value="false">禁用</a-radio>
+              </a-radio-group>
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="隐藏成就">
+              <a-radio-group v-model="modalForm.isHidden">
+                <a-radio :value="1">是</a-radio>
+                <a-radio :value="0">否</a-radio>
               </a-radio-group>
             </a-form-item>
           </a-col>
@@ -269,7 +210,6 @@
 
 <script lang="ts" setup>
   import { ref, reactive } from 'vue';
-  import { useI18n } from 'vue-i18n';
   import type { Pagination } from '@/types/global';
   import { Message, Modal } from '@arco-design/web-vue';
   import {
@@ -287,7 +227,15 @@
   } from '@/api/rpg';
   import useLoading from '@/hooks/loading';
 
-  const { t } = useI18n();
+  const CATEGORY_LABELS: Record<string, string> = {
+    creation: '创作',
+    social: '社交',
+    exploration: '探索',
+    sign: '签到',
+    special: '特殊',
+  };
+  const categoryLabel = (category: string) => CATEGORY_LABELS[category] || category;
+
   const { loading, setLoading } = useLoading(true);
 
   const generateFormModel = () => ({
@@ -316,6 +264,7 @@
     expReward: 10,
     sort: 10,
     active: true,
+    isHidden: 0,
   };
   const modalForm = ref({ ...defaultModalForm });
 
@@ -370,6 +319,7 @@
       expReward: record.expReward,
       sort: record.sort,
       active: record.active !== false,
+      isHidden: record.isHidden ?? 0,
     };
     modalVisible.value = true;
   };
@@ -382,10 +332,10 @@
     if (isEdit.value) {
       const { code, ...data } = modalForm.value;
       await updateAchievement(editId.value, data);
-      Message.success(t('rpgAchievement.message.updateSuccess'));
+      Message.success('更新成功');
     } else {
       await createAchievement(modalForm.value);
-      Message.success(t('rpgAchievement.message.createSuccess'));
+      Message.success('新增成功');
     }
     modalVisible.value = false;
     loadData();
@@ -393,11 +343,11 @@
 
   const handleDelete = (record: any) => {
     Modal.confirm({
-      title: t('rpgAchievement.confirm.delete'),
-      content: t('rpgAchievement.confirm.deleteContent'),
+      title: '删除成就',
+      content: '确定删除该成就吗？删除后不可恢复。',
       onOk: async () => {
         await deleteAchievement(record.id);
-        Message.success(t('rpgAchievement.message.deleteSuccess'));
+        Message.success('删除成功');
         loadData();
       },
     });

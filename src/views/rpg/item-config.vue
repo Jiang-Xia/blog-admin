@@ -23,6 +23,8 @@
                     <a-option value="consumable">消耗品</a-option>
                     <a-option value="buff">Buff</a-option>
                     <a-option value="achievement">成就</a-option>
+                    <a-option value="equipment">装备</a-option>
+                    <a-option value="fragment">碎片</a-option>
                   </a-select>
                 </a-form-item>
               </a-col>
@@ -50,8 +52,18 @@
         <template #columns>
           <a-table-column title="编码" data-index="code" />
           <a-table-column title="名称" data-index="name" />
-          <a-table-column title="类型" data-index="itemType" />
-          <a-table-column title="稀有度" data-index="rarity" />
+          <a-table-column title="类型" data-index="itemType">
+            <template #cell="{ record }">
+              <a-tag>{{ itemTypeLabel(record.itemType) }}</a-tag>
+            </template>
+          </a-table-column>
+          <a-table-column title="稀有度" data-index="rarity">
+            <template #cell="{ record }">
+              <a-tag :color="rarityColor(record.rarity)">
+                {{ rarityLabel(record.rarity) }}
+              </a-tag>
+            </template>
+          </a-table-column>
           <a-table-column title="排序" data-index="sort" />
           <a-table-column title="状态" data-index="active">
             <template #cell="{ record }">{{ record.active ? '启用' : '禁用' }}</template>
@@ -90,6 +102,8 @@
             <a-option value="consumable">消耗品</a-option>
             <a-option value="buff">Buff</a-option>
             <a-option value="achievement">成就</a-option>
+            <a-option value="equipment">装备</a-option>
+            <a-option value="fragment">碎片</a-option>
           </a-select>
         </a-form-item>
         <a-form-item label="稀有度">
@@ -130,6 +144,36 @@
     deleteItemConfig,
   } from '@/api/rpg';
   import useLoading from '@/hooks/loading';
+
+  const ITEM_TYPE_LABELS: Record<string, string> = {
+    title: '称号',
+    avatar_frame: '头像框',
+    pet: '宠物',
+    equipment: '装备',
+    achievement: '成就',
+    buff: '增益',
+    fragment: '碎片',
+    consumable: '消耗品',
+  };
+
+  const RARITY_LABELS: Record<string, string> = {
+    common: '普通',
+    rare: '稀有',
+    epic: '史诗',
+    legendary: '传说',
+  };
+
+  const itemTypeLabel = (type: string) => ITEM_TYPE_LABELS[type] || type;
+  const rarityLabel = (rarity: string) => RARITY_LABELS[rarity] || rarity;
+  const rarityColor = (rarity: string) => {
+    const map: Record<string, string> = {
+      common: 'gray',
+      rare: 'blue',
+      epic: 'purple',
+      legendary: 'orangered',
+    };
+    return map[rarity] || 'gray';
+  };
 
   const { loading, setLoading } = useLoading(true);
   const formModel = ref({

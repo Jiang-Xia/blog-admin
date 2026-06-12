@@ -14,8 +14,6 @@ import localeOperationLog from '@/views/operation-log/locale/zh-CN';
 import localeScheduledTask from '@/views/scheduled-task/locale/zh-CN';
 import localeTaskManage from '@/views/task-manage/locale/zh-CN';
 import localePayOrder from '@/views/pay-order/locale/zh-CN';
-import localeRpg from '@/views/rpg/locale/zh-CN';
-
 import localeWorkplace from '@/views/dashboard/workplace/locale/zh-CN';
 import localeDatascreen from '@/views/dashboard/datascreen/locale/zh-CN';
 
@@ -125,5 +123,4 @@ export default {
   ...localeScheduledTask,
   ...localeTaskManage,
   ...localePayOrder,
-  ...localeRpg,
 };

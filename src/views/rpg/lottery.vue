@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <a-card class="general-card" :title="t('rpgLottery.query.title')">
+    <a-card class="general-card" title="抽奖奖池管理">
       <a-row>
         <a-col :flex="1">
           <a-form
@@ -11,35 +11,29 @@
           >
             <a-row :gutter="16">
               <a-col :span="8">
-                <a-form-item :label="t('rpgLottery.form.keyword')">
+                <a-form-item label="关键词">
                   <a-input
                     v-model="formModel.keyword"
-                    :placeholder="t('rpgLottery.form.placeholder.keyword')"
+                    placeholder="请输入奖品名称"
                     @press-enter="search"
                   />
                 </a-form-item>
               </a-col>
               <a-col :span="8">
-                <a-form-item :label="t('rpgLottery.form.rarity')">
-                  <a-select
-                    v-model="formModel.rarity"
-                    :placeholder="t('rpgLottery.form.placeholder.rarity')"
-                    allow-clear
-                  >
-                    <a-option value="common">{{ t('rpgLottery.table.rarity.common') }}</a-option>
-                    <a-option value="rare">{{ t('rpgLottery.table.rarity.rare') }}</a-option>
-                    <a-option value="epic">{{ t('rpgLottery.table.rarity.epic') }}</a-option>
-                    <a-option value="legendary">{{
-                      t('rpgLottery.table.rarity.legendary')
-                    }}</a-option>
+                <a-form-item label="稀有度">
+                  <a-select v-model="formModel.rarity" placeholder="请选择稀有度" allow-clear>
+                    <a-option value="common">普通</a-option>
+                    <a-option value="rare">稀有</a-option>
+                    <a-option value="epic">史诗</a-option>
+                    <a-option value="legendary">传说</a-option>
                   </a-select>
                 </a-form-item>
               </a-col>
               <a-col :span="8">
-                <a-form-item :label="t('rpgLottery.form.status')">
+                <a-form-item label="状态">
                   <a-select v-model="formModel.active" allow-clear>
-                    <a-option value="true">{{ t('rpgLottery.table.active.enabled') }}</a-option>
-                    <a-option value="false">{{ t('rpgLottery.table.active.disabled') }}</a-option>
+                    <a-option value="true">启用</a-option>
+                    <a-option value="false">禁用</a-option>
                   </a-select>
                 </a-form-item>
               </a-col>
@@ -50,11 +44,11 @@
           <a-space :size="8">
             <a-button type="primary" @click="search">
               <template #icon><icon-search /></template>
-              {{ t('rpgLottery.button.search') }}
+              搜索
             </a-button>
             <a-button @click="reset">
               <template #icon><icon-refresh /></template>
-              {{ t('rpgLottery.button.reset') }}
+              重置
             </a-button>
           </a-space>
         </a-col>
@@ -67,11 +61,9 @@
           <a-space>
             <a-button type="primary" @click="showCreateModal">
               <template #icon><icon-plus /></template>
-              {{ t('rpgLottery.button.create') }}
+              新增奖品
             </a-button>
-            <a-button @click="showRecordsModal">
-              {{ t('rpgLottery.button.records') }}
-            </a-button>
+            <a-button @click="showRecordsModal">抽奖记录</a-button>
           </a-space>
         </a-col>
       </a-row>
@@ -85,56 +77,33 @@
         @page-change="onPageChange"
       >
         <template #columns>
-          <a-table-column :title="t('rpgLottery.table.code')" data-index="code" :width="130" />
-          <a-table-column :title="t('rpgLottery.table.name')" data-index="name" :width="120" />
-          <a-table-column
-            :title="t('rpgLottery.table.description')"
-            data-index="description"
-            ellipsis
-            tooltip
-          />
-          <a-table-column :title="t('rpgLottery.table.type')" data-index="type" :width="80">
+          <a-table-column title="编码" data-index="code" :width="130" />
+          <a-table-column title="名称" data-index="name" :width="120" />
+          <a-table-column title="描述" data-index="description" ellipsis tooltip />
+          <a-table-column title="类型" data-index="type" :width="80">
             <template #cell="{ record }">
-              <a-tag>{{ t(`rpgLottery.table.type.${record.type}`) }}</a-tag>
+              <a-tag>{{ poolTypeLabel(record.type) }}</a-tag>
             </template>
           </a-table-column>
-          <a-table-column :title="t('rpgLottery.table.rarity')" data-index="rarity" :width="80">
+          <a-table-column title="稀有度" data-index="rarity" :width="80">
             <template #cell="{ record }">
               <a-tag :color="rarityColor(record.rarity)">
-                {{ t(`rpgLottery.table.rarity.${record.rarity}`) }}
+                {{ rarityLabel(record.rarity) }}
               </a-tag>
             </template>
           </a-table-column>
-          <a-table-column
-            :title="t('rpgLottery.table.probability')"
-            data-index="probability"
-            :width="80"
-            align="center"
-          >
+          <a-table-column title="概率" data-index="probability" :width="80" align="center">
             <template #cell="{ record }"> {{ (record.probability * 100).toFixed(1) }}% </template>
           </a-table-column>
-          <a-table-column
-            :title="t('rpgLottery.table.sort')"
-            data-index="sort"
-            :width="60"
-            align="center"
-          />
-          <a-table-column :title="t('rpgLottery.table.active')" data-index="active" :width="80">
+          <a-table-column title="排序" data-index="sort" :width="60" align="center" />
+          <a-table-column title="状态" data-index="active" :width="80">
             <template #cell="{ record }">
               <a-tag :color="record.active ? 'green' : 'red'">
-                {{
-                  record.active
-                    ? t('rpgLottery.table.active.enabled')
-                    : t('rpgLottery.table.active.disabled')
-                }}
+                {{ record.active ? '启用' : '禁用' }}
               </a-tag>
             </template>
           </a-table-column>
-          <a-table-column
-            :title="t('rpgLottery.table.operation')"
-            data-index="operations"
-            :width="120"
-          >
+          <a-table-column title="操作" data-index="operations" :width="120">
             <template #cell="{ record }">
               <a-space :size="8">
                 <a-button size="mini" type="primary" @click="showEditModal(record)"
@@ -150,10 +119,9 @@
       </a-table>
     </a-card>
 
-    <!-- 新增/编辑弹窗 -->
     <a-modal
       v-model:visible="modalVisible"
-      :title="isEdit ? t('rpgLottery.modal.edit') : t('rpgLottery.modal.create')"
+      :title="isEdit ? '编辑奖品' : '新增奖品'"
       :width="720"
       @ok="handleModalOk"
       @cancel="modalVisible = false"
@@ -161,77 +129,67 @@
       <a-form :model="modalForm" :label-col-props="{ span: 7 }" :wrapper-col-props="{ span: 17 }">
         <a-row :gutter="16">
           <a-col :span="12">
-            <a-form-item :label="t('rpgLottery.form.codeLabel')" required>
-              <a-input
-                v-model="modalForm.code"
-                :placeholder="t('rpgLottery.form.placeholder.code')"
-                :disabled="isEdit"
-              />
+            <a-form-item label="编码" required>
+              <a-input v-model="modalForm.code" placeholder="奖品编码" :disabled="isEdit" />
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item :label="t('rpgLottery.form.nameLabel')" required>
-              <a-input
-                v-model="modalForm.name"
-                :placeholder="t('rpgLottery.form.placeholder.name')"
-              />
+            <a-form-item label="名称" required>
+              <a-input v-model="modalForm.name" placeholder="奖品名称" />
             </a-form-item>
           </a-col>
         </a-row>
         <a-row :gutter="16">
           <a-col :span="12">
-            <a-form-item :label="t('rpgLottery.form.descLabel')">
-              <a-input
-                v-model="modalForm.description"
-                :placeholder="t('rpgLottery.form.placeholder.desc')"
-              />
+            <a-form-item label="描述">
+              <a-input v-model="modalForm.description" placeholder="奖品描述" />
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item :label="t('rpgLottery.form.typeLabel')">
+            <a-form-item label="奖品类型">
               <a-select v-model="modalForm.type">
-                <a-option value="exp">{{ t('rpgLottery.table.type.exp') }}</a-option>
-                <a-option value="buff">{{ t('rpgLottery.table.type.buff') }}</a-option>
-                <a-option value="ticket">{{ t('rpgLottery.table.type.ticket') }}</a-option>
+                <a-option value="exp">经验</a-option>
+                <a-option value="buff">Buff</a-option>
+                <a-option value="ticket">抽奖券</a-option>
               </a-select>
             </a-form-item>
           </a-col>
         </a-row>
         <a-row :gutter="16">
           <a-col :span="12">
-            <a-form-item :label="t('rpgLottery.form.rarityLabel')">
+            <a-form-item label="稀有度">
               <a-select v-model="modalForm.rarity">
-                <a-option value="common">{{ t('rpgLottery.table.rarity.common') }}</a-option>
-                <a-option value="rare">{{ t('rpgLottery.table.rarity.rare') }}</a-option>
-                <a-option value="epic">{{ t('rpgLottery.table.rarity.epic') }}</a-option>
-                <a-option value="legendary">{{ t('rpgLottery.table.rarity.legendary') }}</a-option>
+                <a-option value="common">普通</a-option>
+                <a-option value="rare">稀有</a-option>
+                <a-option value="epic">史诗</a-option>
+                <a-option value="legendary">传说</a-option>
               </a-select>
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item :label="t('rpgLottery.form.probabilityLabel')">
+            <a-form-item label="概率(0-1)">
               <a-input-number
                 v-model="modalForm.probability"
                 :min="0"
                 :max="1"
                 :step="0.01"
                 :precision="2"
-                :placeholder="t('rpgLottery.form.placeholder.probability')"
+                placeholder="0到1之间的小数"
               />
             </a-form-item>
           </a-col>
         </a-row>
         <a-row :gutter="16">
           <a-col :span="12">
-            <a-form-item :label="t('rpgLottery.form.sortLabel')">
+            <a-form-item label="排序">
               <a-input-number v-model="modalForm.sort" :min="0" />
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item :label="t('rpgLottery.form.activeLabel')">
+            <a-form-item label="状态">
               <a-radio-group v-model="modalForm.active">
-                <a-radio :value="true">{{ t('rpgLottery.table.active.enabled') }}</a-radio>
-                <a-radio :value="false">{{ t('rpgLottery.table.active.disabled') }}</a-radio>
+                <a-radio :value="true">启用</a-radio>
+                <a-radio :value="false">禁用</a-radio>
               </a-radio-group>
             </a-form-item>
           </a-col>
@@ -239,37 +197,21 @@
       </a-form>
     </a-modal>
 
-    <!-- 抽奖记录弹窗 -->
-    <a-modal
-      v-model:visible="recordsVisible"
-      :title="t('rpgLottery.records.title')"
-      :width="700"
-      :footer="false"
-    >
+    <a-modal v-model:visible="recordsVisible" title="抽奖记录" :width="700" :footer="false">
       <a-row :gutter="16" style="margin-bottom: 12px">
         <a-col :span="8">
-          <a-input
-            v-model="recordsQuery.uid"
-            :placeholder="t('rpgLottery.records.uid')"
-            allow-clear
-          />
+          <a-input v-model="recordsQuery.uid" placeholder="用户ID" allow-clear />
         </a-col>
         <a-col :span="8">
-          <a-select
-            v-model="recordsQuery.rarity"
-            :placeholder="t('rpgLottery.form.placeholder.rarity')"
-            allow-clear
-          >
-            <a-option value="common">{{ t('rpgLottery.table.rarity.common') }}</a-option>
-            <a-option value="rare">{{ t('rpgLottery.table.rarity.rare') }}</a-option>
-            <a-option value="epic">{{ t('rpgLottery.table.rarity.epic') }}</a-option>
-            <a-option value="legendary">{{ t('rpgLottery.table.rarity.legendary') }}</a-option>
+          <a-select v-model="recordsQuery.rarity" placeholder="请选择稀有度" allow-clear>
+            <a-option value="common">普通</a-option>
+            <a-option value="rare">稀有</a-option>
+            <a-option value="epic">史诗</a-option>
+            <a-option value="legendary">传说</a-option>
           </a-select>
         </a-col>
         <a-col :span="8">
-          <a-button type="primary" @click="loadRecords">{{
-            t('rpgLottery.button.search')
-          }}</a-button>
+          <a-button type="primary" @click="loadRecords">搜索</a-button>
         </a-col>
       </a-row>
       <a-table
@@ -281,24 +223,16 @@
         @page-change="onRecordsPageChange"
       >
         <template #columns>
-          <a-table-column :title="t('rpgLottery.records.uid')" data-index="uid" :width="80" />
-          <a-table-column :title="t('rpgLottery.records.poolName')" data-index="poolName" />
-          <a-table-column
-            :title="t('rpgLottery.records.poolRarity')"
-            data-index="poolRarity"
-            :width="80"
-          >
+          <a-table-column title="用户ID" data-index="uid" :width="80" />
+          <a-table-column title="奖品名称" data-index="poolName" />
+          <a-table-column title="稀有度" data-index="poolRarity" :width="80">
             <template #cell="{ record }">
               <a-tag :color="rarityColor(record.poolRarity)">
-                {{ t(`rpgLottery.table.rarity.${record.poolRarity}`) }}
+                {{ rarityLabel(record.poolRarity) }}
               </a-tag>
             </template>
           </a-table-column>
-          <a-table-column
-            :title="t('rpgLottery.records.createTime')"
-            data-index="createTime"
-            :width="160"
-          >
+          <a-table-column title="抽奖时间" data-index="createTime" :width="160">
             <template #cell="{ record }">
               {{ $dayjs(record.createTime).format('YYYY-MM-DD HH:mm:ss') }}
             </template>
@@ -311,7 +245,6 @@
 
 <script lang="ts" setup>
   import { ref, reactive } from 'vue';
-  import { useI18n } from 'vue-i18n';
   import type { Pagination } from '@/types/global';
   import { Message, Modal } from '@arco-design/web-vue';
   import {
@@ -330,9 +263,22 @@
   } from '@/api/rpg';
   import useLoading from '@/hooks/loading';
 
-  const { t } = useI18n();
-  const { loading, setLoading } = useLoading(true);
+  const POOL_TYPE_LABELS: Record<string, string> = {
+    exp: '经验',
+    buff: 'Buff',
+    ticket: '抽奖券',
+    achievement: '成就',
+  };
 
+  const RARITY_LABELS: Record<string, string> = {
+    common: '普通',
+    rare: '稀有',
+    epic: '史诗',
+    legendary: '传说',
+  };
+
+  const poolTypeLabel = (type: string) => POOL_TYPE_LABELS[type] || type;
+  const rarityLabel = (rarity: string) => RARITY_LABELS[rarity] || rarity;
   const rarityColor = (rarity: string) => {
     const map: Record<string, string> = {
       common: 'gray',
@@ -342,6 +288,8 @@
     };
     return map[rarity] || 'gray';
   };
+
+  const { loading, setLoading } = useLoading(true);
 
   const generateFormModel = () => ({
     keyword: '',
@@ -435,10 +383,10 @@
     if (isEdit.value) {
       const { code, ...data } = modalForm.value;
       await updateLotteryPool(editId.value, data);
-      Message.success(t('rpgLottery.message.updateSuccess'));
+      Message.success('更新成功');
     } else {
       await createLotteryPool(modalForm.value);
-      Message.success(t('rpgLottery.message.createSuccess'));
+      Message.success('新增成功');
     }
     modalVisible.value = false;
     loadData();
@@ -446,17 +394,16 @@
 
   const handleDelete = (record: any) => {
     Modal.confirm({
-      title: t('rpgLottery.confirm.delete'),
-      content: t('rpgLottery.confirm.deleteContent'),
+      title: '删除奖品',
+      content: '确定删除该奖品吗？删除后不可恢复。',
       onOk: async () => {
         await deleteLotteryPool(record.id);
-        Message.success(t('rpgLottery.message.deleteSuccess'));
+        Message.success('删除成功');
         loadData();
       },
     });
   };
 
-  // 抽奖记录
   const recordsVisible = ref(false);
   const recordsLoading = ref(false);
   const recordsData = ref<any[]>([]);

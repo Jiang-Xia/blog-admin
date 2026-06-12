@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <a-card class="general-card" :title="t('rpgQuest.query.title')">
+    <a-card class="general-card" title="每日任务管理">
       <a-row>
         <a-col :flex="1">
           <a-form
@@ -11,31 +11,27 @@
           >
             <a-row :gutter="16">
               <a-col :span="8">
-                <a-form-item :label="t('rpgQuest.form.keyword')">
+                <a-form-item label="关键词">
                   <a-input
                     v-model="formModel.keyword"
-                    :placeholder="t('rpgQuest.form.placeholder.keyword')"
+                    placeholder="请输入任务名称"
                     @press-enter="search"
                   />
                 </a-form-item>
               </a-col>
               <a-col :span="8">
-                <a-form-item :label="t('rpgQuest.form.type')">
-                  <a-select
-                    v-model="formModel.type"
-                    :placeholder="t('rpgQuest.form.placeholder.type')"
-                    allow-clear
-                  >
-                    <a-option value="daily">{{ t('rpgQuest.table.type.daily') }}</a-option>
-                    <a-option value="weekly">{{ t('rpgQuest.table.type.weekly') }}</a-option>
+                <a-form-item label="类型">
+                  <a-select v-model="formModel.type" placeholder="请选择类型" allow-clear>
+                    <a-option value="daily">每日</a-option>
+                    <a-option value="weekly">每周</a-option>
                   </a-select>
                 </a-form-item>
               </a-col>
               <a-col :span="8">
-                <a-form-item :label="t('rpgQuest.form.status')">
+                <a-form-item label="状态">
                   <a-select v-model="formModel.active" allow-clear>
-                    <a-option value="true">{{ t('rpgQuest.table.active.enabled') }}</a-option>
-                    <a-option value="false">{{ t('rpgQuest.table.active.disabled') }}</a-option>
+                    <a-option value="true">启用</a-option>
+                    <a-option value="false">禁用</a-option>
                   </a-select>
                 </a-form-item>
               </a-col>
@@ -46,11 +42,11 @@
           <a-space :size="8">
             <a-button type="primary" @click="search">
               <template #icon><icon-search /></template>
-              {{ t('rpgQuest.button.search') }}
+              搜索
             </a-button>
             <a-button @click="reset">
               <template #icon><icon-refresh /></template>
-              {{ t('rpgQuest.button.reset') }}
+              重置
             </a-button>
           </a-space>
         </a-col>
@@ -63,7 +59,7 @@
           <a-space>
             <a-button type="primary" @click="showCreateModal">
               <template #icon><icon-plus /></template>
-              {{ t('rpgQuest.button.create') }}
+              新增任务
             </a-button>
           </a-space>
         </a-col>
@@ -78,68 +74,42 @@
         @page-change="onPageChange"
       >
         <template #columns>
-          <a-table-column :title="t('rpgQuest.table.code')" data-index="code" :width="140" />
-          <a-table-column :title="t('rpgQuest.table.name')" data-index="name" :width="110" />
-          <a-table-column
-            :title="t('rpgQuest.table.description')"
-            data-index="description"
-            ellipsis
-            tooltip
-          />
-          <a-table-column :title="t('rpgQuest.table.type')" data-index="type" :width="80">
+          <a-table-column title="编码" data-index="code" :width="140" />
+          <a-table-column title="名称" data-index="name" :width="110" />
+          <a-table-column title="描述" data-index="description" ellipsis tooltip />
+          <a-table-column title="类型" data-index="type" :width="80">
             <template #cell="{ record }">
               <a-tag :color="record.type === 'daily' ? 'blue' : 'purple'">
-                {{ t(`rpgQuest.table.type.${record.type}`) }}
+                {{ questTypeLabel(record.type) }}
               </a-tag>
             </template>
           </a-table-column>
-          <a-table-column
-            :title="t('rpgQuest.table.targetAction')"
-            data-index="targetAction"
-            :width="100"
-          >
+          <a-table-column title="目标行为" data-index="targetAction" :width="100">
             <template #cell="{ record }">
-              {{ t(`rpgQuest.table.targetAction.${record.targetAction}`) }}
+              {{ targetActionLabel(record.targetAction) }}
             </template>
           </a-table-column>
-          <a-table-column
-            :title="t('rpgQuest.table.targetCount')"
-            data-index="targetCount"
-            :width="90"
-            align="center"
-          />
-          <a-table-column
-            :title="t('rpgQuest.table.expReward')"
-            data-index="expReward"
-            :width="90"
-            align="center"
-          >
+          <a-table-column title="目标次数" data-index="targetCount" :width="90" align="center" />
+          <a-table-column title="经验奖励" data-index="expReward" :width="90" align="center">
             <template #cell="{ record }">
               <span style="color: #f59e0b; font-weight: 600">+{{ record.expReward }}</span>
             </template>
           </a-table-column>
-          <a-table-column
-            :title="t('rpgQuest.table.sort')"
-            data-index="sort"
-            :width="60"
-            align="center"
-          />
-          <a-table-column :title="t('rpgQuest.table.active')" data-index="active" :width="80">
+          <a-table-column title="子类型" data-index="questSubtype" :width="80">
+            <template #cell="{ record }">
+              <a-tag>{{ questSubtypeLabel(record.questSubtype) }}</a-tag>
+            </template>
+          </a-table-column>
+          <a-table-column title="生命奖励" data-index="hpReward" :width="80" align="center" />
+          <a-table-column title="排序" data-index="sort" :width="60" align="center" />
+          <a-table-column title="状态" data-index="active" :width="80">
             <template #cell="{ record }">
               <a-tag :color="record.active ? 'green' : 'red'">
-                {{
-                  record.active
-                    ? t('rpgQuest.table.active.enabled')
-                    : t('rpgQuest.table.active.disabled')
-                }}
+                {{ record.active ? '启用' : '禁用' }}
               </a-tag>
             </template>
           </a-table-column>
-          <a-table-column
-            :title="t('rpgQuest.table.operation')"
-            data-index="operations"
-            :width="120"
-          >
+          <a-table-column title="操作" data-index="operations" :width="120">
             <template #cell="{ record }">
               <a-space :size="8">
                 <a-button size="mini" type="primary" @click="showEditModal(record)"
@@ -155,10 +125,9 @@
       </a-table>
     </a-card>
 
-    <!-- 新增/编辑弹窗 -->
     <a-modal
       v-model:visible="modalVisible"
-      :title="isEdit ? t('rpgQuest.modal.edit') : t('rpgQuest.modal.create')"
+      :title="isEdit ? '编辑任务' : '新增任务'"
       :width="720"
       @ok="handleModalOk"
       @cancel="modalVisible = false"
@@ -166,80 +135,85 @@
       <a-form :model="modalForm" :label-col-props="{ span: 7 }" :wrapper-col-props="{ span: 17 }">
         <a-row :gutter="16">
           <a-col :span="12">
-            <a-form-item :label="t('rpgQuest.form.codeLabel')" required>
-              <a-input
-                v-model="modalForm.code"
-                :placeholder="t('rpgQuest.form.placeholder.code')"
-                :disabled="isEdit"
-              />
+            <a-form-item label="编码" required>
+              <a-input v-model="modalForm.code" placeholder="任务编码" :disabled="isEdit" />
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item :label="t('rpgQuest.form.nameLabel')" required>
-              <a-input
-                v-model="modalForm.name"
-                :placeholder="t('rpgQuest.form.placeholder.name')"
-              />
+            <a-form-item label="名称" required>
+              <a-input v-model="modalForm.name" placeholder="任务名称" />
             </a-form-item>
           </a-col>
         </a-row>
         <a-row :gutter="16">
           <a-col :span="12">
-            <a-form-item :label="t('rpgQuest.form.descLabel')">
-              <a-input
-                v-model="modalForm.description"
-                :placeholder="t('rpgQuest.form.placeholder.desc')"
-              />
+            <a-form-item label="描述">
+              <a-input v-model="modalForm.description" placeholder="任务描述" />
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item :label="t('rpgQuest.form.typeLabel')">
+            <a-form-item label="类型">
               <a-select v-model="modalForm.type">
-                <a-option value="daily">{{ t('rpgQuest.table.type.daily') }}</a-option>
-                <a-option value="weekly">{{ t('rpgQuest.table.type.weekly') }}</a-option>
+                <a-option value="daily">每日</a-option>
+                <a-option value="weekly">每周</a-option>
               </a-select>
             </a-form-item>
           </a-col>
         </a-row>
         <a-row :gutter="16">
           <a-col :span="12">
-            <a-form-item :label="t('rpgQuest.form.targetActionLabel')">
+            <a-form-item label="目标行为">
               <a-select v-model="modalForm.targetAction">
-                <a-option value="sign_in">{{ t('rpgQuest.table.targetAction.sign_in') }}</a-option>
-                <a-option value="comment">{{ t('rpgQuest.table.targetAction.comment') }}</a-option>
-                <a-option value="article">{{ t('rpgQuest.table.targetAction.article') }}</a-option>
-                <a-option value="like">{{ t('rpgQuest.table.targetAction.like') }}</a-option>
-                <a-option value="collect">{{ t('rpgQuest.table.targetAction.collect') }}</a-option>
-                <a-option value="msgboard">{{
-                  t('rpgQuest.table.targetAction.msgboard')
-                }}</a-option>
+                <a-option value="sign_in">签到</a-option>
+                <a-option value="comment">评论</a-option>
+                <a-option value="article">发布文章</a-option>
+                <a-option value="like">点赞</a-option>
+                <a-option value="collect">收藏</a-option>
+                <a-option value="msgboard">留言</a-option>
+                <a-option value="tip">打赏</a-option>
               </a-select>
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item :label="t('rpgQuest.form.targetCountLabel')">
+            <a-form-item label="子类型">
+              <a-select v-model="modalForm.questSubtype">
+                <a-option value="daily">daily</a-option>
+                <a-option value="bounty">bounty</a-option>
+                <a-option value="special">special</a-option>
+              </a-select>
+            </a-form-item>
+          </a-col>
+        </a-row>
+        <a-row :gutter="16">
+          <a-col :span="12">
+            <a-form-item label="目标次数">
               <a-input-number v-model="modalForm.targetCount" :min="1" />
             </a-form-item>
           </a-col>
+          <a-col :span="12">
+            <a-form-item label="HP奖励">
+              <a-input-number v-model="modalForm.hpReward" :min="0" :max="100" />
+            </a-form-item>
+          </a-col>
         </a-row>
         <a-row :gutter="16">
           <a-col :span="12">
-            <a-form-item :label="t('rpgQuest.form.expRewardLabel')">
+            <a-form-item label="经验奖励">
               <a-input-number v-model="modalForm.expReward" :min="0" />
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item :label="t('rpgQuest.form.sortLabel')">
+            <a-form-item label="排序">
               <a-input-number v-model="modalForm.sort" :min="0" />
             </a-form-item>
           </a-col>
         </a-row>
         <a-row :gutter="16">
           <a-col :span="12">
-            <a-form-item :label="t('rpgQuest.form.activeLabel')">
+            <a-form-item label="状态">
               <a-radio-group v-model="modalForm.active">
-                <a-radio :value="true">{{ t('rpgQuest.table.active.enabled') }}</a-radio>
-                <a-radio :value="false">{{ t('rpgQuest.table.active.disabled') }}</a-radio>
+                <a-radio :value="true">启用</a-radio>
+                <a-radio :value="false">禁用</a-radio>
               </a-radio-group>
             </a-form-item>
           </a-col>
@@ -251,7 +225,6 @@
 
 <script lang="ts" setup>
   import { ref, reactive } from 'vue';
-  import { useI18n } from 'vue-i18n';
   import type { Pagination } from '@/types/global';
   import { Message, Modal } from '@arco-design/web-vue';
   import {
@@ -264,7 +237,29 @@
   import { getQuestList, createQuest, updateQuest, deleteQuest } from '@/api/rpg';
   import useLoading from '@/hooks/loading';
 
-  const { t } = useI18n();
+  const QUEST_TYPE_LABELS: Record<string, string> = {
+    daily: '每日',
+    weekly: '每周',
+  };
+  const QUEST_SUBTYPE_LABELS: Record<string, string> = {
+    daily: '每日',
+    bounty: '悬赏',
+    special: '特殊',
+  };
+  const TARGET_ACTION_LABELS: Record<string, string> = {
+    sign_in: '签到',
+    comment: '评论',
+    article: '发布文章',
+    like: '点赞',
+    collect: '收藏',
+    msgboard: '留言',
+    tip: '打赏',
+  };
+
+  const questTypeLabel = (type: string) => QUEST_TYPE_LABELS[type] || type;
+  const questSubtypeLabel = (subtype: string) => QUEST_SUBTYPE_LABELS[subtype] || subtype;
+  const targetActionLabel = (action: string) => TARGET_ACTION_LABELS[action] || action;
+
   const { loading, setLoading } = useLoading(true);
 
   const generateFormModel = () => ({
@@ -288,9 +283,11 @@
     name: '',
     description: '',
     type: 'daily',
+    questSubtype: 'daily',
     targetAction: 'sign_in',
     targetCount: 1,
     expReward: 10,
+    hpReward: 0,
     sort: 10,
     active: true,
   };
@@ -342,9 +339,11 @@
       name: record.name,
       description: record.description || '',
       type: record.type,
+      questSubtype: record.questSubtype || 'daily',
       targetAction: record.targetAction,
       targetCount: record.targetCount,
       expReward: record.expReward,
+      hpReward: record.hpReward ?? 0,
       sort: record.sort,
       active: record.active,
     };
@@ -359,10 +358,10 @@
     if (isEdit.value) {
       const { code, ...data } = modalForm.value;
       await updateQuest(editId.value, data);
-      Message.success(t('rpgQuest.message.updateSuccess'));
+      Message.success('更新成功');
     } else {
       await createQuest(modalForm.value);
-      Message.success(t('rpgQuest.message.createSuccess'));
+      Message.success('新增成功');
     }
     modalVisible.value = false;
     loadData();
@@ -370,11 +369,11 @@
 
   const handleDelete = (record: any) => {
     Modal.confirm({
-      title: t('rpgQuest.confirm.delete'),
-      content: t('rpgQuest.confirm.deleteContent'),
+      title: '删除任务',
+      content: '确定删除该任务吗？删除后不可恢复。',
       onOk: async () => {
         await deleteQuest(record.id);
-        Message.success(t('rpgQuest.message.deleteSuccess'));
+        Message.success('删除成功');
         loadData();
       },
     });

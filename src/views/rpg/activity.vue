@@ -14,10 +14,22 @@
         <template #columns>
           <a-table-column title="编码" data-index="code" />
           <a-table-column title="名称" data-index="name" />
-          <a-table-column title="类型" data-index="activityType" />
+          <a-table-column title="类型" data-index="activityType">
+            <template #cell="{ record }">
+              <a-tag>{{ activityTypeLabel(record.activityType) }}</a-tag>
+            </template>
+          </a-table-column>
           <a-table-column title="经验加成" data-index="expBuffRate" />
-          <a-table-column title="开始" data-index="startTime" />
-          <a-table-column title="结束" data-index="endTime" />
+          <a-table-column title="开始" data-index="startTime" :width="170">
+            <template #cell="{ record }">
+              {{ record.startTime ? $dayjs(record.startTime).format('YYYY-MM-DD HH:mm:ss') : '-' }}
+            </template>
+          </a-table-column>
+          <a-table-column title="结束" data-index="endTime" :width="170">
+            <template #cell="{ record }">
+              {{ record.endTime ? $dayjs(record.endTime).format('YYYY-MM-DD HH:mm:ss') : '-' }}
+            </template>
+          </a-table-column>
           <a-table-column title="状态" data-index="active">
             <template #cell="{ record }">{{ record.active ? '启用' : '禁用' }}</template>
           </a-table-column>
@@ -70,6 +82,9 @@
         <a-form-item label="经验加成倍率"
           ><a-input-number v-model="modalForm.expBuffRate" :min="1" :step="0.1"
         /></a-form-item>
+        <a-form-item label="海报URL"
+          ><a-input v-model="modalForm.posterUrl" placeholder="/images/rpg/poster.png"
+        /></a-form-item>
         <a-form-item label="状态">
           <a-radio-group v-model="modalForm.active">
             <a-radio :value="true">启用</a-radio>
@@ -89,6 +104,13 @@
   import { getActivityList, createActivity, updateActivity, deleteActivity } from '@/api/rpg';
   import useLoading from '@/hooks/loading';
 
+  const ACTIVITY_TYPE_LABELS: Record<string, string> = {
+    season: '赛季',
+    event: '活动',
+    festival: '节日',
+  };
+  const activityTypeLabel = (type: string) => ACTIVITY_TYPE_LABELS[type] || type;
+
   const { loading, setLoading } = useLoading(true);
   const formModel = ref({ page: 1, pageSize: 20 });
   const tableData = ref<any[]>([]);
@@ -105,6 +127,7 @@
     startTime: '',
     endTime: '',
     expBuffRate: 1.2,
+    posterUrl: '',
     active: true,
   };
   const modalForm = ref({ ...defaultModalForm });
