@@ -77,6 +77,17 @@ export default {
   'role.message.createSuccess': '创建成功',
   'role.message.updateSuccess': '更新成功',
 
+  // 角色数据范围
+  'role.form.dataScope': '文章数据范围',
+  'role.form.scopeType': '范围类型',
+  'role.form.customDepts': '自定义机构',
+  'role.form.placeholder.scopeType': '请选择数据范围类型',
+  'role.form.placeholder.customDepts': '请选择可访问的机构',
+  'role.scopeType.ALL': '全部机构',
+  'role.scopeType.DEPT': '本部门',
+  'role.scopeType.DEPT_AND_CHILDREN': '本部门及下级',
+  'role.scopeType.CUSTOM': '自定义机构',
+
   // 权限管理
   'privilege.query.title': '权限查询',
   'privilege.form.name': '权限名称',

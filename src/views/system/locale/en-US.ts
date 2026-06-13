@@ -76,6 +76,16 @@ export default {
   'role.message.createSuccess': 'Create Successfully!',
   'role.message.updateSuccess': 'Update Successfully!',
 
+  'role.form.dataScope': 'Article Data Scope',
+  'role.form.scopeType': 'Scope Type',
+  'role.form.customDepts': 'Custom Departments',
+  'role.form.placeholder.scopeType': 'Please select data scope type',
+  'role.form.placeholder.customDepts': 'Please select accessible departments',
+  'role.scopeType.ALL': 'All Departments',
+  'role.scopeType.DEPT': 'Current Department',
+  'role.scopeType.DEPT_AND_CHILDREN': 'Department and Sub-departments',
+  'role.scopeType.CUSTOM': 'Custom Departments',
+
   // Privilege Management
   'privilege.query.title': 'Privilege Query',
   'privilege.form.name': 'Privilege Name',

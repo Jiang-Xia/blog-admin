@@ -38,6 +38,17 @@
                   />
                 </a-form-item>
               </a-col>
+              <a-col :span="8">
+                <a-form-item :label="t('article.form.deptId')">
+                  <a-tree-select
+                    v-model="formModel.deptId"
+                    :data="deptTreeData"
+                    :placeholder="t('article.form.placeholder.deptId')"
+                    allow-clear
+                    :field-names="{ key: 'id', title: 'deptName', children: 'children' }"
+                  />
+                </a-form-item>
+              </a-col>
             </a-row>
           </a-form>
         </a-col>
@@ -157,6 +168,7 @@
               </span>
             </template>
           </a-table-column>
+          <a-table-column :title="t('article.table.dept')" data-index="deptName" :width="120" />
           <a-table-column :title="t('article.table.tag')" data-index="tag" :width="120">
             <template #cell="{ record }">
               <span :style="{ color: record.tagColor }">
@@ -279,13 +291,13 @@
   import useLoading from '@/hooks/loading';
   import type { Pagination } from '@/types/global';
   import { getArticleList, delArticle } from '@/api/article';
+  import { getDeptTree } from '@/api/dept';
   import { Message, Modal } from '@arco-design/web-vue';
   import request from '@/api/request';
-  import { useUserStore } from '@/store';
   import * as XLSX from 'xlsx';
 
-  const { role } = useUserStore();
   const router = useRouter();
+  const deptTreeData = ref<any[]>([]);
   const generateFormModel = () => {
     return {
       page: 1,
@@ -296,6 +308,7 @@
       title: '',
       description: '',
       content: '',
+      deptId: undefined as number | undefined,
       uid: 1,
     };
   };
@@ -318,6 +331,7 @@
     scheduledPublishAt?: string;
     tag?: string;
     tagColor?: string;
+    deptName?: string;
     [k: string]: unknown;
   }
   const renderData = ref<ArticleRow[]>([]);
@@ -348,11 +362,9 @@
     const requestId = ++listRequestId;
     setLoading(true);
     try {
-      const onlyMy = role === 'author'; // 作者只返回自身文章
       formModel.value.page = val;
       pagination.current = val;
       const params = {
-        onlyMy,
         ...formModel.value,
       };
       const res = await getArticleList(params);
@@ -406,6 +418,11 @@
     });
   };
   getArticleListHandle();
+  const loadDeptTree = async () => {
+    const res = await getDeptTree();
+    deptTreeData.value = res.data ?? [];
+  };
+  loadDeptTree();
   const reset = () => {
     formModel.value = generateFormModel();
     search();

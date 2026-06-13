@@ -22,21 +22,16 @@
 </template>
 
 <script lang="ts" setup>
-  import { useUserStore } from '@/store';
   import { getArticleList } from '@/api/article';
   import { ref } from 'vue';
   import { useI18n } from 'vue-i18n';
 
   const { t } = useI18n();
 
-  const { role } = useUserStore();
-
   const list = ref<any>([]);
   const types = ['orangered', 'cyan', 'blue', 'blue', 'cyan'];
   const getArticleListHandle = async () => {
-    const onlyMy = role === 'author'; // 作者只返回自身文章
     const params = {
-      onlyMy,
       page: 1,
       pageSize: 5,
     };

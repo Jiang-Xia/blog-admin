@@ -43,3 +43,26 @@ export const delRole = async (id: string) => {
   });
   return res;
 };
+
+export interface RoleDataScopeItem {
+  resourceType: string;
+  scopeType: 'ALL' | 'DEPT' | 'DEPT_AND_CHILDREN' | 'CUSTOM';
+  deptIds?: number[];
+}
+
+export const getRoleDataScope = async (id: number) => {
+  const res = await request({
+    url: `/role/${id}/data-scope`,
+    method: 'get',
+  });
+  return res;
+};
+
+export const updateRoleDataScope = async (id: number, dataScopes: RoleDataScopeItem[]) => {
+  const res = await request({
+    url: `/role/${id}/data-scope`,
+    method: 'put',
+    data: { dataScopes },
+  });
+  return res;
+};
