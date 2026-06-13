@@ -29,7 +29,7 @@
                     <a-option value="buff">Buff</a-option>
                     <a-option value="achievement">成就</a-option>
                     <a-option value="equipment">装备</a-option>
-                    <a-option value="fragment">碎片</a-option>
+                    <a-option value="fragment">钻石</a-option>
                   </a-select>
                 </a-form-item>
               </a-col>
@@ -223,7 +223,7 @@
     equipment: '装备',
     achievement: '成就',
     buff: '增益',
-    fragment: '碎片',
+    fragment: '钻石',
     consumable: '消耗品',
   };
 

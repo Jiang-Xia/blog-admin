@@ -204,3 +204,12 @@ export const getTipLogList = (params: Record<string, any>) => {
 export const getSocialLogList = (params: Record<string, any>) => {
   return request({ url: '/admin/rpg/social-logs', method: 'get', params });
 };
+
+/** 超管充值钻石 */
+export const rechargeDiamonds = (uid: number, data: { amount: number; reason?: string }) => {
+  return request({
+    url: `/admin/rpg/users/${uid}/diamonds`,
+    method: 'post',
+    data,
+  });
+};

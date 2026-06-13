@@ -27,7 +27,7 @@
                   <div class="user-name">{{ formatUserName(record, 'to') }}</div>
                 </template>
               </a-table-column>
-              <a-table-column title="碎片" data-index="amount" :width="80" align="center" />
+              <a-table-column title="钻石" data-index="amount" :width="80" align="center" />
               <a-table-column title="时间" data-index="createTime" :width="170">
                 <template #cell="{ record }">
                   {{
@@ -77,7 +77,7 @@
                 </template>
               </a-table-column>
               <a-table-column
-                title="消耗碎片"
+                title="消耗钻石"
                 data-index="costFragments"
                 :width="90"
                 align="center"

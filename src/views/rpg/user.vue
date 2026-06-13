@@ -120,6 +120,7 @@
             </template>
           </a-table-column>
           <a-table-column title="抽奖券" data-index="lotteryTickets" :width="80" align="center" />
+          <a-table-column title="钻石" data-index="fragments" :width="80" align="center" />
           <a-table-column title="禁言状态" :width="90">
             <template #cell="{ record }">
               <a-tag :color="isBanned(record) ? 'red' : 'green'">
@@ -127,11 +128,22 @@
               </a-tag>
             </template>
           </a-table-column>
-          <a-table-column title="操作" data-index="operations" :width="80" fixed="right">
+          <a-table-column title="操作" data-index="operations" :width="140" fixed="right">
             <template #cell="{ record }">
-              <a-button size="mini" type="primary" @click="showDetail(record)">
-                <icon-eye />
-              </a-button>
+              <a-space :size="4">
+                <a-button size="mini" type="primary" @click="showDetail(record)">
+                  <icon-eye />
+                </a-button>
+                <a-button
+                  v-if="isSuperAdmin"
+                  size="mini"
+                  type="outline"
+                  status="warning"
+                  @click="openRecharge(record)"
+                >
+                  充值
+                </a-button>
+              </a-space>
             </template>
           </a-table-column>
         </template>
@@ -179,6 +191,7 @@
             <a-descriptions-item label="抽奖券">{{
               detailData.lotteryTickets
             }}</a-descriptions-item>
+            <a-descriptions-item label="钻石">{{ detailData.fragments ?? 0 }}</a-descriptions-item>
             <a-descriptions-item label="累计签到">{{
               detailData.totalSignDays
             }}</a-descriptions-item>
@@ -261,15 +274,46 @@
         </template>
       </a-spin>
     </a-modal>
+
+    <a-modal
+      v-model:visible="rechargeVisible"
+      title="充值钻石"
+      :ok-loading="rechargeLoading"
+      @ok="submitRecharge"
+      @cancel="rechargeVisible = false"
+    >
+      <a-form :model="rechargeForm" layout="vertical">
+        <a-form-item label="用户">
+          <span>{{ rechargeForm.nickname || rechargeForm.uid }}</span>
+        </a-form-item>
+        <a-form-item label="充值数量" required>
+          <a-input-number
+            v-model="rechargeForm.amount"
+            :min="1"
+            :max="100000"
+            placeholder="1~100000"
+            style="width: 100%"
+          />
+        </a-form-item>
+        <a-form-item label="备注">
+          <a-input v-model="rechargeForm.reason" placeholder="可选，如：测试充值" />
+        </a-form-item>
+      </a-form>
+    </a-modal>
   </div>
 </template>
 
 <script lang="ts" setup>
-  import { ref, reactive } from 'vue';
+  import { ref, reactive, computed } from 'vue';
   import type { Pagination } from '@/types/global';
   import { IconSearch, IconRefresh, IconEye } from '@arco-design/web-vue/es/icon';
-  import { getUserRpgList, getUserRpgDetail, getRpgStats } from '@/api/rpg';
+  import { Message } from '@arco-design/web-vue';
+  import { getUserRpgList, getUserRpgDetail, getRpgStats, rechargeDiamonds } from '@/api/rpg';
   import useLoading from '@/hooks/loading';
+  import useUserStore from '@/store/modules/user';
+
+  const userStore = useUserStore();
+  const isSuperAdmin = computed(() => userStore.roles?.some((r: { id: number }) => r.id === 1));
 
   const statsItems = [
     { key: 'totalPlayers', title: '总玩家数' },
@@ -356,6 +400,42 @@
   const detailVisible = ref(false);
   const detailLoading = ref(false);
   const detailData = ref<any>(null);
+
+  const rechargeVisible = ref(false);
+  const rechargeLoading = ref(false);
+  const rechargeForm = reactive({
+    uid: 0,
+    nickname: '',
+    amount: 100,
+    reason: 'admin_test',
+  });
+
+  const openRecharge = (record: any) => {
+    rechargeForm.uid = record.uid;
+    rechargeForm.nickname = record.nickname || record.username || String(record.uid);
+    rechargeForm.amount = 100;
+    rechargeForm.reason = 'admin_test';
+    rechargeVisible.value = true;
+  };
+
+  const submitRecharge = async () => {
+    if (!rechargeForm.amount || rechargeForm.amount < 1) {
+      Message.warning('请输入有效充值数量');
+      return;
+    }
+    rechargeLoading.value = true;
+    try {
+      await rechargeDiamonds(rechargeForm.uid, {
+        amount: rechargeForm.amount,
+        reason: rechargeForm.reason,
+      });
+      Message.success('充值成功');
+      rechargeVisible.value = false;
+      loadData();
+    } finally {
+      rechargeLoading.value = false;
+    }
+  };
 
   const showDetail = async (record: any) => {
     detailVisible.value = true;

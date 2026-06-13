@@ -141,6 +141,7 @@
           />
           <a-table-column :title="t('article.table.cover')" data-index="category" :width="100">
             <template #cell="{ record }">
+              {{ record.cover }}
               <a-popover title="">
                 <a-image width="40" height="40" :src="record.cover" />
                 <template #content>
