@@ -29,10 +29,11 @@
       <a-table
         :loading="loading"
         row-key="id"
-        :pagination="pagination"
+        :pagination="false"
         :data="taskList"
         :bordered="false"
-        @page-change="onPageChange"
+        scrollbar
+        :scroll="{ x: 1100, y: 600 }"
       >
         <template #columns>
           <a-table-column :title="t('taskManage.table.name')" data-index="name" :width="180">
@@ -87,9 +88,9 @@
             :width="70"
             align="center"
           />
-          <a-table-column :title="t('taskManage.table.actions')" :width="240" align="center">
+          <a-table-column :title="t('taskManage.table.actions')" :width="160" fixed="right">
             <template #cell="{ record }">
-              <a-space :size="4">
+              <a-space :size="8">
                 <a-button
                   size="mini"
                   type="primary"
@@ -98,7 +99,7 @@
                 >
                   <template #icon><icon-play-arrow /></template>
                 </a-button>
-                <a-button size="mini" type="primary" status="normal" @click="handleEdit(record)">
+                <a-button size="mini" type="primary" @click="handleEdit(record)">
                   <template #icon><icon-edit /></template>
                 </a-button>
                 <a-popconfirm
@@ -114,6 +115,13 @@
           </a-table-column>
         </template>
       </a-table>
+      <TablePagination
+        :total="pagination.total"
+        :current="pagination.current"
+        :page-size="pagination.pageSize"
+        @change="onPageChange"
+        @page-size-change="onPageSizeChange"
+      />
     </a-card>
 
     <!-- 新增/编辑弹窗 -->
@@ -230,6 +238,14 @@
   const onPageChange = (current: number) => {
     queryParams.value.page = current;
     pagination.current = current;
+    loadTaskList();
+  };
+
+  const onPageSizeChange = (pageSize: number) => {
+    queryParams.value.page = 1;
+    queryParams.value.pageSize = pageSize;
+    pagination.current = 1;
+    pagination.pageSize = pageSize;
     loadTaskList();
   };
 
@@ -368,5 +384,13 @@
     font-size: 12px;
     color: var(--color-text-4);
     margin-left: 4px;
+  }
+
+  :deep(.arco-table-th) {
+    &:last-child {
+      .arco-table-th-item-title {
+        margin-left: 16px;
+      }
+    }
   }
 </style>

@@ -260,16 +260,13 @@
           </a-table-column>
         </template>
       </a-table>
-      <a-space style="width: 100%; padding-top: 16px; justify-content: flex-end">
-        <a-pagination
-          @change="onPageChange"
-          @page-size-change="onPageSizeChange"
-          :total="pagination.total"
-          show-total
-          show-jumper
-          show-page-size
-        />
-      </a-space>
+      <TablePagination
+        :total="pagination.total"
+        :current="pagination.current"
+        :page-size="pagination.pageSize"
+        @change="onPageChange"
+        @page-size-change="onPageSizeChange"
+      />
     </a-card>
   </div>
 </template>

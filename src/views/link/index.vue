@@ -17,27 +17,33 @@
       <a-table
         :loading="loading"
         row-key="id"
-        :pagination="pagination"
-        :data="renderData"
+        :pagination="false"
+        :data="tableData"
         :bordered="false"
-        @page-change="onPageChange"
+        scrollbar
+        :scroll="{ x: 980, y: 600 }"
       >
         <template #columns>
-          <a-table-column :title="t('link.table.title')" data-index="title" />
-          <a-table-column :title="t('link.table.icon')" data-index="url" align="center">
+          <a-table-column :title="t('link.table.title')" data-index="title" :width="160" />
+          <a-table-column
+            :title="t('link.table.icon')"
+            data-index="url"
+            align="center"
+            :width="100"
+          >
             <template #cell="{ record }">
               <a-avatar>
                 <img :alt="record.title" :src="record.icon" />
               </a-avatar>
             </template>
           </a-table-column>
-          <a-table-column :title="t('link.table.description')" data-index="desp" />
-          <a-table-column :title="t('link.table.website')" data-index="url">
+          <a-table-column :title="t('link.table.description')" data-index="desp" :width="200" />
+          <a-table-column :title="t('link.table.website')" data-index="url" :width="260">
             <template #cell="{ record }">
               <a-link :href="record.url" target="_blank">{{ record.url }}</a-link>
             </template>
           </a-table-column>
-          <a-table-column :title="t('link.table.status')" data-index="url">
+          <a-table-column :title="t('link.table.status')" data-index="url" :width="100">
             <template #cell="{ record }">
               <!-- :disabled="record.agreed" -->
               <a-switch v-model="record.agreed" @change="onSwitchChange(record)">
@@ -50,7 +56,12 @@
               </a-switch>
             </template>
           </a-table-column>
-          <a-table-column :title="t('link.table.operation')" data-index="operations">
+          <a-table-column
+            :title="t('link.table.operation')"
+            data-index="operations"
+            :width="120"
+            fixed="right"
+          >
             <template #cell="{ record }">
               <a-space :size="8">
                 <a-button size="mini" type="primary" status="danger" @click="delHandle(record.id)">
@@ -61,12 +72,19 @@
           </a-table-column>
         </template>
       </a-table>
+      <TablePagination
+        :total="pagination.total"
+        :current="pagination.current"
+        :page-size="pagination.pageSize"
+        @change="onPageChange"
+        @page-size-change="onPageSizeChange"
+      />
     </a-card>
   </div>
 </template>
 
 <script lang="ts" setup>
-  import { computed, ref, reactive } from 'vue';
+  import { computed, ref, reactive, watch } from 'vue';
   import { useI18n } from 'vue-i18n';
   import useLoading from '@/hooks/loading';
   import type { Pagination } from '@/types/global';
@@ -93,6 +111,7 @@
   const basePagination: Pagination = {
     current: 1,
     pageSize: 20,
+    total: 0,
   };
   const pagination = reactive({
     ...basePagination,
@@ -104,12 +123,28 @@
     pagination.total = res.data.length;
     setLoading(false);
   };
+  watch(
+    () => renderData.value,
+    (list) => {
+      pagination.total = list.length;
+    },
+    { immediate: true },
+  );
+  const tableData = computed(() => {
+    const start = (pagination.current - 1) * pagination.pageSize;
+    return renderData.value.slice(start, start + pagination.pageSize);
+  });
   const search = () => {
+    pagination.current = 1;
     getListHandle();
   };
   const onPageChange = (current: number) => {
+    pagination.current = current;
+  };
+  const onPageSizeChange = (pageSize: number) => {
     pagination.current = 1;
-    getListHandle();
+    pagination.pageSize = pageSize;
+    formModel.value.pageSize = pageSize;
   };
   getListHandle();
   const reset = () => {

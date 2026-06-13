@@ -53,11 +53,11 @@
       <a-table
         :loading="loading"
         row-key="id"
-        :pagination="pagination"
+        :pagination="false"
         :data="tableData"
         :bordered="false"
-        @page-change="onPageChange"
-        @page-size-change="onPageSizeChange"
+        scrollbar
+        :scroll="{ x: 1350, y: 600 }"
       >
         <template #columns>
           <a-table-column
@@ -147,6 +147,13 @@
           </a-table-column>
         </template>
       </a-table>
+      <TablePagination
+        :total="pagination.total"
+        :current="pagination.current"
+        :page-size="pagination.pageSize"
+        @change="onPageChange"
+        @page-size-change="onPageSizeChange"
+      />
     </a-card>
 
     <!-- 退款弹窗（支持部分退款） -->
@@ -233,8 +240,6 @@
     total: 0,
     current: 1,
     pageSize: 20,
-    showTotal: true,
-    showPageSize: true,
   });
 
   // 退款弹窗
@@ -390,5 +395,13 @@
 <style scoped lang="less">
   .container {
     padding: 0;
+  }
+
+  :deep(.arco-table-th) {
+    &:last-child {
+      .arco-table-th-item-title {
+        margin-left: 16px;
+      }
+    }
   }
 </style>

@@ -71,15 +71,16 @@
       <a-table
         :loading="loading"
         row-key="id"
-        :pagination="pagination"
+        :pagination="false"
         :data="tableData"
         :bordered="false"
-        @page-change="onPageChange"
+        scrollbar
+        :scroll="{ x: 1000, y: 600 }"
       >
         <template #columns>
           <a-table-column title="编码" data-index="code" :width="130" />
           <a-table-column title="名称" data-index="name" :width="120" />
-          <a-table-column title="描述" data-index="description" ellipsis tooltip />
+          <a-table-column title="描述" data-index="description" :width="160" ellipsis tooltip />
           <a-table-column title="类型" data-index="type" :width="80">
             <template #cell="{ record }">
               <a-tag>{{ poolTypeLabel(record.type) }}</a-tag>
@@ -103,7 +104,7 @@
               </a-tag>
             </template>
           </a-table-column>
-          <a-table-column title="操作" data-index="operations" :width="120">
+          <a-table-column title="操作" data-index="operations" :width="120" fixed="right">
             <template #cell="{ record }">
               <a-space :size="8">
                 <a-button size="mini" type="primary" @click="showEditModal(record)"
@@ -117,6 +118,13 @@
           </a-table-column>
         </template>
       </a-table>
+      <TablePagination
+        :total="pagination.total"
+        :current="pagination.current"
+        :page-size="pagination.pageSize"
+        @change="onPageChange"
+        @page-size-change="onPageSizeChange"
+      />
     </a-card>
 
     <a-modal
@@ -217,14 +225,15 @@
       <a-table
         :loading="recordsLoading"
         row-key="id"
-        :pagination="recordsPagination"
+        :pagination="false"
         :data="recordsData"
         :bordered="false"
-        @page-change="onRecordsPageChange"
+        scrollbar
+        :scroll="{ x: 600, y: 400 }"
       >
         <template #columns>
           <a-table-column title="用户ID" data-index="uid" :width="80" />
-          <a-table-column title="奖品名称" data-index="poolName" />
+          <a-table-column title="奖品名称" data-index="poolName" :width="160" />
           <a-table-column title="稀有度" data-index="poolRarity" :width="80">
             <template #cell="{ record }">
               <a-tag :color="rarityColor(record.poolRarity)">
@@ -239,6 +248,13 @@
           </a-table-column>
         </template>
       </a-table>
+      <TablePagination
+        :total="recordsPagination.total"
+        :current="recordsPagination.current"
+        :page-size="recordsPagination.pageSize"
+        @change="onRecordsPageChange"
+        @page-size-change="onRecordsPageSizeChange"
+      />
     </a-modal>
   </div>
 </template>
@@ -351,6 +367,14 @@
     loadData();
   };
 
+  const onPageSizeChange = (pageSize: number) => {
+    formModel.value.page = 1;
+    formModel.value.pageSize = pageSize;
+    pagination.current = 1;
+    pagination.pageSize = pageSize;
+    loadData();
+  };
+
   const showCreateModal = () => {
     isEdit.value = false;
     editId.value = 0;
@@ -436,6 +460,12 @@
 
   const onRecordsPageChange = (current: number) => {
     recordsPagination.current = current;
+    loadRecords();
+  };
+
+  const onRecordsPageSizeChange = (pageSize: number) => {
+    recordsPagination.current = 1;
+    recordsPagination.pageSize = pageSize;
     loadRecords();
   };
 </script>

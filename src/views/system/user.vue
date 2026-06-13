@@ -72,27 +72,44 @@
       <a-table
         :loading="loading"
         row-key="id"
-        :pagination="pagination"
+        :pagination="false"
         :data="renderData"
         :bordered="false"
-        @page-change="onPageChange"
+        scrollbar
+        :scroll="{ x: 1280, y: 600 }"
       >
         <template #columns>
-          <a-table-column :title="t('user.table.mobile')" data-index="mobile" align="center" />
-          <a-table-column :title="t('system.table.avatar')" data-index="url" align="center">
+          <a-table-column
+            :title="t('user.table.mobile')"
+            data-index="mobile"
+            align="center"
+            :width="130"
+          />
+          <a-table-column
+            :title="t('system.table.avatar')"
+            data-index="url"
+            align="center"
+            :width="80"
+          >
             <template #cell="{ record }">
               <a-avatar>
                 <img :alt="record.avatar" :src="record.avatar" />
               </a-avatar>
             </template>
           </a-table-column>
-          <a-table-column :title="t('user.table.username')" data-index="username" align="center" />
-          <a-table-column :title="t('user.table.nickname')" data-index="nickname" />
-          <a-table-column :title="t('system.table.roleType')" data-index="role" />
+          <a-table-column
+            :title="t('user.table.username')"
+            data-index="username"
+            align="center"
+            :width="120"
+          />
+          <a-table-column :title="t('user.table.nickname')" data-index="nickname" :width="120" />
+          <a-table-column :title="t('system.table.roleType')" data-index="role" :width="100" />
           <a-table-column
             :title="t('user.table.createTime')"
             data-index="createTime"
             align="center"
+            :width="170"
           >
             <template #cell="{ record }">
               {{ formatDate(record.createTime) }}
@@ -102,12 +119,13 @@
             :title="t('system.table.updateTime')"
             data-index="updateTime"
             align="center"
+            :width="170"
           >
             <template #cell="{ record }">
               {{ formatDate(record.updateTime) }}
             </template>
           </a-table-column>
-          <a-table-column :title="t('system.table.locked')" data-index="status">
+          <a-table-column :title="t('system.table.locked')" data-index="status" :width="80">
             <template #cell="{ record }">
               <!-- :disabled="record.agreed" -->
               <a-switch
@@ -128,9 +146,23 @@
               </a-switch>
             </template>
           </a-table-column>
-          <a-table-column :title="t('user.table.operation')" data-index="operations">
+          <a-table-column
+            :title="t('user.table.operation')"
+            data-index="operations"
+            :width="200"
+            fixed="right"
+          >
             <template #cell="{ record }">
               <a-space :size="8">
+                <a-button
+                  v-permission="'user:edit'"
+                  size="mini"
+                  type="primary"
+                  :disabled="record.role === 'super'"
+                  @click="showModal('edit', record.id)"
+                >
+                  <icon-edit />
+                </a-button>
                 <a-button
                   v-permission="'user:delete'"
                   size="mini"
@@ -141,23 +173,12 @@
                   <icon-delete />
                 </a-button>
                 <a-button
-                  v-permission="'user:edit'"
-                  size="mini"
-                  type="primary"
-                  :disabled="record.role === 'super'"
-                  @click="showModal('edit', record.id)"
-                >
-                  {{ t('user.button.edit') }}
-                  <icon-edit />
-                </a-button>
-                <a-button
                   v-permission="'user:resetPassword'"
                   size="mini"
                   type="primary"
                   :disabled="record.role === 'super'"
                   @click="resetHandle(record)"
                 >
-                  {{ t('user.button.resetPassword') }}
                   <icon-refresh />
                 </a-button>
               </a-space>
@@ -165,6 +186,13 @@
           </a-table-column>
         </template>
       </a-table>
+      <TablePagination
+        :total="pagination.total"
+        :current="pagination.current"
+        :page-size="pagination.pageSize"
+        @change="onPageChange"
+        @page-size-change="onPageSizeChange"
+      />
     </a-card>
     <add-modal ref="addRef" @success="search"></add-modal>
   </div>
@@ -229,6 +257,13 @@
   };
   const onPageChange = (current: number) => {
     getTableListHandle(current);
+  };
+  const onPageSizeChange = (pageSize: number) => {
+    formModel.value.page = 1;
+    formModel.value.pageSize = pageSize;
+    pagination.current = 1;
+    pagination.pageSize = pageSize;
+    getTableListHandle(1);
   };
   getTableListHandle();
   const reset = () => {

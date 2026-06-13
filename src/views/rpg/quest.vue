@@ -68,15 +68,16 @@
       <a-table
         :loading="loading"
         row-key="id"
-        :pagination="pagination"
+        :pagination="false"
         :data="tableData"
         :bordered="false"
-        @page-change="onPageChange"
+        scrollbar
+        :scroll="{ x: 1200, y: 600 }"
       >
         <template #columns>
           <a-table-column title="编码" data-index="code" :width="140" />
           <a-table-column title="名称" data-index="name" :width="110" />
-          <a-table-column title="描述" data-index="description" ellipsis tooltip />
+          <a-table-column title="描述" data-index="description" :width="160" ellipsis tooltip />
           <a-table-column title="类型" data-index="type" :width="80">
             <template #cell="{ record }">
               <a-tag :color="record.type === 'daily' ? 'blue' : 'purple'">
@@ -109,7 +110,7 @@
               </a-tag>
             </template>
           </a-table-column>
-          <a-table-column title="操作" data-index="operations" :width="120">
+          <a-table-column title="操作" data-index="operations" :width="120" fixed="right">
             <template #cell="{ record }">
               <a-space :size="8">
                 <a-button size="mini" type="primary" @click="showEditModal(record)"
@@ -123,6 +124,13 @@
           </a-table-column>
         </template>
       </a-table>
+      <TablePagination
+        :total="pagination.total"
+        :current="pagination.current"
+        :page-size="pagination.pageSize"
+        @change="onPageChange"
+        @page-size-change="onPageSizeChange"
+      />
     </a-card>
 
     <a-modal
@@ -321,6 +329,14 @@
   const onPageChange = (current: number) => {
     formModel.value.page = current;
     pagination.current = current;
+    loadData();
+  };
+
+  const onPageSizeChange = (pageSize: number) => {
+    formModel.value.page = 1;
+    formModel.value.pageSize = pageSize;
+    pagination.current = 1;
+    pagination.pageSize = pageSize;
     loadData();
   };
 

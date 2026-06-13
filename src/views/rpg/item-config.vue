@@ -3,7 +3,12 @@
     <a-card class="general-card" title="系统物品管理">
       <a-row>
         <a-col :flex="1">
-          <a-form :model="formModel" label-align="left">
+          <a-form
+            :model="formModel"
+            :label-col-props="{ span: 6 }"
+            :wrapper-col-props="{ span: 18 }"
+            label-align="left"
+          >
             <a-row :gutter="16">
               <a-col :span="8">
                 <a-form-item label="关键词">
@@ -32,95 +37,161 @@
           </a-form>
         </a-col>
         <a-col :span="5" style="text-align: right">
-          <a-space>
-            <a-button type="primary" @click="search"><icon-search />搜索</a-button>
-            <a-button @click="reset"><icon-refresh />重置</a-button>
+          <a-space :size="8">
+            <a-button type="primary" @click="search">
+              <template #icon><icon-search /></template>
+              搜索
+            </a-button>
+            <a-button @click="reset">
+              <template #icon><icon-refresh /></template>
+              重置
+            </a-button>
           </a-space>
         </a-col>
       </a-row>
       <a-divider style="margin-top: 0" />
-      <a-button type="primary" style="margin-bottom: 16px" @click="showCreateModal">
-        <icon-plus />新增物品
-      </a-button>
+      <a-row style="margin-bottom: 16px">
+        <a-col :span="16">
+          <a-button type="primary" @click="showCreateModal">
+            <template #icon><icon-plus /></template>
+            新增物品
+          </a-button>
+        </a-col>
+      </a-row>
       <a-table
         row-key="id"
         :loading="loading"
         :data="tableData"
-        :pagination="pagination"
-        @page-change="onPageChange"
+        :pagination="false"
+        :bordered="false"
+        scrollbar
+        :scroll="{ x: 900, y: 600 }"
       >
         <template #columns>
-          <a-table-column title="编码" data-index="code" />
-          <a-table-column title="名称" data-index="name" />
-          <a-table-column title="类型" data-index="itemType">
+          <a-table-column title="编码" data-index="code" :width="140" />
+          <a-table-column title="名称" data-index="name" :width="120" />
+          <a-table-column title="类型" data-index="itemType" :width="100">
             <template #cell="{ record }">
               <a-tag>{{ itemTypeLabel(record.itemType) }}</a-tag>
             </template>
           </a-table-column>
-          <a-table-column title="稀有度" data-index="rarity">
+          <a-table-column title="稀有度" data-index="rarity" :width="90">
             <template #cell="{ record }">
               <a-tag :color="rarityColor(record.rarity)">
                 {{ rarityLabel(record.rarity) }}
               </a-tag>
             </template>
           </a-table-column>
-          <a-table-column title="排序" data-index="sort" />
-          <a-table-column title="状态" data-index="active">
-            <template #cell="{ record }">{{ record.active ? '启用' : '禁用' }}</template>
-          </a-table-column>
-          <a-table-column title="操作">
+          <a-table-column title="排序" data-index="sort" :width="70" align="center" />
+          <a-table-column title="状态" data-index="active" :width="80">
             <template #cell="{ record }">
-              <a-space>
-                <a-button type="text" size="small" @click="showEditModal(record)"
-                  ><icon-edit
-                /></a-button>
-                <a-button type="text" size="small" status="danger" @click="handleDelete(record)"
-                  ><icon-delete
-                /></a-button>
+              <a-tag :color="record.active ? 'green' : 'red'">
+                {{ record.active ? '启用' : '禁用' }}
+              </a-tag>
+            </template>
+          </a-table-column>
+          <a-table-column title="操作" :width="120" fixed="right">
+            <template #cell="{ record }">
+              <a-space :size="8">
+                <a-button size="mini" type="primary" @click="showEditModal(record)">
+                  <icon-edit />
+                </a-button>
+                <a-button size="mini" type="primary" status="danger" @click="handleDelete(record)">
+                  <icon-delete />
+                </a-button>
               </a-space>
             </template>
           </a-table-column>
         </template>
       </a-table>
+      <TablePagination
+        :total="pagination.total"
+        :current="pagination.current"
+        :page-size="pagination.pageSize"
+        @change="onPageChange"
+        @page-size-change="onPageSizeChange"
+      />
     </a-card>
     <a-modal
       v-model:visible="modalVisible"
       :title="isEdit ? '编辑物品' : '新增物品'"
+      :width="720"
       @ok="handleModalOk"
+      @cancel="modalVisible = false"
     >
-      <a-form :model="modalForm" layout="vertical">
-        <a-form-item label="编码" required>
-          <a-input v-model="modalForm.code" :disabled="isEdit" />
-        </a-form-item>
-        <a-form-item label="名称" required><a-input v-model="modalForm.name" /></a-form-item>
-        <a-form-item label="描述"><a-textarea v-model="modalForm.description" /></a-form-item>
-        <a-form-item label="类型">
-          <a-select v-model="modalForm.itemType">
-            <a-option value="title">称号</a-option>
-            <a-option value="avatar_frame">头像框</a-option>
-            <a-option value="pet">宠物</a-option>
-            <a-option value="consumable">消耗品</a-option>
-            <a-option value="buff">Buff</a-option>
-            <a-option value="achievement">成就</a-option>
-            <a-option value="equipment">装备</a-option>
-            <a-option value="fragment">碎片</a-option>
-          </a-select>
-        </a-form-item>
-        <a-form-item label="稀有度">
-          <a-select v-model="modalForm.rarity">
-            <a-option value="common">普通</a-option>
-            <a-option value="rare">稀有</a-option>
-            <a-option value="epic">史诗</a-option>
-            <a-option value="legendary">传说</a-option>
-          </a-select>
-        </a-form-item>
-        <a-form-item label="排序"><a-input-number v-model="modalForm.sort" :min="0" /></a-form-item>
-        <a-form-item label="状态">
-          <a-radio-group v-model="modalForm.active">
-            <a-radio :value="true">启用</a-radio>
-            <a-radio :value="false">禁用</a-radio>
-          </a-radio-group>
-        </a-form-item>
+      <a-form :model="modalForm" :label-col-props="{ span: 7 }" :wrapper-col-props="{ span: 17 }">
+        <a-row :gutter="16">
+          <a-col :span="12">
+            <a-form-item label="编码" required>
+              <a-input v-model="modalForm.code" :disabled="isEdit" placeholder="唯一编码" />
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="名称" required>
+              <a-input v-model="modalForm.name" placeholder="物品名称" />
+            </a-form-item>
+          </a-col>
+        </a-row>
+        <a-row :gutter="16">
+          <a-col :span="12">
+            <a-form-item label="描述">
+              <a-input v-model="modalForm.description" placeholder="物品描述" />
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="类型">
+              <a-select v-model="modalForm.itemType">
+                <a-option value="title">称号</a-option>
+                <a-option value="avatar_frame">头像框</a-option>
+                <a-option value="pet">宠物</a-option>
+                <a-option value="consumable">消耗品</a-option>
+                <a-option value="buff">Buff</a-option>
+                <a-option value="achievement">成就</a-option>
+                <a-option value="equipment">装备</a-option>
+                <a-option value="fragment">碎片</a-option>
+              </a-select>
+            </a-form-item>
+          </a-col>
+        </a-row>
+        <a-row :gutter="16">
+          <a-col :span="12">
+            <a-form-item label="稀有度">
+              <a-select v-model="modalForm.rarity">
+                <a-option value="common">普通</a-option>
+                <a-option value="rare">稀有</a-option>
+                <a-option value="epic">史诗</a-option>
+                <a-option value="legendary">传说</a-option>
+              </a-select>
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="排序">
+              <a-input-number v-model="modalForm.sort" :min="0" style="width: 100%" />
+            </a-form-item>
+          </a-col>
+        </a-row>
+        <a-row :gutter="16">
+          <a-col :span="12">
+            <a-form-item label="图标">
+              <a-input v-model="modalForm.icon" placeholder="图标ID" />
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="分类">
+              <a-input v-model="modalForm.category" placeholder="可选分类" />
+            </a-form-item>
+          </a-col>
+        </a-row>
+        <a-row :gutter="16">
+          <a-col :span="12">
+            <a-form-item label="状态">
+              <a-radio-group v-model="modalForm.active">
+                <a-radio :value="true">启用</a-radio>
+                <a-radio :value="false">禁用</a-radio>
+              </a-radio-group>
+            </a-form-item>
+          </a-col>
+        </a-row>
       </a-form>
     </a-modal>
   </div>
@@ -228,6 +299,13 @@
     pagination.current = current;
     loadData();
   };
+  const onPageSizeChange = (pageSize: number) => {
+    formModel.value.page = 1;
+    formModel.value.pageSize = pageSize;
+    pagination.current = 1;
+    pagination.pageSize = pageSize;
+    loadData();
+  };
 
   const showCreateModal = () => {
     isEdit.value = false;
@@ -271,3 +349,16 @@
     });
   };
 </script>
+
+<style scoped lang="less">
+  .container {
+    padding: 20px;
+  }
+  :deep(.arco-table-th) {
+    &:last-child {
+      .arco-table-th-item-title {
+        margin-left: 16px;
+      }
+    }
+  }
+</style>

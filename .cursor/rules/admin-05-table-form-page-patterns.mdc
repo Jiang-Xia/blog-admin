@@ -12,3 +12,31 @@ alwaysApply: false
 - 删除、禁用、发布等风险操作必须可撤销或有明确确认弹窗。
 - 大列表请求要有 loading 与空态，不允许接口慢时页面无状态反馈。
 - 页面事件处理函数按“获取、提交、重置、状态切换”语义命名，便于维护。
+
+## 表格规范（参考 article/list.vue）
+
+- 表格禁用内置分页：`:pagination="false"`，使用外部 `<TablePagination>` 组件。
+- 表格滚动：`scrollbar` + `:scroll="{ x: <列宽之和>, y: 600 }"` + `:bordered="false"`。
+- 每列必须设置 `:width`；操作列 `fixed="right"` `:width="120"`。
+- 操作按钮：`size="mini" type="primary"` 编辑（`<icon-edit />`），`status="danger"` 删除（`<icon-delete />`）。
+- 操作列 header 对齐：
+
+```less
+:deep(.arco-table-th:last-child .arco-table-th-item-title) {
+  margin-left: 16px;
+}
+```
+
+## 分页规范（TablePagination 组件）
+
+- **禁止**在页面中单独写 `a-pagination` 或自定义分页布局，统一使用 `<TablePagination>`。
+- 必传 `:total`、`:current`、`:page-size`。
+- 展示：总条数 + 当前页条数范围（第 X-Y 条）+ 跳转页 + 每页条数。
+- 事件：`@change` 翻页，`@page-size-change` 重置到第 1 页并同步 `formModel.pageSize`。
+
+## RPG 编辑弹框规范（参考 rpg/achievement.vue）
+
+- 弹框宽度 `:width="720"`。
+- 表单布局：`:label-col-props="{ span: 7 }"` + `:wrapper-col-props="{ span: 17 }"`。
+- 字段双列：`a-row :gutter="16"` + `a-col :span="12"`。
+- 状态类字段使用 `a-radio-group`。

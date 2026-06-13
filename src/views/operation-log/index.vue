@@ -86,10 +86,11 @@
       <a-table
         :loading="loading"
         row-key="id"
-        :pagination="pagination"
+        :pagination="false"
         :data="tableData"
         :bordered="false"
-        @page-change="onPageChange"
+        scrollbar
+        :scroll="{ x: 1320, y: 600 }"
       >
         <template #columns>
           <a-table-column :title="t('operationLog.table.id')" data-index="id" :width="70" />
@@ -127,6 +128,7 @@
             :title="t('operationLog.table.description')"
             data-index="description"
             :ellipsis="true"
+            :width="180"
           />
           <a-table-column :title="t('operationLog.table.ip')" data-index="ip" :width="130" />
           <a-table-column
@@ -164,6 +166,13 @@
           </a-table-column>
         </template>
       </a-table>
+      <TablePagination
+        :total="pagination.total"
+        :current="pagination.current"
+        :page-size="pagination.pageSize"
+        @change="onPageChange"
+        @page-size-change="onPageSizeChange"
+      />
     </a-card>
 
     <!-- 请求体详情弹窗 -->
@@ -270,6 +279,14 @@
   const onPageChange = (current: number) => {
     formModel.value.page = current;
     pagination.current = current;
+    loadData();
+  };
+
+  const onPageSizeChange = (pageSize: number) => {
+    formModel.value.page = 1;
+    formModel.value.pageSize = pageSize;
+    pagination.current = 1;
+    pagination.pageSize = pageSize;
     loadData();
   };
 

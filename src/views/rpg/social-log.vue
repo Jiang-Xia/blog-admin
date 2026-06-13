@@ -7,12 +7,14 @@
             row-key="id"
             :loading="loading"
             :data="tipData"
-            :pagination="tipPagination"
-            @page-change="onTipPageChange"
+            :pagination="false"
+            :bordered="false"
+            scrollbar
+            :scroll="{ x: 800, y: 600 }"
           >
             <template #columns>
-              <a-table-column title="ID" data-index="id" />
-              <a-table-column title="文章ID" data-index="articleId" />
+              <a-table-column title="ID" data-index="id" :width="70" />
+              <a-table-column title="文章ID" data-index="articleId" :width="90" />
               <a-table-column title="打赏者" data-index="fromUid" :width="140">
                 <template #cell="{ record }">
                   <div>{{ record.fromUid }}</div>
@@ -25,7 +27,7 @@
                   <div class="user-name">{{ formatUserName(record, 'to') }}</div>
                 </template>
               </a-table-column>
-              <a-table-column title="碎片" data-index="amount" />
+              <a-table-column title="碎片" data-index="amount" :width="80" align="center" />
               <a-table-column title="时间" data-index="createTime" :width="170">
                 <template #cell="{ record }">
                   {{
@@ -37,17 +39,26 @@
               </a-table-column>
             </template>
           </a-table>
+          <TablePagination
+            :total="tipPagination.total"
+            :current="tipPagination.current"
+            :page-size="tipPagination.pageSize"
+            @change="onTipPageChange"
+            @page-size-change="onTipPageSizeChange"
+          />
         </a-tab-pane>
         <a-tab-pane key="social" title="社交流水">
           <a-table
             row-key="id"
             :loading="loading"
             :data="socialData"
-            :pagination="socialPagination"
-            @page-change="onSocialPageChange"
+            :pagination="false"
+            :bordered="false"
+            scrollbar
+            :scroll="{ x: 900, y: 600 }"
           >
             <template #columns>
-              <a-table-column title="ID" data-index="id" />
+              <a-table-column title="ID" data-index="id" :width="70" />
               <a-table-column title="发起者" data-index="fromUid" :width="140">
                 <template #cell="{ record }">
                   <div>{{ record.fromUid }}</div>
@@ -60,13 +71,18 @@
                   <div class="user-name">{{ formatUserName(record, 'to') }}</div>
                 </template>
               </a-table-column>
-              <a-table-column title="动作" data-index="action">
+              <a-table-column title="动作" data-index="action" :width="100">
                 <template #cell="{ record }">
                   <a-tag>{{ socialActionLabel(record.action) }}</a-tag>
                 </template>
               </a-table-column>
-              <a-table-column title="消耗碎片" data-index="costFragments" />
-              <a-table-column title="生命变化" data-index="hpDelta" />
+              <a-table-column
+                title="消耗碎片"
+                data-index="costFragments"
+                :width="90"
+                align="center"
+              />
+              <a-table-column title="生命变化" data-index="hpDelta" :width="90" align="center" />
               <a-table-column title="时间" data-index="createTime" :width="170">
                 <template #cell="{ record }">
                   {{
@@ -78,6 +94,13 @@
               </a-table-column>
             </template>
           </a-table>
+          <TablePagination
+            :total="socialPagination.total"
+            :current="socialPagination.current"
+            :page-size="socialPagination.pageSize"
+            @change="onSocialPageChange"
+            @page-size-change="onSocialPageSizeChange"
+          />
         </a-tab-pane>
       </a-tabs>
     </a-card>
@@ -107,8 +130,6 @@
   const activeTab = ref('tips');
   const tipData = ref<any[]>([]);
   const socialData = ref<any[]>([]);
-  const tipPage = ref(1);
-  const socialPage = ref(1);
   const basePagination: Pagination = { current: 1, pageSize: 20, total: 0 };
   const tipPagination = reactive({ ...basePagination });
   const socialPagination = reactive({ ...basePagination });
@@ -116,10 +137,12 @@
   const loadTips = async () => {
     setLoading(true);
     try {
-      const res: any = await getTipLogList({ page: tipPage.value, pageSize: 20 });
+      const res: any = await getTipLogList({
+        page: tipPagination.current,
+        pageSize: tipPagination.pageSize,
+      });
       tipData.value = res.data.list;
       tipPagination.total = res.data.pagination.total;
-      tipPagination.current = tipPage.value;
     } finally {
       setLoading(false);
     }
@@ -128,10 +151,12 @@
   const loadSocial = async () => {
     setLoading(true);
     try {
-      const res: any = await getSocialLogList({ page: socialPage.value, pageSize: 20 });
+      const res: any = await getSocialLogList({
+        page: socialPagination.current,
+        pageSize: socialPagination.pageSize,
+      });
       socialData.value = res.data.list;
       socialPagination.total = res.data.pagination.total;
-      socialPagination.current = socialPage.value;
     } finally {
       setLoading(false);
     }
@@ -144,11 +169,21 @@
   };
 
   const onTipPageChange = (current: number) => {
-    tipPage.value = current;
+    tipPagination.current = current;
+    loadTips();
+  };
+  const onTipPageSizeChange = (pageSize: number) => {
+    tipPagination.current = 1;
+    tipPagination.pageSize = pageSize;
     loadTips();
   };
   const onSocialPageChange = (current: number) => {
-    socialPage.value = current;
+    socialPagination.current = current;
+    loadSocial();
+  };
+  const onSocialPageSizeChange = (pageSize: number) => {
+    socialPagination.current = 1;
+    socialPagination.pageSize = pageSize;
     loadSocial();
   };
 </script>

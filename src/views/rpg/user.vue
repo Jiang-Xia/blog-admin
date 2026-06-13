@@ -3,7 +3,7 @@
     <a-card class="general-card" title="RPG统计概览" style="margin-bottom: 16px">
       <a-spin :loading="statsLoading" style="width: 100%">
         <a-row :gutter="16">
-          <a-col :span="3" v-for="item in statsItems" :key="item.key">
+          <a-col :span="6" v-for="item in statsItems" :key="item.key">
             <a-statistic
               :title="item.title"
               :value="stats[item.key] ?? 0"
@@ -65,10 +65,11 @@
       <a-table
         :loading="loading"
         row-key="id"
-        :pagination="pagination"
+        :pagination="false"
         :data="tableData"
         :bordered="false"
-        @page-change="onPageChange"
+        scrollbar
+        :scroll="{ x: 1200, y: 600 }"
       >
         <template #columns>
           <a-table-column title="用户ID" data-index="uid" :width="70" />
@@ -126,24 +127,39 @@
               </a-tag>
             </template>
           </a-table-column>
-          <a-table-column title="操作" data-index="operations" :width="80">
+          <a-table-column title="操作" data-index="operations" :width="80" fixed="right">
             <template #cell="{ record }">
-              <a-button size="mini" type="text" @click="showDetail(record)">详情</a-button>
+              <a-button size="mini" type="primary" @click="showDetail(record)">
+                <icon-eye />
+              </a-button>
             </template>
           </a-table-column>
         </template>
       </a-table>
+      <TablePagination
+        :total="pagination.total"
+        :current="pagination.current"
+        :page-size="pagination.pageSize"
+        @change="onPageChange"
+        @page-size-change="onPageSizeChange"
+      />
     </a-card>
 
-    <a-modal v-model:visible="detailVisible" title="用户RPG详情" :width="720" :footer="false">
+    <a-modal
+      v-model:visible="detailVisible"
+      title="用户RPG详情"
+      :width="960"
+      :footer="false"
+      :body-style="{ maxHeight: '70vh', overflow: 'auto', padding: '16px 20px' }"
+    >
       <a-spin :loading="detailLoading" style="width: 100%">
         <template v-if="detailData">
           <a-descriptions
-            title="基本信息"
-            :column="3"
+            title="用户概览"
+            :column="4"
             bordered
             size="small"
-            style="margin-bottom: 16px"
+            style="margin-bottom: 12px"
           >
             <a-descriptions-item label="UID">{{ detailData.uid }}</a-descriptions-item>
             <a-descriptions-item label="昵称">{{
@@ -152,15 +168,11 @@
             <a-descriptions-item label="Email">{{
               detailData.user?.email || '-'
             }}</a-descriptions-item>
-          </a-descriptions>
-
-          <a-descriptions
-            title="RPG数据"
-            :column="4"
-            bordered
-            size="small"
-            style="margin-bottom: 16px"
-          >
+            <a-descriptions-item label="禁言状态">
+              <a-tag :color="isBanned(detailData) ? 'red' : 'green'" size="small">
+                {{ isBanned(detailData) ? '禁言中' : '正常' }}
+              </a-tag>
+            </a-descriptions-item>
             <a-descriptions-item label="等级">LV{{ detailData.level }}</a-descriptions-item>
             <a-descriptions-item label="经验值">{{ detailData.exp }}</a-descriptions-item>
             <a-descriptions-item label="生命值">{{ detailData.lifeValue }}</a-descriptions-item>
@@ -176,25 +188,26 @@
             <a-descriptions-item label="敏感词命中">{{
               detailData.sensitiveHitsCount
             }}</a-descriptions-item>
-            <a-descriptions-item label="禁言状态">
-              <a-tag :color="isBanned(detailData) ? 'red' : 'green'" size="small">
-                {{ isBanned(detailData) ? '禁言中' : '正常' }}
-              </a-tag>
-            </a-descriptions-item>
           </a-descriptions>
 
           <h4 style="margin-bottom: 8px">成就进度 ({{ detailData.achievements?.length || 0 }})</h4>
           <a-table
-            v-if="detailData.achievements?.length"
-            :data="detailData.achievements"
+            :data="detailData.achievements || []"
             :pagination="false"
             size="small"
             :bordered="false"
-            style="margin-bottom: 16px"
+            :scroll="{ y: 200 }"
+            style="margin-bottom: 12px"
           >
             <template #columns>
-              <a-table-column title="编码" data-index="achievementCode" :width="150" />
-              <a-table-column title="进度" data-index="progress" :width="80" align="center" />
+              <a-table-column title="名称" data-index="name" :width="120" ellipsis tooltip />
+              <a-table-column title="编码" data-index="achievementCode" :width="130" ellipsis />
+              <a-table-column title="进度" :width="100" align="center">
+                <template #cell="{ record }">
+                  {{ record.progress }}/{{ record.maxProgress }}
+                </template>
+              </a-table-column>
+              <a-table-column title="经验奖励" data-index="expReward" :width="90" align="center" />
               <a-table-column title="已完成" :width="80" align="center">
                 <template #cell="{ record }">
                   <a-tag :color="record.completed ? 'green' : 'gray'" size="small">
@@ -202,20 +215,33 @@
                   </a-tag>
                 </template>
               </a-table-column>
+              <a-table-column title="完成时间" :width="160">
+                <template #cell="{ record }">
+                  {{
+                    record.completedAt ? $dayjs(record.completedAt).format('YYYY-MM-DD HH:mm') : '-'
+                  }}
+                </template>
+              </a-table-column>
             </template>
           </a-table>
 
           <h4 style="margin-bottom: 8px">今日任务 ({{ detailData.questProgress?.length || 0 }})</h4>
           <a-table
-            v-if="detailData.questProgress?.length"
-            :data="detailData.questProgress"
+            :data="detailData.questProgress || []"
             :pagination="false"
             size="small"
             :bordered="false"
+            :scroll="{ y: 200 }"
           >
             <template #columns>
-              <a-table-column title="编码" data-index="questCode" :width="150" />
-              <a-table-column title="进度" data-index="progress" :width="80" align="center" />
+              <a-table-column title="名称" data-index="name" :width="120" ellipsis tooltip />
+              <a-table-column title="编码" data-index="questCode" :width="130" ellipsis />
+              <a-table-column title="进度" :width="100" align="center">
+                <template #cell="{ record }">
+                  {{ record.progress }}/{{ record.targetCount }}
+                </template>
+              </a-table-column>
+              <a-table-column title="经验奖励" data-index="expReward" :width="90" align="center" />
               <a-table-column title="已完成" :width="80" align="center">
                 <template #cell="{ record }">
                   <a-tag :color="record.completed ? 'green' : 'gray'" size="small">{{
@@ -241,7 +267,7 @@
 <script lang="ts" setup>
   import { ref, reactive } from 'vue';
   import type { Pagination } from '@/types/global';
-  import { IconSearch, IconRefresh } from '@arco-design/web-vue/es/icon';
+  import { IconSearch, IconRefresh, IconEye } from '@arco-design/web-vue/es/icon';
   import { getUserRpgList, getUserRpgDetail, getRpgStats } from '@/api/rpg';
   import useLoading from '@/hooks/loading';
 
@@ -316,6 +342,14 @@
   const onPageChange = (current: number) => {
     formModel.value.page = current;
     pagination.current = current;
+    loadData();
+  };
+
+  const onPageSizeChange = (pageSize: number) => {
+    formModel.value.page = 1;
+    formModel.value.pageSize = pageSize;
+    pagination.current = 1;
+    pagination.pageSize = pageSize;
     loadData();
   };
 

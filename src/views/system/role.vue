@@ -56,20 +56,32 @@
       <a-table
         :loading="loading"
         row-key="id"
-        :pagination="pagination"
+        :pagination="false"
         :data="renderData"
         :bordered="false"
-        @page-change="onPageChange"
+        scrollbar
+        :scroll="{ x: 720, y: 600 }"
       >
         <template #columns>
-          <a-table-column :title="t('system.table.roleId')" data-index="id" align="center" />
+          <a-table-column
+            :title="t('system.table.roleId')"
+            data-index="id"
+            align="center"
+            :width="100"
+          />
           <a-table-column
             :title="t('system.table.roleName')"
             data-index="roleName"
             align="center"
+            :width="160"
           />
-          <a-table-column :title="t('system.table.roleDesc')" data-index="roleDesc" />
-          <a-table-column :title="t('role.table.operation')" data-index="operations">
+          <a-table-column :title="t('system.table.roleDesc')" data-index="roleDesc" :width="340" />
+          <a-table-column
+            :title="t('role.table.operation')"
+            data-index="operations"
+            :width="120"
+            fixed="right"
+          >
             <template #cell="{ record }">
               <a-space :size="8">
                 <a-button
@@ -94,6 +106,13 @@
           </a-table-column>
         </template>
       </a-table>
+      <TablePagination
+        :total="pagination.total"
+        :current="pagination.current"
+        :page-size="pagination.pageSize"
+        @change="onPageChange"
+        @page-size-change="onPageSizeChange"
+      />
     </a-card>
     <add-modal ref="addRef" @success="search"></add-modal>
   </div>
@@ -143,6 +162,13 @@
   };
   const onPageChange = (current: number) => {
     getTableListHandle(current);
+  };
+  const onPageSizeChange = (pageSize: number) => {
+    formModel.value.page = 1;
+    formModel.value.pageSize = pageSize;
+    pagination.current = 1;
+    pagination.pageSize = pageSize;
+    getTableListHandle(1);
   };
   getTableListHandle();
   const reset = () => {

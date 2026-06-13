@@ -86,14 +86,19 @@
       <a-table
         :loading="loading"
         row-key="id"
-        :pagination="pagination"
+        :pagination="false"
         :data="tableData"
         :bordered="false"
-        @page-change="onPageChange"
+        scrollbar
+        :scroll="{ x: 1100, y: 600 }"
       >
         <template #columns>
-          <a-table-column :title="t('sensitiveWord.table.word')" data-index="word" />
-          <a-table-column :title="t('sensitiveWord.table.category')" data-index="category" />
+          <a-table-column :title="t('sensitiveWord.table.word')" data-index="word" :width="140" />
+          <a-table-column
+            :title="t('sensitiveWord.table.category')"
+            data-index="category"
+            :width="120"
+          />
           <a-table-column title="等级" data-index="level" :width="70" />
           <a-table-column title="扣HP" data-index="hpPenalty" :width="70" />
           <a-table-column title="需审核" data-index="needReview" :width="80">
@@ -106,7 +111,7 @@
               {{ record.action === 2 ? '拒绝' : record.action === 3 ? '仅记录' : '替换' }}
             </template>
           </a-table-column>
-          <a-table-column :title="t('sensitiveWord.table.status')" data-index="status">
+          <a-table-column :title="t('sensitiveWord.table.status')" data-index="status" :width="100">
             <template #cell="{ record }">
               <a-tag :color="record.status === 1 ? 'green' : 'red'">
                 {{
@@ -117,7 +122,11 @@
               </a-tag>
             </template>
           </a-table-column>
-          <a-table-column :title="t('sensitiveWord.table.createTime')" data-index="createTime">
+          <a-table-column
+            :title="t('sensitiveWord.table.createTime')"
+            data-index="createTime"
+            :width="170"
+          >
             <template #cell="{ record }">
               {{ $dayjs(record.createTime).format('YYYY-MM-DD HH:mm:ss') }}
             </template>
@@ -125,7 +134,8 @@
           <a-table-column
             :title="t('sensitiveWord.table.operation')"
             data-index="operations"
-            :width="150"
+            :width="120"
+            fixed="right"
           >
             <template #cell="{ record }">
               <a-space :size="8">
@@ -140,6 +150,13 @@
           </a-table-column>
         </template>
       </a-table>
+      <TablePagination
+        :total="pagination.total"
+        :current="pagination.current"
+        :page-size="pagination.pageSize"
+        @change="onPageChange"
+        @page-size-change="onPageSizeChange"
+      />
     </a-card>
 
     <!-- 新增/编辑弹窗 -->
@@ -278,6 +295,14 @@
   const onPageChange = (current: number) => {
     formModel.value.page = current;
     pagination.current = current;
+    loadData();
+  };
+
+  const onPageSizeChange = (pageSize: number) => {
+    formModel.value.page = 1;
+    formModel.value.pageSize = pageSize;
+    pagination.current = 1;
+    pagination.pageSize = pageSize;
     loadData();
   };
 

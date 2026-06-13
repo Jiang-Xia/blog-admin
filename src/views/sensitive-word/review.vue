@@ -72,10 +72,11 @@
       <a-table
         :loading="loading"
         row-key="id"
-        :pagination="pagination"
+        :pagination="false"
         :data="tableData"
         :bordered="false"
-        @page-change="onPageChange"
+        scrollbar
+        :scroll="{ x: 1200, y: 600 }"
       >
         <template #columns>
           <a-table-column
@@ -169,7 +170,7 @@
           <a-table-column
             :title="t('sensitiveWordReview.table.operation')"
             data-index="operations"
-            :width="150"
+            :width="120"
             fixed="right"
           >
             <template #cell="{ record }">
@@ -191,6 +192,13 @@
           </a-table-column>
         </template>
       </a-table>
+      <TablePagination
+        :total="pagination.total"
+        :current="pagination.current"
+        :page-size="pagination.pageSize"
+        @change="onPageChange"
+        @page-size-change="onPageSizeChange"
+      />
     </a-card>
   </div>
 </template>
@@ -273,6 +281,14 @@
   const onPageChange = (current: number) => {
     formModel.value.page = current;
     pagination.current = current;
+    loadData();
+  };
+
+  const onPageSizeChange = (pageSize: number) => {
+    formModel.value.page = 1;
+    formModel.value.pageSize = pageSize;
+    pagination.current = 1;
+    pagination.pageSize = pageSize;
     loadData();
   };
 

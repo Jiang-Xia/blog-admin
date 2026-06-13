@@ -1,35 +1,56 @@
 <template>
   <div class="container">
     <a-card class="general-card" title="公会管理">
-      <a-row style="margin-bottom: 16px">
-        <a-col :span="8">
-          <a-input v-model="formModel.keyword" placeholder="公会名称" @press-enter="search" />
+      <a-row>
+        <a-col :flex="1">
+          <a-form label-align="left">
+            <a-row :gutter="16">
+              <a-col :span="8">
+                <a-form-item label="关键词">
+                  <a-input
+                    v-model="formModel.keyword"
+                    placeholder="公会名称"
+                    @press-enter="search"
+                  />
+                </a-form-item>
+              </a-col>
+            </a-row>
+          </a-form>
         </a-col>
-        <a-col :span="8" style="margin-left: 8px">
-          <a-space>
-            <a-button type="primary" @click="search"><icon-search />搜索</a-button>
-            <a-button @click="reset"><icon-refresh />重置</a-button>
+        <a-col :span="5" style="text-align: right">
+          <a-space :size="8">
+            <a-button type="primary" @click="search">
+              <template #icon><icon-search /></template>
+              搜索
+            </a-button>
+            <a-button @click="reset">
+              <template #icon><icon-refresh /></template>
+              重置
+            </a-button>
           </a-space>
         </a-col>
       </a-row>
+      <a-divider style="margin-top: 0" />
       <a-table
         row-key="id"
         :loading="loading"
         :data="tableData"
-        :pagination="pagination"
-        @page-change="onPageChange"
+        :pagination="false"
+        :bordered="false"
+        scrollbar
+        :scroll="{ x: 900, y: 600 }"
       >
         <template #columns>
-          <a-table-column title="ID" data-index="id" />
-          <a-table-column title="名称" data-index="name" />
-          <a-table-column title="成员数" data-index="memberCount" />
+          <a-table-column title="ID" data-index="id" :width="70" />
+          <a-table-column title="名称" data-index="name" :width="140" />
+          <a-table-column title="成员数" data-index="memberCount" :width="80" align="center" />
           <a-table-column title="会长" data-index="leaderUid" :width="140">
             <template #cell="{ record }">
               <div>{{ record.leaderUid }}</div>
               <div class="user-name">{{ formatLeaderName(record) }}</div>
             </template>
           </a-table-column>
-          <a-table-column title="公告" data-index="announcement" ellipsis />
+          <a-table-column title="公告" data-index="announcement" :width="200" ellipsis tooltip />
           <a-table-column title="创建时间" data-index="createTime" :width="170">
             <template #cell="{ record }">
               {{
@@ -37,15 +58,22 @@
               }}
             </template>
           </a-table-column>
-          <a-table-column title="操作">
+          <a-table-column title="操作" :width="80" fixed="right">
             <template #cell="{ record }">
-              <a-button type="text" size="small" status="danger" @click="handleDelete(record)">
-                <icon-delete />解散
+              <a-button size="mini" type="primary" status="danger" @click="handleDelete(record)">
+                <icon-delete />
               </a-button>
             </template>
           </a-table-column>
         </template>
       </a-table>
+      <TablePagination
+        :total="pagination.total"
+        :current="pagination.current"
+        :page-size="pagination.pageSize"
+        @change="onPageChange"
+        @page-size-change="onPageSizeChange"
+      />
     </a-card>
   </div>
 </template>
@@ -93,6 +121,13 @@
     pagination.current = current;
     loadData();
   };
+  const onPageSizeChange = (pageSize: number) => {
+    formModel.value.page = 1;
+    formModel.value.pageSize = pageSize;
+    pagination.current = 1;
+    pagination.pageSize = pageSize;
+    loadData();
+  };
 
   const handleDelete = (record: any) => {
     Modal.confirm({
@@ -114,5 +149,12 @@
   .user-name {
     color: var(--color-text-3);
     font-size: 12px;
+  }
+  :deep(.arco-table-th) {
+    &:last-child {
+      .arco-table-th-item-title {
+        margin-left: 16px;
+      }
+    }
   }
 </style>
