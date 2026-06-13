@@ -245,6 +245,7 @@
             username: values.username,
             password: values.password,
             authCode: values.authCode,
+            captchaId: captchaId.value,
           };
         } else {
           // 邮箱登录数据
@@ -277,6 +278,7 @@
         if (loginType.value === 'mobile' && shouldRefreshGraphicCaptcha(err?.bizCode)) {
           void changeAuthCodeUrl();
           userInfo.authCode = '';
+          captchaId.value = '';
         }
       } finally {
         setLoading(false);
@@ -294,14 +296,17 @@
     try {
       const res = await getAuthCode();
       authCodeUrl.value = `data:image/svg+xml;base64,${res.captchaBase64}`;
+      captchaId.value = res.captchaId || '';
       authCodeLoadError.value = false;
     } catch {
       authCodeUrl.value = '';
+      captchaId.value = '';
       authCodeLoadError.value = true;
       // 错误提示由 axios 全局拦截器统一处理
     }
   };
   const authCodeLoadError = ref(false);
+  const captchaId = ref('');
   const changeAuthCodeUrlDebounced = useDebounceFn(() => {
     void changeAuthCodeUrl();
   }, 300);

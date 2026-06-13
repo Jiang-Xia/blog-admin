@@ -76,7 +76,7 @@
         :data="renderData"
         :bordered="false"
         scrollbar
-        :scroll="{ x: 1280, y: 600 }"
+        :scroll="{ x: 1400, y: 600 }"
       >
         <template #columns>
           <a-table-column
@@ -104,7 +104,18 @@
             :width="120"
           />
           <a-table-column :title="t('user.table.nickname')" data-index="nickname" :width="120" />
-          <a-table-column :title="t('system.table.roleType')" data-index="role" :width="100" />
+          <a-table-column
+            :title="t('user.table.roles')"
+            data-index="roleNames"
+            align="center"
+            :width="150"
+          />
+          <a-table-column
+            :title="t('user.table.dept')"
+            data-index="deptName"
+            align="center"
+            :width="120"
+          />
           <a-table-column
             :title="t('user.table.createTime')"
             data-index="createTime"
@@ -226,7 +237,9 @@
     username: string;
     nickname: string;
     avatar: string;
-    role: string;
+    roleNames: string;
+    deptName: string;
+    role?: string;
     status: string;
     createTime?: string;
     updateTime?: string;

@@ -90,21 +90,20 @@
         :data="tableData"
         :bordered="false"
         scrollbar
-        :scroll="{ x: 1320, y: 600 }"
+        :scroll="{ x: 1300, y: 600 }"
       >
         <template #columns>
-          <a-table-column :title="t('operationLog.table.id')" data-index="id" :width="70" />
           <a-table-column
             :title="t('operationLog.table.username')"
             data-index="username"
-            :width="120"
+            :width="90"
           />
-          <a-table-column :title="t('operationLog.table.module')" data-index="module" :width="120">
+          <a-table-column :title="t('operationLog.table.module')" data-index="module" :width="110">
             <template #cell="{ record }">
               <a-tag color="arcoblue">{{ record.module }}</a-tag>
             </template>
           </a-table-column>
-          <a-table-column :title="t('operationLog.table.action')" data-index="action" :width="100">
+          <a-table-column :title="t('operationLog.table.action')" data-index="action" :width="90">
             <template #cell="{ record }">
               <a-tag :color="actionColorMap[record.action] || 'gray'">
                 {{ t(`operationLog.table.action.${record.action}`) || record.action }}
@@ -128,7 +127,7 @@
             :title="t('operationLog.table.description')"
             data-index="description"
             :ellipsis="true"
-            :width="180"
+            :width="280"
           />
           <a-table-column :title="t('operationLog.table.ip')" data-index="ip" :width="130" />
           <a-table-column
@@ -151,7 +150,7 @@
               {{ $dayjs(record.createTime).format('YYYY-MM-DD HH:mm:ss') }}
             </template>
           </a-table-column>
-          <a-table-column :title="t('operationLog.table.requestBody')" :width="80">
+          <a-table-column :title="t('operationLog.table.requestBody')" :width="80" fixed="right">
             <template #cell="{ record }">
               <a-button
                 v-if="record.requestBody"

@@ -101,7 +101,7 @@
               <a-tag>{{ questSubtypeLabel(record.questSubtype) }}</a-tag>
             </template>
           </a-table-column>
-          <a-table-column title="生命奖励" data-index="hpReward" :width="80" align="center" />
+          <a-table-column title="生命奖励" data-index="hpReward" :width="90" align="center" />
           <a-table-column title="排序" data-index="sort" :width="60" align="center" />
           <a-table-column title="状态" data-index="active" :width="80">
             <template #cell="{ record }">

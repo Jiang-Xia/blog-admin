@@ -10,6 +10,8 @@ export default {
   'user.table.username': 'Username',
   'user.table.nickname': 'Nickname',
   'user.table.mobile': 'Mobile',
+  'user.table.roles': 'Roles',
+  'user.table.dept': 'Department',
   'user.table.createTime': 'Create Time',
   'user.table.operation': 'Operation',
   'user.button.edit': 'Edit',

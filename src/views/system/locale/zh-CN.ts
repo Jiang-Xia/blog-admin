@@ -10,6 +10,8 @@ export default {
   'user.table.username': '账号',
   'user.table.nickname': '昵称',
   'user.table.mobile': '手机号',
+  'user.table.roles': '所属角色',
+  'user.table.dept': '所属部门',
   'user.table.createTime': '创建时间',
   'user.table.operation': '操作',
   'user.button.edit': '编辑',

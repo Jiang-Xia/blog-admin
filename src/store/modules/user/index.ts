@@ -85,6 +85,7 @@ const useUserStore = defineStore('user', {
             {
               mobile: mobileLogin.username,
               authCode: mobileLogin.authCode,
+              captchaId: mobileLogin.captchaId,
               password: rsaEncrypt(mobileLogin.password),
               admin: true,
             },

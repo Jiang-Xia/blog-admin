@@ -6,6 +6,7 @@ export interface MobileLoginData {
   username: string;
   password: string;
   authCode: string;
+  captchaId?: string;
 }
 
 export interface EmailLoginData {
