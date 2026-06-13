@@ -17,7 +17,11 @@
 
 ## 📖 项目简介
 
-Blog Admin 是一个基于 **Vue3**、**TypeScript**、**Vite** 和 **Arco Design Vue** 构建的现代化博客后台管理系统。该系统采用最新的前端技术栈，为个人博客提供完整的文章管理、用户管理、内容分类、标签管理等核心功能。
+Blog Admin 是一个基于 **Vue3**、**TypeScript**、**Vite** 和 **Arco Design Vue** 构建的现代化博客后台管理系统。该系统采用最新的前端技术栈，为个人博客提供完整的文章管理、用户管理、内容分类、标签管理、RPG 游戏化运营等核心功能。
+
+本仓库为博客三端架构中的**管理后台**，配套服务：
+- 后端 API：[blog-server](../blog-server)
+- 博客前台：[blog-home-nuxt](../blog-home-nuxt)
 
 ## ✨ 核心特性
 
@@ -37,6 +41,7 @@ Blog Admin 是一个基于 **Vue3**、**TypeScript**、**Vite** 和 **Arco Desig
 - **💬 评论系统** - 文章评论管理和审核
 - **🔗 链接管理** - 友情链接和资源链接管理
 - **📁 资源管理** - 文件上传、图片管理等
+- **🎮 RPG 管理** - 成就、任务、奖池、用户数据、物品配置、活动、公会、社交流水
 - **🌐 国际化支持** - 中英文双语支持
 - **📱 响应式设计** - 支持多设备访问
 
@@ -72,14 +77,40 @@ src/
     ├── system/       # 系统管理
     ├── comment/      # 评论管理
     ├── resource/     # 资源管理
+    ├── rpg/          # RPG 游戏化管理（8 个页面）
     └── login/        # 登录页面
 ```
+
+## 🏗️ 技术架构
+
+```
+浏览器
+  → Vue Router 路由
+    → views/*.vue（Arco Design 页面）
+      → src/api/*.ts（axios + JWT）
+        → blog-server /api/v1
+```
+
+- **内容编辑**：文章编辑页使用 `md-editor-v3`，提交 `content` + `contentHtml` 至后端
+- **权限控制**：基于后端 RBAC，菜单与按钮按角色/权限动态渲染
+- **路由模块**：`router/routes/modules/` 按业务域拆分（content、interaction、ext-apps 等）
 
 ## 🚀 快速开始
 
 ### 环境要求
 - Node.js >= 20.19.3
 - npm >= 10.8.2 或 yarn >= 1.22.0
+- 已启动的 [blog-server](../blog-server)
+
+### 环境配置
+
+修改 `.env.development`：
+
+```env
+VITE_API_BASE_URL=http://localhost:5000/api/v1
+VITE_PREFIX_PATH=/x-blog
+VITE_NUXT_OPEN_ENCRYPT=false
+```
 
 ### 推荐IDE
 - [VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.volar) - Vue3 官方推荐的开发工具
@@ -180,6 +211,21 @@ yarn type-check
 - 图片资源处理
 - 静态资源优化
 
+### RPG 管理 (`/ext-apps/rpg`)
+
+| 路由 | 页面 | 功能 |
+|------|------|------|
+| `/ext-apps/rpg/achievement` | 成就管理 | `rpg_item_config` CRUD |
+| `/ext-apps/rpg/quest` | 任务管理 | 每日/悬赏/特殊任务 CRUD |
+| `/ext-apps/rpg/lottery` | 奖池管理 | 抽奖池配置与记录 |
+| `/ext-apps/rpg/user` | 用户数据 | RPG 用户只读与统计 |
+| `/ext-apps/rpg/item-config` | 系统物品 | 称号/头像框/宠物等 CRUD |
+| `/ext-apps/rpg/activity` | 活动管理 | 赛季/节日活动 CRUD |
+| `/ext-apps/rpg/guild` | 公会管理 | 公会列表与删除 |
+| `/ext-apps/rpg/social-log` | 社交流水 | 打赏/社交互动记录 |
+
+详细后端文档见 [blog-server RPG 技术文档](../blog-server/src/modules/rpg/RPG-TECH.md)。
+
 ## 🎨 界面预览
 
 系统采用现代化的设计风格，包含：
@@ -201,6 +247,11 @@ yarn type-check
 ## 📄 开源协议
 
 本项目基于 [MIT License](./LICENSE) 开源协议。
+
+## 📚 相关文档
+
+- [blog-server README](../blog-server/README.md) - 后端 API 与部署
+- [blog-server RPG 技术文档](../blog-server/src/modules/rpg/RPG-TECH.md) - RPG 管理端接口
 
 ## 👨‍💻 作者
 
