@@ -208,7 +208,7 @@ export const getSocialLogList = (params: Record<string, any>) => {
 /** 超管充值钻石 */
 export const rechargeDiamonds = (uid: number, data: { amount: number; reason?: string }) => {
   return request({
-    url: `/admin/rpg/users/${uid}/diamonds`,
+    url: `/admin/rpg/users/${uid}/currency`,
     method: 'post',
     data,
   });

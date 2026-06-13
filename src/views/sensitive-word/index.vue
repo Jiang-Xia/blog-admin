@@ -191,9 +191,9 @@
         </a-form-item>
         <a-form-item label="等级">
           <a-select v-model="modalForm.level">
-            <a-option :value="1">1-轻</a-option>
-            <a-option :value="2">2-中</a-option>
-            <a-option :value="3">3-重</a-option>
+            <a-option :value="1">1-重(拒绝)</a-option>
+            <a-option :value="2">2-中(正能量替换)</a-option>
+            <a-option :value="3">3-轻(仅记录)</a-option>
           </a-select>
         </a-form-item>
         <a-form-item label="扣HP">

@@ -78,7 +78,7 @@
               </a-table-column>
               <a-table-column
                 title="消耗钻石"
-                data-index="costFragments"
+                data-index="costCurrency"
                 :width="90"
                 align="center"
               />

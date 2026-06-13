@@ -120,7 +120,7 @@
             </template>
           </a-table-column>
           <a-table-column title="抽奖券" data-index="lotteryTickets" :width="80" align="center" />
-          <a-table-column title="钻石" data-index="fragments" :width="80" align="center" />
+          <a-table-column title="钻石" data-index="currency" :width="80" align="center" />
           <a-table-column title="禁言状态" :width="90">
             <template #cell="{ record }">
               <a-tag :color="isBanned(record) ? 'red' : 'green'">
@@ -191,7 +191,7 @@
             <a-descriptions-item label="抽奖券">{{
               detailData.lotteryTickets
             }}</a-descriptions-item>
-            <a-descriptions-item label="钻石">{{ detailData.fragments ?? 0 }}</a-descriptions-item>
+            <a-descriptions-item label="钻石">{{ detailData.currency ?? 0 }}</a-descriptions-item>
             <a-descriptions-item label="累计签到">{{
               detailData.totalSignDays
             }}</a-descriptions-item>
