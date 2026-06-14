@@ -11,14 +11,14 @@
   }
   const { logout } = useUser();
   const { t } = useI18n();
-  const { email, nickname, mobile, homepage, intro, avatar, id: uid } = useUserStore();
+  const { email, nickname, username, homepage, intro, avatar, id: uid } = useUserStore();
   const visible = ref(false);
   const form = reactive({
     password: '',
     passwordRepeat: '',
     passwordOld: '',
     nickname,
-    mobile,
+    username,
     email,
     homepage,
     intro,
@@ -59,7 +59,7 @@
   // 修改除了密码之外的信息
   const handleFinish = async (values: any) => {
     // console.log('values', values)
-    const keys: string[] = ['nickname', 'mobile', 'homepage', 'intro', 'avatar'];
+    const keys: string[] = ['nickname', 'homepage', 'intro', 'avatar'];
     const obj: stringKey = {};
     keys.forEach((v: string) => {
       obj[v] = values[v];
@@ -87,10 +87,10 @@
       </template>
 
       <a-form :model="form" auto-label-width @submit-success="handleFinish">
-        <a-form-item v-if="form.mobile" field="mobile" :label="t('user.form.mobile')">
+        <a-form-item v-if="form.username" field="username" :label="t('user.form.username')">
           <a-input
-            v-model="form.mobile"
-            :placeholder="t('user.form.placeholder.mobile')"
+            v-model="form.username"
+            :placeholder="t('user.form.placeholder.username')"
             disabled
           />
         </a-form-item>

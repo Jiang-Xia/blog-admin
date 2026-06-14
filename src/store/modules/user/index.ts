@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { type LoginData, type MobileLoginData, type EmailLoginData } from '@/api/user';
+import { type LoginData, type AccountLoginData, type EmailLoginData } from '@/api/user';
 import { setToken, clearToken, getToken } from '@/utils/auth';
 import { removeRouteListener } from '@/utils/route-listener';
 import { userInfo, userLogin } from '@/api/login';
@@ -10,7 +10,7 @@ import useAppStore from '../app';
 interface UserState {
   email: string;
   nickname: string;
-  mobile: string;
+  username: string;
   token: string;
   id: number;
   role: string;
@@ -29,7 +29,7 @@ const useUserStore = defineStore('user', {
   state: (): UserState => ({
     email: '',
     nickname: '',
-    mobile: '',
+    username: '',
     token: getToken(),
     id: 0,
     role: '',
@@ -79,17 +79,17 @@ const useUserStore = defineStore('user', {
       try {
         // 判断是手机号登录还是邮箱登录
         if ('username' in loginForm && 'authCode' in loginForm) {
-          // 手机号登录
-          const mobileLogin = loginForm as MobileLoginData;
+          // 账号登录
+          const accountLogin = loginForm as AccountLoginData;
           const res = await userLogin(
             {
-              mobile: mobileLogin.username,
-              authCode: mobileLogin.authCode,
-              captchaId: mobileLogin.captchaId,
-              password: rsaEncrypt(mobileLogin.password),
+              username: accountLogin.username,
+              authCode: accountLogin.authCode,
+              captchaId: accountLogin.captchaId,
+              password: rsaEncrypt(accountLogin.password),
               admin: true,
             },
-            'mobile',
+            'account',
           );
           const user = res.info.user as UserState;
           setToken(res.info.token);

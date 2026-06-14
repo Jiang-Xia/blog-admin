@@ -12,15 +12,6 @@
           >
             <a-row :gutter="16">
               <a-col :span="6">
-                <a-form-item :label="t('user.form.mobile')">
-                  <a-input
-                    v-model="formModel.mobile"
-                    :placeholder="t('user.form.placeholder.mobile')"
-                    allow-clear
-                  />
-                </a-form-item>
-              </a-col>
-              <a-col :span="6">
                 <a-form-item :label="t('user.form.username')">
                   <a-input
                     v-model="formModel.username"
@@ -83,8 +74,8 @@
       >
         <template #columns>
           <a-table-column
-            :title="t('user.table.mobile')"
-            data-index="mobile"
+            :title="t('user.table.username')"
+            data-index="username"
             align="center"
             :width="130"
           />
@@ -100,12 +91,6 @@
               </a-avatar>
             </template>
           </a-table-column>
-          <a-table-column
-            :title="t('user.table.username')"
-            data-index="username"
-            align="center"
-            :width="120"
-          />
           <a-table-column :title="t('user.table.nickname')" data-index="nickname" :width="120" />
           <a-table-column
             :title="t('user.table.roles')"
@@ -227,7 +212,6 @@
       page: 1,
       pageSize: 10,
       total: 0,
-      mobile: '',
       nickname: '',
       username: '',
     };
@@ -236,7 +220,6 @@
   const { t } = useI18n();
   interface User {
     id: string;
-    mobile: string;
     username: string;
     nickname: string;
     avatar: string;
@@ -290,7 +273,7 @@
     const record = renderData.value.find((item) => item.id === id);
     Modal.confirm({
       title: t('user.confirm.delete'),
-      content: `确定删除用户 ${record?.nickname || record?.mobile || '该用户'} 吗？`,
+      content: `确定删除用户 ${record?.nickname || record?.username || '该用户'} 吗？`,
       onOk: async () => {
         const res = await request.delete('/user', { params: { id } });
         Message.success(t('user.message.deleteSuccess'));
@@ -308,13 +291,13 @@
     addRef.value.show({ type, id });
   };
   const resetHandle = async (record: any) => {
-    const { mobile, nickname } = record;
-    const userName = record?.nickname || record?.mobile || t('user.label.thisUser');
+    const { username, nickname } = record;
+    const userName = record?.nickname || record?.username || t('user.label.thisUser');
     Modal.confirm({
       title: t('user.confirm.resetPassword'),
       content: t('user.confirm.resetPasswordContent', { user: userName }),
       onOk: async () => {
-        const res = await request.post('/user/resetPassword', { mobile, nickname });
+        const res = await request.post('/user/resetPassword', { username, nickname });
         Message.success(t('user.message.resetPasswordSuccess'));
       },
     });

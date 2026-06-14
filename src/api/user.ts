@@ -2,7 +2,7 @@ import request from '@/api/request';
 import type { RouteRecordNormalized } from 'vue-router';
 import type { UserState } from '@/store/modules/user/types';
 
-export interface MobileLoginData {
+export interface AccountLoginData {
   username: string;
   password: string;
   authCode: string;
@@ -15,7 +15,7 @@ export interface EmailLoginData {
   verificationCode: string;
 }
 
-export type LoginData = MobileLoginData | EmailLoginData;
+export type LoginData = AccountLoginData | EmailLoginData;
 
 export interface LoginRes {
   token: string;
@@ -52,8 +52,7 @@ export function sendEmailCaptcha(email: string) {
 // 管理员创建用户
 export interface AdminCreateUserData {
   nickname: string;
-  username?: string;
-  mobile: string;
+  username: string;
   email?: string;
   password: string;
   roleIds?: number[];
