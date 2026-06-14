@@ -16,6 +16,7 @@
                   <a-input
                     v-model="formModel.title"
                     :placeholder="t('category.form.placeholder.name')"
+                    allow-clear
                   />
                 </a-form-item>
               </a-col>

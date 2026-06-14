@@ -15,6 +15,7 @@
                   <a-input
                     v-model="formModel.keyword"
                     :placeholder="t('sensitiveWord.form.placeholder.keyword')"
+                    allow-clear
                     @press-enter="search"
                   />
                 </a-form-item>
@@ -171,6 +172,7 @@
           <a-input
             v-model="modalForm.word"
             :placeholder="t('sensitiveWord.form.placeholder.word')"
+            allow-clear
           />
         </a-form-item>
         <a-form-item :label="t('sensitiveWord.form.categoryLabel')">
@@ -196,9 +198,7 @@
             <a-option :value="3">3-轻(仅记录)</a-option>
           </a-select>
         </a-form-item>
-        <a-form-item label="扣HP">
-          <a-input-number v-model="modalForm.hpPenalty" :min="0" :max="100" />
-        </a-form-item>
+        <a-form-item label="扣HP"> </a-form-item>
         <a-form-item label="需审核">
           <a-radio-group v-model="modalForm.needReview">
             <a-radio :value="1">是</a-radio>

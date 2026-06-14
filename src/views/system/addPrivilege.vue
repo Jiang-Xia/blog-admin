@@ -27,6 +27,7 @@
           v-model="formState.privilegeName"
           :max-length="20"
           :placeholder="t('privilege.form.placeholder.privilegeName')"
+          allow-clear
         />
       </a-form-item>
       <a-form-item
@@ -37,6 +38,7 @@
         <a-input
           v-model="formState.privilegeCode"
           :placeholder="t('privilege.form.placeholder.privilegeCode')"
+          allow-clear
         />
       </a-form-item>
       <a-form-item
@@ -61,6 +63,7 @@
         <a-input
           v-model="formState.pathPattern"
           :placeholder="t('privilege.form.placeholder.pathPatternDetail')"
+          allow-clear
         />
       </a-form-item>
       <a-form-item :label="t('privilege.form.httpMethod')" name="httpMethod" field="httpMethod">

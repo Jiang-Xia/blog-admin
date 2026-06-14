@@ -2,6 +2,67 @@
   <div class="container">
     <!-- <Breadcrumb :items="['menu.list', 'menu.list.searchTable']" /> -->
     <a-card class="general-card" :title="t('link.query.title')">
+      <a-row>
+        <a-col :flex="1">
+          <a-form
+            :model="formModel"
+            :label-col-props="{ span: 6 }"
+            :wrapper-col-props="{ span: 18 }"
+            label-align="left"
+          >
+            <a-row :gutter="16">
+              <a-col :span="8">
+                <a-form-item :label="t('link.table.title')">
+                  <a-input
+                    v-model="formModel.title"
+                    :placeholder="t('link.form.placeholder.title')"
+                    allow-clear
+                    @press-enter="search"
+                  />
+                </a-form-item>
+              </a-col>
+              <a-col :span="8">
+                <a-form-item :label="t('link.table.website')">
+                  <a-input
+                    v-model="formModel.url"
+                    :placeholder="t('link.form.placeholder.url')"
+                    allow-clear
+                    @press-enter="search"
+                  />
+                </a-form-item>
+              </a-col>
+              <a-col :span="8">
+                <a-form-item :label="t('link.table.status')">
+                  <a-select
+                    v-model="formModel.agreed"
+                    :placeholder="t('link.form.placeholder.status')"
+                    allow-clear
+                  >
+                    <a-option :value="true">{{ t('link.status.approved') }}</a-option>
+                    <a-option :value="false">{{ t('link.status.pending') }}</a-option>
+                  </a-select>
+                </a-form-item>
+              </a-col>
+            </a-row>
+          </a-form>
+        </a-col>
+        <a-col :span="5" style="text-align: right">
+          <a-space :size="8">
+            <a-button type="primary" @click="search">
+              <template #icon>
+                <icon-search />
+              </template>
+              {{ t('common.button.search') }}
+            </a-button>
+            <a-button @click="reset">
+              <template #icon>
+                <icon-refresh />
+              </template>
+              {{ t('common.button.reset') }}
+            </a-button>
+          </a-space>
+        </a-col>
+      </a-row>
       <a-row style="margin-bottom: 16px">
         <a-col :span="16">
           <!-- <a-space>
@@ -94,14 +155,10 @@
   const generateFormModel = () => {
     return {
       page: 1,
-      category: '',
-      tags: [],
       pageSize: 20,
-      total: 0,
       title: '',
-      description: '',
-      content: '',
-      uid: 1,
+      url: '',
+      agreed: undefined as boolean | undefined,
     };
   };
   const { loading, setLoading } = useLoading(true);
@@ -118,7 +175,13 @@
   });
   const getListHandle = async (val = 1) => {
     setLoading(true);
-    const res = await request.get('/link');
+    const params: Record<string, unknown> = {};
+    if (formModel.value.title) params.title = formModel.value.title;
+    if (formModel.value.url) params.url = formModel.value.url;
+    if (formModel.value.agreed !== undefined && formModel.value.agreed !== null) {
+      params.agreed = formModel.value.agreed;
+    }
+    const res = await request.get('/link', { params });
     renderData.value = res.data;
     pagination.total = res.data.length;
     setLoading(false);
@@ -149,6 +212,7 @@
   getListHandle();
   const reset = () => {
     formModel.value = generateFormModel();
+    search();
   };
   const delHandle = async (id: number) => {
     Modal.confirm({

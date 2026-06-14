@@ -16,6 +16,7 @@
                   <a-input
                     v-model="formModel.deptName"
                     :placeholder="t('dept.form.placeholder.name')"
+                    allow-clear
                   />
                 </a-form-item>
               </a-col>
@@ -296,7 +297,11 @@
   const getTreeDataHandle = async () => {
     try {
       setLoading(true);
-      const res = await getDeptTree();
+      const { deptName, status } = formModel.value;
+      const params: Record<string, unknown> = {};
+      if (deptName) params.deptName = deptName;
+      if (status !== undefined && status !== null) params.status = status;
+      const res = await getDeptTree(params);
       treeData.value = res.data || [];
       treeTableData.value = res.data;
       setLoading(false);

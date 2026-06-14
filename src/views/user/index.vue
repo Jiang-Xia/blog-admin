@@ -102,16 +102,29 @@
             v-model="form.nickname"
             :max-length="11"
             :placeholder="t('user.form.placeholder.nickname')"
+            allow-clear
           />
         </a-form-item>
         <a-form-item field="avatar" :label="t('user.form.avatar')">
-          <a-input v-model="form.avatar" :placeholder="t('user.form.placeholder.avatar')" />
+          <a-input
+            v-model="form.avatar"
+            :placeholder="t('user.form.placeholder.avatar')"
+            allow-clear
+          />
         </a-form-item>
         <a-form-item field="homepage" :label="t('user.form.homepage')">
-          <a-input v-model="form.homepage" :placeholder="t('user.form.placeholder.homepage')" />
+          <a-input
+            v-model="form.homepage"
+            :placeholder="t('user.form.placeholder.homepage')"
+            allow-clear
+          />
         </a-form-item>
         <a-form-item field="intro" :label="t('user.form.intro')">
-          <a-input v-model="form.intro" :placeholder="t('user.form.placeholder.intro')" />
+          <a-input
+            v-model="form.intro"
+            :placeholder="t('user.form.placeholder.intro')"
+            allow-clear
+          />
         </a-form-item>
         <a-form-item>
           <a-button html-type="submit" type="primary">{{ t('common.button.save') }}</a-button>

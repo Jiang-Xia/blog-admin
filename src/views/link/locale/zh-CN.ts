@@ -1,6 +1,11 @@
 export default {
   // 友情链接管理
   'link.query.title': '友链查询',
+  'link.form.placeholder.title': '请输入标题',
+  'link.form.placeholder.url': '请输入网址',
+  'link.form.placeholder.status': '请选择状态',
+  'link.status.approved': '已通过',
+  'link.status.pending': '待审核',
   'link.button.add': '新建',
   'link.table.title': '标题',
   'link.table.icon': '图标',

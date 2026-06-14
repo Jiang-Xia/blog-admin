@@ -23,6 +23,7 @@
                 v-model="formState.title"
                 autocomplete="off"
                 :placeholder="t('article.form.title')"
+                allow-clear
               />
             </a-form-item>
             <a-form-item
@@ -43,6 +44,7 @@
                 v-model="formState.cover"
                 autocomplete="off"
                 :placeholder="t('article.form.placeholder.coverUrl')"
+                allow-clear
               />
             </a-form-item>
 

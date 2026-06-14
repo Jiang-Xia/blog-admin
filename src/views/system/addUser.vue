@@ -27,7 +27,11 @@
         />
       </a-form-item>
       <a-form-item :label="t('user.form.nickname')" name="nickname" field="nickname">
-        <a-input v-model="formState.nickname" :placeholder="t('user.form.placeholder.nickname')" />
+        <a-input
+          v-model="formState.nickname"
+          :placeholder="t('user.form.placeholder.nickname')"
+          allow-clear
+        />
       </a-form-item>
       <a-form-item
         v-if="type !== 'edit'"
@@ -36,7 +40,11 @@
         field="password"
         :max-length="16"
       >
-        <a-input v-model="formState.password" :placeholder="t('user.form.placeholder.password')" />
+        <a-input
+          v-model="formState.password"
+          :placeholder="t('user.form.placeholder.password')"
+          allow-clear
+        />
       </a-form-item>
       <a-form-item
         v-if="type !== 'edit'"
@@ -48,6 +56,7 @@
         <a-input
           v-model="formState.passwordRepeat"
           :placeholder="t('user.form.placeholder.passwordRepeat')"
+          allow-clear
         />
       </a-form-item>
 
@@ -83,7 +92,11 @@
       </a-form-item>
 
       <a-form-item :label="t('user.form.avatar')" name="avatar" field="avatar">
-        <a-input v-model="formState.avatar" :placeholder="t('user.form.placeholder.avatar')" />
+        <a-input
+          v-model="formState.avatar"
+          :placeholder="t('user.form.placeholder.avatar')"
+          allow-clear
+        />
       </a-form-item>
 
       <a-form-item :label="t('user.form.intro')" name="intro" field="intro">

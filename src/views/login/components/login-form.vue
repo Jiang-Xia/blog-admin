@@ -32,6 +32,7 @@
           <a-input
             v-model="userInfo.username"
             :placeholder="t('login.form.userName.placeholder')"
+            allow-clear
             :max-length="11"
           >
             <template #prefix>
@@ -65,6 +66,7 @@
           <a-input
             v-model="userInfo.authCode"
             :placeholder="t('login.form.imageCode.placeholder')"
+            allow-clear
             :max-length="6"
           >
             <template #suffix>
@@ -101,7 +103,11 @@
           :validate-trigger="['change', 'blur']"
           hide-label
         >
-          <a-input v-model="userInfo.email" :placeholder="t('login.form.email.placeholder')">
+          <a-input
+            v-model="userInfo.email"
+            allow-clear
+            :placeholder="t('login.form.email.placeholder')"
+          >
             <template #prefix>
               <icon-user />
             </template>
@@ -132,6 +138,7 @@
           <a-input-search
             v-model="userInfo.emailAuthCode"
             :placeholder="t('login.form.emailAuthCode.placeholder')"
+            allow-clear
             :max-length="6"
             search-button
             :disabled="emailCaptchaDisabled"

@@ -12,11 +12,12 @@
           >
             <a-row :gutter="16">
               <a-col :span="10">
-                <a-form-item :label="t('system.form.routeName')">
+                <a-form-item :label="t('menu.form.keyword')">
                   <a-input
-                    v-model="formModel.content"
-                    :placeholder="t('system.form.placeholder.routeName')"
-                    disabled
+                    v-model="formModel.keyword"
+                    :placeholder="t('menu.form.placeholder.keyword')"
+                    allow-clear
+                    @press-enter="search"
                   />
                 </a-form-item>
               </a-col>
@@ -154,7 +155,7 @@
       page: 1,
       pageSize: 10,
       total: 0,
-      content: '',
+      keyword: '',
     };
   };
   const { loading, setLoading } = useLoading(true);
@@ -175,15 +176,37 @@
     pagination.current = val;
     const res = await request.get('/admin/menu').then((res) => res.data);
     renderData.value = res;
-    pagination.total = res.length;
     setLoading(false);
   };
+
+  const flattenMenus = (nodes: any[]): any[] => {
+    if (!Array.isArray(nodes)) return [];
+    return nodes.flatMap((node) => {
+      const children = node.children || [];
+      return [node, ...flattenMenus(children)];
+    });
+  };
+
+  const allMenus = computed(() => flattenMenus(renderData.value as any[]));
+
+  const filteredMenus = computed(() => {
+    const kw = formModel.value.keyword?.trim().toLowerCase();
+    if (!kw) return allMenus.value;
+    return allMenus.value.filter((menu) =>
+      [menu.name, menu.menuCnName, menu.path, menu.id, menu.filePath].some((value) =>
+        String(value || '')
+          .toLowerCase()
+          .includes(kw),
+      ),
+    );
+  });
+
   const tableData = computed(() => {
     const start = (pagination.current - 1) * pagination.pageSize;
-    return renderData.value.slice(start, start + pagination.pageSize);
+    return filteredMenus.value.slice(start, start + pagination.pageSize);
   });
   watch(
-    () => renderData.value,
+    filteredMenus,
     (list) => {
       pagination.total = list.length;
     },
@@ -205,6 +228,7 @@
   getTableListHandle();
   const reset = () => {
     formModel.value = generateFormModel();
+    search();
   };
   const delHandle = async (id: any) => {
     Modal.confirm({

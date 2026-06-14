@@ -26,28 +26,53 @@
         />
       </a-form-item>
       <a-form-item :label="t('menu.form.parentId')" name="pid" field="pid">
-        <a-input v-model="formState.pid" :placeholder="t('menu.form.placeholder.parentId')" />
+        <a-input
+          v-model="formState.pid"
+          :placeholder="t('menu.form.placeholder.parentId')"
+          allow-clear
+        />
       </a-form-item>
       <a-form-item :label="t('menu.form.menuPath')" name="path" field="path">
-        <a-input v-model="formState.path" :placeholder="t('menu.form.placeholder.menuPath')" />
+        <a-input
+          v-model="formState.path"
+          :placeholder="t('menu.form.placeholder.menuPath')"
+          allow-clear
+        />
       </a-form-item>
       <a-form-item :label="t('menu.form.menuName')" name="name" field="name">
-        <a-input v-model="formState.name" :placeholder="t('menu.form.placeholder.menuName')" />
+        <a-input
+          v-model="formState.name"
+          :placeholder="t('menu.form.placeholder.menuName')"
+          allow-clear
+        />
       </a-form-item>
       <a-form-item :label="t('menu.form.menuCnName')" name="menuCnName" field="menuCnName">
         <a-input
           v-model="formState.menuCnName"
           :placeholder="t('menu.form.placeholder.menuCnName')"
+          allow-clear
         />
       </a-form-item>
       <a-form-item :label="t('menu.form.menuIcon')" name="icon" field="icon">
-        <a-input v-model="formState.icon" :placeholder="t('menu.form.placeholder.menuIcon')" />
+        <a-input
+          v-model="formState.icon"
+          :placeholder="t('menu.form.placeholder.menuIcon')"
+          allow-clear
+        />
       </a-form-item>
       <a-form-item :label="t('menu.form.locale')" name="locale" field="locale">
-        <a-input v-model="formState.locale" :placeholder="t('menu.form.placeholder.locale')" />
+        <a-input
+          v-model="formState.locale"
+          :placeholder="t('menu.form.placeholder.locale')"
+          allow-clear
+        />
       </a-form-item>
       <a-form-item :label="t('menu.form.filePath')" name="filePath" field="filePath">
-        <a-input v-model="formState.filePath" :placeholder="t('menu.form.placeholder.filePath')" />
+        <a-input
+          v-model="formState.filePath"
+          :placeholder="t('menu.form.placeholder.filePath')"
+          allow-clear
+        />
       </a-form-item>
       <a-form-item :label="t('menu.form.menuSort')" name="order" field="order">
         <a-input-number

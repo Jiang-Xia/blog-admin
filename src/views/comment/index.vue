@@ -12,6 +12,31 @@
           >
             <a-row :gutter="16">
               <a-col :span="12">
+                <a-form-item :label="t('comment.form.content')">
+                  <a-input
+                    v-model="formModel.content"
+                    :placeholder="t('comment.form.placeholder.content')"
+                    allow-clear
+                    @press-enter="search()"
+                  />
+                </a-form-item>
+              </a-col>
+              <a-col :span="12">
+                <a-form-item :label="t('comment.form.status')">
+                  <a-select
+                    v-model="formModel.status"
+                    :placeholder="t('comment.form.placeholder.status')"
+                    allow-clear
+                  >
+                    <a-option value="approved">{{ t('comment.status.approved') }}</a-option>
+                    <a-option value="pending">{{ t('comment.status.pending') }}</a-option>
+                    <a-option value="rejected">{{ t('comment.status.rejected') }}</a-option>
+                  </a-select>
+                </a-form-item>
+              </a-col>
+            </a-row>
+            <a-row :gutter="16">
+              <a-col :span="12">
                 <a-form-item :label="t('comment.form.selectArticle')">
                   <a-select
                     v-model="formModel.articleId"
@@ -19,6 +44,7 @@
                     :placeholder="t('comment.form.placeholder.selectArticle')"
                     :field-names="{ value: 'id', label: 'title' }"
                     allow-search
+                    allow-clear
                   >
                   </a-select>
                 </a-form-item>
@@ -164,6 +190,8 @@
   const generateFormModel = () => {
     return {
       articleId: '',
+      content: '',
+      status: '',
       page: 1,
       pageSize: 10,
     };
@@ -182,7 +210,7 @@
     list: commentData,
     total,
     loadMore,
-  } = useTableList('/comment/findAll', formModel.value, undefined, false);
+  } = useTableList('/comment/admin', formModel.value, undefined, false);
   const articleOptions: any = ref([]);
   const tableKey = ref(0);
   const renderData = computed(() => {
@@ -215,7 +243,6 @@
     client: true,
   }).then((res) => {
     articleOptions.value = res.list;
-    formModel.value.articleId = res.list[0]?.id;
     refreshList();
   });
   const refreshList = async () => {
@@ -240,7 +267,6 @@
   };
   const reset = () => {
     formModel.value = generateFormModel();
-    formModel.value.articleId = articleOptions.value[0]?.id;
     pagination.current = 1;
     search();
   };

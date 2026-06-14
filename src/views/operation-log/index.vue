@@ -15,6 +15,7 @@
                   <a-input
                     v-model="formModel.username"
                     :placeholder="t('operationLog.form.placeholder.username')"
+                    allow-clear
                     @press-enter="search"
                   />
                 </a-form-item>

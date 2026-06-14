@@ -16,6 +16,7 @@
                   <a-input
                     v-model="formModel.mobile"
                     :placeholder="t('user.form.placeholder.mobile')"
+                    allow-clear
                   />
                 </a-form-item>
               </a-col>
@@ -24,6 +25,7 @@
                   <a-input
                     v-model="formModel.username"
                     :placeholder="t('user.form.placeholder.username')"
+                    allow-clear
                   />
                 </a-form-item>
               </a-col>
@@ -32,6 +34,7 @@
                   <a-input
                     v-model="formModel.nickname"
                     :placeholder="t('user.form.placeholder.nickname')"
+                    allow-clear
                   />
                 </a-form-item>
               </a-col>
@@ -281,6 +284,7 @@
   getTableListHandle();
   const reset = () => {
     formModel.value = generateFormModel();
+    search();
   };
   const delHandle = async (id: any) => {
     const record = renderData.value.find((item) => item.id === id);

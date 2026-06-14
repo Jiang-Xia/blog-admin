@@ -3,6 +3,38 @@
     <a-card class="general-card" title="打赏与社交流水">
       <a-tabs v-model:active-key="activeTab" @change="onTabChange">
         <a-tab-pane key="tips" title="打赏流水">
+          <a-form :model="tipQuery" layout="inline" style="margin-bottom: 16px">
+            <a-form-item label="打赏者UID">
+              <a-input
+                v-model="tipQuery.fromUid"
+                placeholder="UID"
+                allow-clear
+                style="width: 120px"
+              />
+            </a-form-item>
+            <a-form-item label="作者UID">
+              <a-input
+                v-model="tipQuery.toUid"
+                placeholder="UID"
+                allow-clear
+                style="width: 120px"
+              />
+            </a-form-item>
+            <a-form-item label="文章ID">
+              <a-input
+                v-model="tipQuery.articleId"
+                placeholder="文章ID"
+                allow-clear
+                style="width: 120px"
+              />
+            </a-form-item>
+            <a-form-item>
+              <a-space>
+                <a-button type="primary" @click="searchTips">搜索</a-button>
+                <a-button @click="resetTips">重置</a-button>
+              </a-space>
+            </a-form-item>
+          </a-form>
           <a-table
             row-key="id"
             :loading="loading"
@@ -48,6 +80,42 @@
           />
         </a-tab-pane>
         <a-tab-pane key="social" title="社交流水">
+          <a-form :model="socialQuery" layout="inline" style="margin-bottom: 16px">
+            <a-form-item label="发起者UID">
+              <a-input
+                v-model="socialQuery.fromUid"
+                placeholder="UID"
+                allow-clear
+                style="width: 120px"
+              />
+            </a-form-item>
+            <a-form-item label="目标UID">
+              <a-input
+                v-model="socialQuery.toUid"
+                placeholder="UID"
+                allow-clear
+                style="width: 120px"
+              />
+            </a-form-item>
+            <a-form-item label="动作">
+              <a-select
+                v-model="socialQuery.action"
+                placeholder="全部"
+                allow-clear
+                style="width: 120px"
+              >
+                <a-option value="cheer">加油</a-option>
+                <a-option value="egg">扔鸡蛋</a-option>
+                <a-option value="flower">送鲜花</a-option>
+              </a-select>
+            </a-form-item>
+            <a-form-item>
+              <a-space>
+                <a-button type="primary" @click="searchSocial">搜索</a-button>
+                <a-button @click="resetSocial">重置</a-button>
+              </a-space>
+            </a-form-item>
+          </a-form>
           <a-table
             row-key="id"
             :loading="loading"
@@ -133,14 +201,35 @@
   const basePagination: Pagination = { current: 1, pageSize: 20, total: 0 };
   const tipPagination = reactive({ ...basePagination });
   const socialPagination = reactive({ ...basePagination });
+  const tipQuery = reactive({ fromUid: '', toUid: '', articleId: '' });
+  const socialQuery = reactive({ fromUid: '', toUid: '', action: '' });
+
+  const buildTipParams = () => {
+    const params: Record<string, string | number> = {
+      page: tipPagination.current,
+      pageSize: tipPagination.pageSize,
+    };
+    if (tipQuery.fromUid) params.fromUid = tipQuery.fromUid;
+    if (tipQuery.toUid) params.toUid = tipQuery.toUid;
+    if (tipQuery.articleId) params.articleId = tipQuery.articleId;
+    return params;
+  };
+
+  const buildSocialParams = () => {
+    const params: Record<string, string | number> = {
+      page: socialPagination.current,
+      pageSize: socialPagination.pageSize,
+    };
+    if (socialQuery.fromUid) params.fromUid = socialQuery.fromUid;
+    if (socialQuery.toUid) params.toUid = socialQuery.toUid;
+    if (socialQuery.action) params.action = socialQuery.action;
+    return params;
+  };
 
   const loadTips = async () => {
     setLoading(true);
     try {
-      const res: any = await getTipLogList({
-        page: tipPagination.current,
-        pageSize: tipPagination.pageSize,
-      });
+      const res: any = await getTipLogList(buildTipParams());
       tipData.value = res.data.list;
       tipPagination.total = res.data.pagination.total;
     } finally {
@@ -151,10 +240,7 @@
   const loadSocial = async () => {
     setLoading(true);
     try {
-      const res: any = await getSocialLogList({
-        page: socialPagination.current,
-        pageSize: socialPagination.pageSize,
-      });
+      const res: any = await getSocialLogList(buildSocialParams());
       socialData.value = res.data.list;
       socialPagination.total = res.data.pagination.total;
     } finally {
@@ -162,10 +248,34 @@
     }
   };
 
+  const searchTips = () => {
+    tipPagination.current = 1;
+    loadTips();
+  };
+
+  const resetTips = () => {
+    tipQuery.fromUid = '';
+    tipQuery.toUid = '';
+    tipQuery.articleId = '';
+    searchTips();
+  };
+
+  const searchSocial = () => {
+    socialPagination.current = 1;
+    loadSocial();
+  };
+
+  const resetSocial = () => {
+    socialQuery.fromUid = '';
+    socialQuery.toUid = '';
+    socialQuery.action = '';
+    searchSocial();
+  };
+
   loadTips();
 
   const onTabChange = (key: string | number) => {
-    if (key === 'social' && socialData.value.length === 0) loadSocial();
+    if (key === 'social') loadSocial();
   };
 
   const onTipPageChange = (current: number) => {

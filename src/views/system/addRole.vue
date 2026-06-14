@@ -23,10 +23,15 @@
           v-model="formState.roleName"
           :max-length="11"
           :placeholder="t('role.form.placeholder.roleName')"
+          allow-clear
         />
       </a-form-item>
       <a-form-item :label="t('role.form.roleDesc')" name="roleDesc" field="roleDesc">
-        <a-input v-model="formState.roleDesc" :placeholder="t('role.form.placeholder.roleDesc')" />
+        <a-input
+          v-model="formState.roleDesc"
+          :placeholder="t('role.form.placeholder.roleDesc')"
+          allow-clear
+        />
       </a-form-item>
       <a-form-item :label="t('role.form.privileges')" name="privileges" field="privileges">
         <a-tree

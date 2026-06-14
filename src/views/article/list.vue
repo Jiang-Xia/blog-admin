@@ -16,6 +16,7 @@
                   <a-input
                     v-model="formModel.title"
                     :placeholder="t('article.form.placeholder.title')"
+                    allow-clear
                     @press-enter="search()"
                   />
                 </a-form-item>
@@ -25,6 +26,7 @@
                   <a-input
                     v-model="formModel.description"
                     :placeholder="t('article.form.placeholder.description')"
+                    allow-clear
                     @press-enter="search()"
                   />
                 </a-form-item>
@@ -34,6 +36,7 @@
                   <a-input
                     v-model="formModel.content"
                     :placeholder="t('article.form.placeholder.content')"
+                    allow-clear
                     @press-enter="search()"
                   />
                 </a-form-item>
@@ -308,7 +311,6 @@
       description: '',
       content: '',
       deptId: undefined as number | undefined,
-      uid: 1,
     };
   };
   const { loading, setLoading } = useLoading(true);

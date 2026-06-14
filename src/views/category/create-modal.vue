@@ -78,7 +78,8 @@
     <a-input
       v-model="name"
       :placeholder="t('category.form.placeholder.input') + type + t('category.form.nameSuffix')"
-    ></a-input>
+      allow-clear
+    />
   </a-modal>
 </template>
 

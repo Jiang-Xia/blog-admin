@@ -201,6 +201,7 @@ export default {
   'menu.form.menuSort': 'Sort Order',
   'menu.form.locale': 'Locale Key',
   'menu.form.filePath': 'File Path',
+  'menu.form.keyword': 'Keyword',
   'menu.form.placeholder.menuId': 'Please input menu ID',
   'menu.form.placeholder.parentId': 'Please input parent ID',
   'menu.form.placeholder.menuPath': 'Please input menu path',
@@ -209,6 +210,7 @@ export default {
   'menu.form.placeholder.menuIcon': 'Please input icon name',
   'menu.form.placeholder.locale': 'Please input locale key',
   'menu.form.placeholder.filePath': 'Please input file path',
+  'menu.form.placeholder.keyword': 'Name / path / ID',
   'menu.form.placeholder.menuSort': 'Please input sort order',
   // Add/Edit Menu
   'menu.modal.add': 'Add Menu',

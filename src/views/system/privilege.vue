@@ -16,6 +16,7 @@
                   <a-input
                     v-model="formModel.privilegeName"
                     :placeholder="t('privilege.form.placeholder.name')"
+                    allow-clear
                   />
                 </a-form-item>
               </a-col>
@@ -24,6 +25,7 @@
                   <a-input
                     v-model="formModel.pathPattern"
                     :placeholder="t('privilege.form.placeholder.pathPattern')"
+                    allow-clear
                   />
                 </a-form-item>
               </a-col>
@@ -289,6 +291,7 @@
   getTableListHandle();
   const reset = () => {
     formModel.value = generateFormModel();
+    search();
   };
   const delHandle = async (id: any) => {
     Modal.confirm({

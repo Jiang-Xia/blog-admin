@@ -16,6 +16,7 @@
                   <a-input
                     v-model="formModel.roleName"
                     :placeholder="t('role.form.placeholder.name')"
+                    allow-clear
                   />
                 </a-form-item>
               </a-col>
@@ -173,6 +174,7 @@
   getTableListHandle();
   const reset = () => {
     formModel.value = generateFormModel();
+    search();
   };
   const delHandle = async (id: any) => {
     Modal.confirm({

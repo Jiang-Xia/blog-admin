@@ -16,6 +16,7 @@
                   <a-input
                     v-model="formModel.comment"
                     :placeholder="t('msgboard.form.placeholder.comment')"
+                    allow-clear
                     @press-enter="search()"
                   />
                 </a-form-item>
@@ -25,6 +26,7 @@
                   <a-input
                     v-model="formModel.respondent"
                     :placeholder="t('msgboard.form.placeholder.reply')"
+                    allow-clear
                     @press-enter="search()"
                   />
                 </a-form-item>
@@ -36,6 +38,7 @@
                   <a-input
                     v-model="formModel.eamil"
                     :placeholder="t('msgboard.form.placeholder.email')"
+                    allow-clear
                     @press-enter="search()"
                   />
                 </a-form-item>
@@ -45,8 +48,25 @@
                   <a-input
                     v-model="formModel.name"
                     :placeholder="t('msgboard.form.placeholder.nickname')"
+                    allow-clear
                     @press-enter="search()"
                   />
+                </a-form-item>
+              </a-col>
+            </a-row>
+            <a-row :gutter="16">
+              <a-col :span="12">
+                <a-form-item :label="t('msgboard.form.status')">
+                  <a-select
+                    v-model="formModel.status"
+                    :placeholder="t('msgboard.form.placeholder.status')"
+                    allow-clear
+                  >
+                    <a-option value="all">{{ t('msgboard.status.all') }}</a-option>
+                    <a-option value="approved">{{ t('msgboard.status.approved') }}</a-option>
+                    <a-option value="pending">{{ t('msgboard.status.pending') }}</a-option>
+                    <a-option value="rejected">{{ t('msgboard.status.rejected') }}</a-option>
+                  </a-select>
                 </a-form-item>
               </a-col>
             </a-row>
@@ -174,6 +194,7 @@
       comment: '',
       eamil: '',
       respondent: '',
+      status: 'all',
       page: 1,
       pageSize: 10,
     };

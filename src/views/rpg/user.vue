@@ -29,6 +29,7 @@
                   <a-input
                     v-model="formModel.keyword"
                     placeholder="昵称/用户名"
+                    allow-clear
                     @press-enter="search"
                   />
                 </a-form-item>
@@ -296,7 +297,7 @@
           />
         </a-form-item>
         <a-form-item label="备注">
-          <a-input v-model="rechargeForm.reason" placeholder="可选，如：测试充值" />
+          <a-input v-model="rechargeForm.reason" placeholder="可选，如：测试充值" allow-clear />
         </a-form-item>
       </a-form>
     </a-modal>

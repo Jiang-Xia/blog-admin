@@ -15,6 +15,7 @@
                   <a-input
                     v-model="formModel.keyword"
                     placeholder="物品名称"
+                    allow-clear
                     @press-enter="search"
                   />
                 </a-form-item>
@@ -128,14 +129,14 @@
           </a-col>
           <a-col :span="12">
             <a-form-item label="名称" required>
-              <a-input v-model="modalForm.name" placeholder="物品名称" />
+              <a-input v-model="modalForm.name" placeholder="物品名称" allow-clear />
             </a-form-item>
           </a-col>
         </a-row>
         <a-row :gutter="16">
           <a-col :span="12">
             <a-form-item label="描述">
-              <a-input v-model="modalForm.description" placeholder="物品描述" />
+              <a-input v-model="modalForm.description" placeholder="物品描述" allow-clear />
             </a-form-item>
           </a-col>
           <a-col :span="12">
@@ -165,20 +166,18 @@
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item label="排序">
-              <a-input-number v-model="modalForm.sort" :min="0" style="width: 100%" />
-            </a-form-item>
+            <a-form-item label="排序"> </a-form-item>
           </a-col>
         </a-row>
         <a-row :gutter="16">
           <a-col :span="12">
             <a-form-item label="图标">
-              <a-input v-model="modalForm.icon" placeholder="图标ID" />
+              <a-input v-model="modalForm.icon" placeholder="图标ID" allow-clear />
             </a-form-item>
           </a-col>
           <a-col :span="12">
             <a-form-item label="分类">
-              <a-input v-model="modalForm.category" placeholder="可选分类" />
+              <a-input v-model="modalForm.category" placeholder="可选分类" allow-clear />
             </a-form-item>
           </a-col>
         </a-row>

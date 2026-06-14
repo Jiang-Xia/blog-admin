@@ -10,6 +10,7 @@
                   <a-input
                     v-model="formModel.keyword"
                     placeholder="公会名称"
+                    allow-clear
                     @press-enter="search"
                   />
                 </a-form-item>

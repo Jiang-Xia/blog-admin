@@ -15,6 +15,7 @@
                   <a-input
                     v-model="formModel.keyword"
                     placeholder="请输入任务名称"
+                    allow-clear
                     @press-enter="search"
                   />
                 </a-form-item>
@@ -149,14 +150,14 @@
           </a-col>
           <a-col :span="12">
             <a-form-item label="名称" required>
-              <a-input v-model="modalForm.name" placeholder="任务名称" />
+              <a-input v-model="modalForm.name" placeholder="任务名称" allow-clear />
             </a-form-item>
           </a-col>
         </a-row>
         <a-row :gutter="16">
           <a-col :span="12">
             <a-form-item label="描述">
-              <a-input v-model="modalForm.description" placeholder="任务描述" />
+              <a-input v-model="modalForm.description" placeholder="任务描述" allow-clear />
             </a-form-item>
           </a-col>
           <a-col :span="12">
@@ -194,26 +195,18 @@
         </a-row>
         <a-row :gutter="16">
           <a-col :span="12">
-            <a-form-item label="目标次数">
-              <a-input-number v-model="modalForm.targetCount" :min="1" />
-            </a-form-item>
+            <a-form-item label="目标次数"> </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item label="HP奖励">
-              <a-input-number v-model="modalForm.hpReward" :min="0" :max="100" />
-            </a-form-item>
+            <a-form-item label="HP奖励"> </a-form-item>
           </a-col>
         </a-row>
         <a-row :gutter="16">
           <a-col :span="12">
-            <a-form-item label="经验奖励">
-              <a-input-number v-model="modalForm.expReward" :min="0" />
-            </a-form-item>
+            <a-form-item label="经验奖励"> </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item label="排序">
-              <a-input-number v-model="modalForm.sort" :min="0" />
-            </a-form-item>
+            <a-form-item label="排序"> </a-form-item>
           </a-col>
         </a-row>
         <a-row :gutter="16">

@@ -15,6 +15,7 @@
                   <a-input
                     v-model="formModel.keyword"
                     placeholder="活动名称"
+                    allow-clear
                     @press-enter="search"
                   />
                 </a-form-item>
@@ -137,14 +138,14 @@
           </a-col>
           <a-col :span="12">
             <a-form-item label="名称" required>
-              <a-input v-model="modalForm.name" placeholder="活动名称" />
+              <a-input v-model="modalForm.name" placeholder="活动名称" allow-clear />
             </a-form-item>
           </a-col>
         </a-row>
         <a-row :gutter="16">
           <a-col :span="12">
             <a-form-item label="描述">
-              <a-input v-model="modalForm.description" placeholder="活动描述" />
+              <a-input v-model="modalForm.description" placeholder="活动描述" allow-clear />
             </a-form-item>
           </a-col>
           <a-col :span="12">
@@ -182,7 +183,11 @@
           </a-col>
           <a-col :span="12">
             <a-form-item label="海报URL">
-              <a-input v-model="modalForm.posterUrl" placeholder="/images/rpg/poster.png" />
+              <a-input
+                v-model="modalForm.posterUrl"
+                placeholder="/images/rpg/poster.png"
+                allow-clear
+              />
             </a-form-item>
           </a-col>
         </a-row>

@@ -15,6 +15,7 @@
                   <a-input
                     v-model="formModel.keyword"
                     placeholder="请输入成就名称"
+                    allow-clear
                     @press-enter="search"
                   />
                 </a-form-item>
@@ -147,14 +148,14 @@
           </a-col>
           <a-col :span="12">
             <a-form-item label="名称" required>
-              <a-input v-model="modalForm.name" placeholder="成就显示名称" />
+              <a-input v-model="modalForm.name" placeholder="成就显示名称" allow-clear />
             </a-form-item>
           </a-col>
         </a-row>
         <a-row :gutter="16">
           <a-col :span="12">
             <a-form-item label="描述">
-              <a-input v-model="modalForm.description" placeholder="成就描述" />
+              <a-input v-model="modalForm.description" placeholder="成就描述" allow-clear />
             </a-form-item>
           </a-col>
           <a-col :span="12">
@@ -172,25 +173,19 @@
         <a-row :gutter="16">
           <a-col :span="12">
             <a-form-item label="图标">
-              <a-input v-model="modalForm.icon" placeholder="图标ID" />
+              <a-input v-model="modalForm.icon" placeholder="图标ID" allow-clear />
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item label="达成次数">
-              <a-input-number v-model="modalForm.maxProgress" :min="1" placeholder="达成所需次数" />
-            </a-form-item>
+            <a-form-item label="达成次数"> </a-form-item>
           </a-col>
         </a-row>
         <a-row :gutter="16">
           <a-col :span="12">
-            <a-form-item label="经验奖励">
-              <a-input-number v-model="modalForm.expReward" :min="0" placeholder="完成奖励经验值" />
-            </a-form-item>
+            <a-form-item label="经验奖励"> </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item label="排序">
-              <a-input-number v-model="modalForm.sort" :min="0" />
-            </a-form-item>
+            <a-form-item label="排序"> </a-form-item>
           </a-col>
         </a-row>
         <a-row :gutter="16">

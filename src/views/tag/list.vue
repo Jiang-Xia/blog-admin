@@ -16,6 +16,7 @@
                   <a-input
                     v-model="formModel.title"
                     :placeholder="t('tag.form.placeholder.name')"
+                    allow-clear
                   />
                 </a-form-item>
               </a-col>
@@ -158,15 +159,7 @@
 
   const generateFormModel = () => {
     return {
-      page: 1,
-      category: '',
-      tags: [],
-      pageSize: 20,
-      total: 0,
       title: '',
-      description: '',
-      content: '',
-      uid: 1,
     };
   };
 
