@@ -14,7 +14,6 @@ import localeOperationLog from '@/views/operation-log/locale/zh-CN';
 import localeScheduledTask from '@/views/scheduled-task/locale/zh-CN';
 import localeTaskManage from '@/views/task-manage/locale/zh-CN';
 import localePayOrder from '@/views/pay-order/locale/zh-CN';
-
 import localeWorkplace from '@/views/dashboard/workplace/locale/zh-CN';
 import localeDatascreen from '@/views/dashboard/datascreen/locale/zh-CN';
 
@@ -93,6 +92,16 @@ export default {
 
   'menu.server.extApps': '扩展应用',
   'menu.server.payOrder': '支付管理',
+
+  'menu.server.rpgManage': 'RPG管理',
+  'menu.server.rpgAchievement': '成就管理',
+  'menu.server.rpgQuest': '每日任务',
+  'menu.server.rpgLottery': '抽奖奖池',
+  'menu.server.rpgUser': '用户RPG数据',
+  'menu.server.rpgItemConfig': '系统物品',
+  'menu.server.rpgActivity': '活动赛季',
+  'menu.server.rpgGuild': '公会管理',
+  'menu.server.rpgSocialLog': '打赏社交流水',
 
   ...localeSettings,
   ...localeCommon,

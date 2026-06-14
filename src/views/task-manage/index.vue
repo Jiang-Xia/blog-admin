@@ -12,14 +12,47 @@
       </a-alert>
       <!-- 工具栏 -->
       <a-row style="margin-bottom: 16px" :gutter="16">
-        <a-col :span="16">
+        <a-col :flex="1">
+          <a-form :model="queryParams" layout="inline">
+            <a-form-item :label="t('taskManage.form.search')">
+              <a-input
+                v-model="queryParams.keyword"
+                :placeholder="t('taskManage.form.placeholder.search')"
+                allow-clear
+                @press-enter="handleSearch"
+              />
+            </a-form-item>
+            <a-form-item :label="t('taskManage.form.enabled')">
+              <a-select
+                v-model="queryParams.enabled"
+                :placeholder="t('taskManage.form.placeholder.enabled')"
+                allow-clear
+                style="width: 120px"
+              >
+                <a-option value="true">{{ t('taskManage.status.enabled') }}</a-option>
+                <a-option value="false">{{ t('taskManage.status.disabled') }}</a-option>
+              </a-select>
+            </a-form-item>
+            <a-form-item>
+              <a-space>
+                <a-button type="primary" @click="handleSearch">
+                  <template #icon><icon-search /></template>
+                  {{ t('common.button.search') }}
+                </a-button>
+                <a-button @click="handleReset">
+                  <template #icon><icon-refresh /></template>
+                  {{ t('common.button.reset') }}
+                </a-button>
+              </a-space>
+            </a-form-item>
+          </a-form>
+        </a-col>
+        <a-col :span="8" style="text-align: right">
           <a-button type="primary" @click="handleAdd">
             <template #icon><icon-plus /></template>
             {{ t('taskManage.action.add') }}
           </a-button>
-        </a-col>
-        <a-col :span="8" style="text-align: right">
-          <a-button @click="loadTaskList">
+          <a-button @click="loadTaskList" style="margin-left: 8px">
             <template #icon><icon-refresh /></template>
           </a-button>
         </a-col>
@@ -29,10 +62,11 @@
       <a-table
         :loading="loading"
         row-key="id"
-        :pagination="pagination"
+        :pagination="false"
         :data="taskList"
         :bordered="false"
-        @page-change="onPageChange"
+        scrollbar
+        :scroll="{ x: 1100, y: 600 }"
       >
         <template #columns>
           <a-table-column :title="t('taskManage.table.name')" data-index="name" :width="180">
@@ -87,9 +121,9 @@
             :width="70"
             align="center"
           />
-          <a-table-column :title="t('taskManage.table.actions')" :width="240" align="center">
+          <a-table-column :title="t('taskManage.table.actions')" :width="160" fixed="right">
             <template #cell="{ record }">
-              <a-space :size="4">
+              <a-space :size="8">
                 <a-button
                   size="mini"
                   type="primary"
@@ -98,7 +132,7 @@
                 >
                   <template #icon><icon-play-arrow /></template>
                 </a-button>
-                <a-button size="mini" type="primary" status="normal" @click="handleEdit(record)">
+                <a-button size="mini" type="primary" @click="handleEdit(record)">
                   <template #icon><icon-edit /></template>
                 </a-button>
                 <a-popconfirm
@@ -114,6 +148,13 @@
           </a-table-column>
         </template>
       </a-table>
+      <TablePagination
+        :total="pagination.total"
+        :current="pagination.current"
+        :page-size="pagination.pageSize"
+        @change="onPageChange"
+        @page-size-change="onPageSizeChange"
+      />
     </a-card>
 
     <!-- 新增/编辑弹窗 -->
@@ -137,15 +178,17 @@
           <a-input
             v-model="formData.description"
             :placeholder="t('taskManage.form.placeholder.description')"
+            allow-clear
           />
         </a-form-item>
         <a-form-item :label="t('taskManage.form.cron')" :rules="[{ required: true }]">
-          <a-input v-model="formData.cron" placeholder="0 0 10 * * *" />
+          <a-input v-model="formData.cron" placeholder="0 0 10 * * *" allow-clear />
         </a-form-item>
         <a-form-item :label="t('taskManage.form.cronHuman')">
           <a-input
             v-model="formData.cronHuman"
             :placeholder="t('taskManage.form.placeholder.cronHuman')"
+            allow-clear
           />
         </a-form-item>
         <a-form-item :label="t('taskManage.form.enabled')">
@@ -154,9 +197,7 @@
         <a-form-item :label="t('taskManage.form.logRecording')">
           <a-switch v-model="formData.logRecording" />
         </a-form-item>
-        <a-form-item :label="t('taskManage.form.sortOrder')">
-          <a-input-number v-model="formData.sortOrder" :min="0" :max="999" />
-        </a-form-item>
+        <a-form-item :label="t('taskManage.form.sortOrder')"> </a-form-item>
       </a-form>
     </a-modal>
   </div>
@@ -170,6 +211,7 @@
   import {
     IconPlus,
     IconRefresh,
+    IconSearch,
     IconPlayArrow,
     IconEdit,
     IconDelete,
@@ -195,7 +237,22 @@
   // 分页
   const basePagination: Pagination = { current: 1, pageSize: 20, total: 0 };
   const pagination = reactive({ ...basePagination });
-  const queryParams = ref({ page: 1, pageSize: 20 });
+  const queryParams = ref<{ page: number; pageSize: number; keyword?: string; enabled?: string }>({
+    page: 1,
+    pageSize: 20,
+  });
+
+  const handleSearch = () => {
+    queryParams.value.page = 1;
+    pagination.current = 1;
+    loadTaskList();
+  };
+
+  const handleReset = () => {
+    queryParams.value = { page: 1, pageSize: pagination.pageSize };
+    pagination.current = 1;
+    loadTaskList();
+  };
 
   // 新增/编辑
   const formVisible = ref(false);
@@ -230,6 +287,14 @@
   const onPageChange = (current: number) => {
     queryParams.value.page = current;
     pagination.current = current;
+    loadTaskList();
+  };
+
+  const onPageSizeChange = (pageSize: number) => {
+    queryParams.value.page = 1;
+    queryParams.value.pageSize = pageSize;
+    pagination.current = 1;
+    pagination.pageSize = pageSize;
     loadTaskList();
   };
 
@@ -368,5 +433,13 @@
     font-size: 12px;
     color: var(--color-text-4);
     margin-left: 4px;
+  }
+
+  :deep(.arco-table-th) {
+    &:last-child {
+      .arco-table-th-item-title {
+        margin-left: 16px;
+      }
+    }
   }
 </style>

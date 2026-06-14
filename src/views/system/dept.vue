@@ -16,6 +16,7 @@
                   <a-input
                     v-model="formModel.deptName"
                     :placeholder="t('dept.form.placeholder.name')"
+                    allow-clear
                   />
                 </a-form-item>
               </a-col>
@@ -119,12 +120,14 @@
         v-else
         :loading="loading"
         row-key="id"
-        :data="treeTableData"
+        :data="tableData"
         :bordered="false"
         :columns="tableColumns"
         :pagination="false"
         :row-class-name="getRowClassName"
         class="dept-tree-table"
+        scrollbar
+        :scroll="{ x: 1100, y: 600 }"
       >
         <template #columns>
           <a-table-column v-for="column in tableColumns" :key="column.dataIndex" v-bind="column">
@@ -139,33 +142,17 @@
                   {{ record.status === 1 ? t('common.status.normal') : t('common.status.disable') }}
                 </a-tag>
               </template>
-              <template v-else-if="column.dataIndex === 'operations'">
-                <a-space :size="8">
-                  <a-button
-                    v-permission="'dept:update'"
-                    size="mini"
-                    type="primary"
-                    @click="showModal('edit', record.id)"
-                  >
-                    <icon-edit />
-                  </a-button>
-                  <a-button
-                    v-permission="'dept:delete'"
-                    size="mini"
-                    type="primary"
-                    status="danger"
-                    @click="delHandle(record.id)"
-                  >
-                    <icon-delete />
-                  </a-button>
-                </a-space>
-              </template>
               <template v-else>
                 {{ record[column.dataIndex] }}
               </template>
             </template>
           </a-table-column>
-          <a-table-column :title="t('dept.table.operation')">
+          <a-table-column
+            :title="t('dept.table.operation')"
+            data-index="operations"
+            :width="120"
+            fixed="right"
+          >
             <template #cell="{ record }">
               <a-space :size="8">
                 <a-button
@@ -190,6 +177,14 @@
           </a-table-column>
         </template>
       </a-table>
+      <TablePagination
+        v-if="viewMode === 'table'"
+        :total="pagination.total"
+        :current="pagination.current"
+        :page-size="pagination.pageSize"
+        @change="onPageChange"
+        @page-size-change="onPageSizeChange"
+      />
     </a-card>
     <add-modal ref="addRef" @success="search"></add-modal>
   </div>
@@ -225,10 +220,35 @@
   const basePagination: Pagination = {
     current: 1,
     pageSize: 10,
+    total: 0,
   };
   const pagination = reactive({
     ...basePagination,
   });
+
+  const flattenDeptTree = (nodes: any[], level = 0): any[] => {
+    if (!Array.isArray(nodes)) return [];
+    return nodes.flatMap((node) => {
+      const item = { ...node, level: node.level ?? level };
+      const children = node.children || [];
+      return [item, ...flattenDeptTree(children, level + 1)];
+    });
+  };
+
+  const flatDeptList = computed(() => flattenDeptTree(treeTableData.value as any[]));
+
+  const tableData = computed(() => {
+    const start = (pagination.current - 1) * pagination.pageSize;
+    return flatDeptList.value.slice(start, start + pagination.pageSize);
+  });
+
+  watch(
+    flatDeptList,
+    (list) => {
+      pagination.total = list.length;
+    },
+    { immediate: true },
+  );
 
   // 表格列定义
   const tableColumns = [
@@ -236,30 +256,37 @@
       title: t('dept.table.name'),
       dataIndex: 'deptName',
       align: 'center',
+      width: 180,
     },
     {
       title: t('dept.table.code'),
       dataIndex: 'deptCode',
+      width: 120,
     },
     {
       title: t('dept.form.parentId'),
       dataIndex: 'parentId',
+      width: 100,
     },
     {
       title: t('dept.table.leader'),
       dataIndex: 'leaderName',
+      width: 120,
     },
     {
       title: t('dept.table.sort'),
       dataIndex: 'orderNum',
+      width: 80,
     },
     {
       title: t('dept.table.status'),
       dataIndex: 'status',
+      width: 100,
     },
     {
       title: t('dept.form.description'),
       dataIndex: 'remark',
+      width: 200,
     },
   ];
   const getTableListHandle = async (val = 1) => {
@@ -270,7 +297,11 @@
   const getTreeDataHandle = async () => {
     try {
       setLoading(true);
-      const res = await getDeptTree();
+      const { deptName, status } = formModel.value;
+      const params: Record<string, unknown> = {};
+      if (deptName) params.deptName = deptName;
+      if (status !== undefined && status !== null) params.status = status;
+      const res = await getDeptTree(params);
       treeData.value = res.data || [];
       treeTableData.value = res.data;
       setLoading(false);
@@ -295,7 +326,11 @@
     getTableListHandle();
   };
   const onPageChange = (current: number) => {
-    getTableListHandle(current);
+    pagination.current = current;
+  };
+  const onPageSizeChange = (pageSize: number) => {
+    pagination.current = 1;
+    pagination.pageSize = pageSize;
   };
   getTableListHandle();
 

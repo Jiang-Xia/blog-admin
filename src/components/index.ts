@@ -11,6 +11,7 @@ import {
 } from 'echarts/components';
 import Chart from './chart/index.vue';
 import Breadcrumb from './breadcrumb/index.vue';
+import TablePagination from './table-pagination/index.vue';
 import XIcon from './x-icon/index';
 
 // Manually introduce ECharts modules to reduce packing size
@@ -32,6 +33,7 @@ export default {
   install(Vue: App) {
     Vue.component('Chart', Chart);
     Vue.component('Breadcrumb', Breadcrumb);
+    Vue.component('TablePagination', TablePagination);
     Vue.component('XIcon', XIcon);
   },
 };

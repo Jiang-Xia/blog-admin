@@ -12,6 +12,31 @@
           >
             <a-row :gutter="16">
               <a-col :span="12">
+                <a-form-item :label="t('comment.form.content')">
+                  <a-input
+                    v-model="formModel.content"
+                    :placeholder="t('comment.form.placeholder.content')"
+                    allow-clear
+                    @press-enter="search()"
+                  />
+                </a-form-item>
+              </a-col>
+              <a-col :span="12">
+                <a-form-item :label="t('comment.form.status')">
+                  <a-select
+                    v-model="formModel.status"
+                    :placeholder="t('comment.form.placeholder.status')"
+                    allow-clear
+                  >
+                    <a-option value="approved">{{ t('comment.status.approved') }}</a-option>
+                    <a-option value="pending">{{ t('comment.status.pending') }}</a-option>
+                    <a-option value="rejected">{{ t('comment.status.rejected') }}</a-option>
+                  </a-select>
+                </a-form-item>
+              </a-col>
+            </a-row>
+            <a-row :gutter="16">
+              <a-col :span="12">
                 <a-form-item :label="t('comment.form.selectArticle')">
                   <a-select
                     v-model="formModel.articleId"
@@ -19,6 +44,7 @@
                     :placeholder="t('comment.form.placeholder.selectArticle')"
                     :field-names="{ value: 'id', label: 'title' }"
                     allow-search
+                    allow-clear
                   >
                   </a-select>
                 </a-form-item>
@@ -44,14 +70,15 @@
         </a-col>
       </a-row>
       <a-table
+        :key="tableKey"
         :loading="loading"
-        row-key="id"
-        :pagination="pagination"
+        row-key="rowKey"
+        :pagination="false"
         :data="renderData"
         :bordered="false"
         stripe
-        :load-more="loadTableDataMore"
-        @page-change="onPageChange"
+        scrollbar
+        :scroll="{ x: 1380, y: 600 }"
       >
         <template #columns>
           <a-table-column
@@ -125,7 +152,7 @@
           <a-table-column
             :title="t('comment.table.operation')"
             data-index="operations"
-            :width="100"
+            :width="120"
             fixed="right"
           >
             <template #cell="{ record }">
@@ -138,6 +165,13 @@
           </a-table-column>
         </template>
       </a-table>
+      <TablePagination
+        :total="pagination.total"
+        :current="pagination.current"
+        :page-size="pagination.pageSize"
+        @change="onPageChange"
+        @page-size-change="onPageSizeChange"
+      />
     </a-card>
   </div>
 </template>
@@ -148,15 +182,16 @@
   // import useLoading from '@/hooks/loading';
   import type { Pagination } from '@/types/global';
   import { Message, Modal } from '@arco-design/web-vue';
-  import request from '@/api/request';
   import { useTableList } from '@/hooks/data';
-  import { getArticleList } from '@/api/article';
+  import { delComment, delReply, getArticleList } from '@/api/article';
 
   const { t } = useI18n();
 
   const generateFormModel = () => {
     return {
       articleId: '',
+      content: '',
+      status: '',
       page: 1,
       pageSize: 10,
     };
@@ -175,18 +210,25 @@
     list: commentData,
     total,
     loadMore,
-  } = useTableList('/comment/findAll', formModel.value, undefined, false);
+  } = useTableList('/comment/admin', formModel.value, undefined, false);
   const articleOptions: any = ref([]);
+  const tableKey = ref(0);
   const renderData = computed(() => {
-    const list = commentData.value.map((v: any) => {
-      v.isLeaf = !v.replys.length;
-      v.replys.map((v2: any) => {
-        v2.isLeaf = true;
-        return v2;
-      });
-      return v;
+    return commentData.value.map((v: any) => {
+      const replys = v.replys || [];
+      return {
+        ...v,
+        rowKey: `comment-${v.id}`,
+        isLeaf: replys.length === 0,
+        children: replys.length
+          ? replys.map((v2: any) => ({
+              ...v2,
+              rowKey: `reply-${v2.id}`,
+              isLeaf: true,
+            }))
+          : undefined,
+      };
     });
-    return list;
   });
   watch(
     () => commentData.value,
@@ -201,41 +243,48 @@
     client: true,
   }).then((res) => {
     articleOptions.value = res.list;
-    formModel.value.articleId = res.list[0]?.id;
-    loadMore();
+    refreshList();
   });
+  const refreshList = async () => {
+    await loadMore();
+    tableKey.value += 1;
+  };
   const search = () => {
     action.value = formModel.value;
-    loadMore();
+    refreshList();
   };
   const onPageChange = (current: number) => {
     formModel.value.page = current;
     pagination.current = current;
     search();
   };
+  const onPageSizeChange = (pageSize: number) => {
+    formModel.value.page = 1;
+    formModel.value.pageSize = pageSize;
+    pagination.current = 1;
+    pagination.pageSize = pageSize;
+    search();
+  };
   const reset = () => {
     formModel.value = generateFormModel();
-    formModel.value.articleId = articleOptions.value[0]?.id;
     pagination.current = 1;
     search();
   };
   const delHandle = async (record: any) => {
-    let url = '/comment/delete';
-    if (record.tUserInfo) {
-      url = '/reply/delete';
-    }
+    const isReply = !!record.tUserInfo;
     Modal.confirm({
       title: t('comment.confirm.delete'),
       content: t('comment.confirm.deleteContent'),
       onOk: async () => {
-        const res = await request.post(url, [record.id]);
+        if (isReply) {
+          await delReply(record.id);
+        } else {
+          await delComment(record.id);
+        }
         Message.success(t('comment.message.deleteSuccess'));
-        search();
+        await refreshList();
       },
     });
-  };
-  const loadTableDataMore = (record: any, done: any) => {
-    done(record.replys);
   };
 </script>
 

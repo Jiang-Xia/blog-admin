@@ -23,10 +23,15 @@
           v-model="formState.roleName"
           :max-length="11"
           :placeholder="t('role.form.placeholder.roleName')"
+          allow-clear
         />
       </a-form-item>
       <a-form-item :label="t('role.form.roleDesc')" name="roleDesc" field="roleDesc">
-        <a-input v-model="formState.roleDesc" :placeholder="t('role.form.placeholder.roleDesc')" />
+        <a-input
+          v-model="formState.roleDesc"
+          :placeholder="t('role.form.placeholder.roleDesc')"
+          allow-clear
+        />
       </a-form-item>
       <a-form-item :label="t('role.form.privileges')" name="privileges" field="privileges">
         <a-tree
@@ -46,6 +51,34 @@
           @check="onTreeCheck"
         >
         </a-tree>
+      </a-form-item>
+
+      <a-form-item :label="t('role.form.dataScope')" field="articleScopeType">
+        <a-select
+          v-model="formState.articleScopeType"
+          :placeholder="t('role.form.placeholder.scopeType')"
+        >
+          <a-option value="ALL">{{ t('role.scopeType.ALL') }}</a-option>
+          <a-option value="DEPT">{{ t('role.scopeType.DEPT') }}</a-option>
+          <a-option value="DEPT_AND_CHILDREN">{{ t('role.scopeType.DEPT_AND_CHILDREN') }}</a-option>
+          <a-option value="CUSTOM">{{ t('role.scopeType.CUSTOM') }}</a-option>
+        </a-select>
+      </a-form-item>
+
+      <a-form-item
+        v-if="formState.articleScopeType === 'CUSTOM'"
+        :label="t('role.form.customDepts')"
+        field="articleCustomDeptIds"
+      >
+        <a-tree-select
+          v-model="formState.articleCustomDeptIds"
+          :data="deptTreeData"
+          :placeholder="t('role.form.placeholder.customDepts')"
+          multiple
+          allow-clear
+          tree-checkable
+          :field-names="{ key: 'value', title: 'deptName', children: 'children' }"
+        />
       </a-form-item>
 
       <a-form-item :wrapper-col-props="{ span: 13, offset: 7 }">
@@ -70,7 +103,8 @@
   import { useAppStore } from '@/store';
   import request from '@/api/request';
   import { useI18n } from 'vue-i18n';
-  import { getRoleById, createRole, updateRole } from '@/api/role';
+  import { getRoleById, createRole, updateRole, updateRoleDataScope } from '@/api/role';
+  import { getDeptTree } from '@/api/dept';
   const { t } = useI18n();
 
   const appStore = useAppStore();
@@ -87,11 +121,15 @@
     roleName: string;
     roleDesc: string;
     privileges: string[];
+    articleScopeType: string;
+    articleCustomDeptIds: number[];
   }
   const defaultForm = {
     roleName: '',
     roleDesc: '',
     privileges: [],
+    articleScopeType: 'DEPT',
+    articleCustomDeptIds: [],
   };
 
   const formRef = ref();
@@ -99,6 +137,7 @@
   const currentId = ref('');
   const formState: FormState = reactive({ ...defaultForm });
   const treeData = ref<any[]>([]);
+  const deptTreeData = ref<any[]>([]);
   // 自定义异步校验
   const checkTitle = async (value: string, cb: (error?: string) => void) => {
     console.log(value);
@@ -130,6 +169,24 @@
       .then((res) => res.data);
     console.log(res, 'getMenuPrivilegeTree');
     treeData.value = res;
+  };
+
+  const loadDeptTree = async () => {
+    const res = await getDeptTree();
+    deptTreeData.value = res.data ?? [];
+  };
+
+  const buildArticleDataScope = () => ({
+    resourceType: 'article',
+    scopeType: formState.articleScopeType,
+    deptIds:
+      formState.articleScopeType === 'CUSTOM'
+        ? formState.articleCustomDeptIds.map((id) => Number(id))
+        : undefined,
+  });
+
+  const saveArticleDataScope = async (roleId: number) => {
+    await updateRoleDataScope(roleId, [buildArticleDataScope()]);
   };
 
   // 已选中的子节点
@@ -173,6 +230,7 @@
       // 编辑
       params.editId = currentId.value;
       const res = await updateRole(params);
+      await saveArticleDataScope(Number(currentId.value));
       visible.value = false;
       // console.log({ res });
       Message.success(t('role.message.updateSuccess'));
@@ -180,6 +238,10 @@
     } else {
       // 新建
       const res = await createRole(params);
+      const roleId = res.data?.id;
+      if (roleId) {
+        await saveArticleDataScope(Number(roleId));
+      }
       visible.value = false;
       Message.success(t('role.message.createSuccess'));
       resetForm();
@@ -200,18 +262,27 @@
     const res = await getRoleById(Number(currentId.value));
     const keys = Object.keys(defaultForm);
     keys.forEach((key: string) => {
-      formState[key as keyof FormState] = res.data[key];
+      if (key !== 'articleScopeType' && key !== 'articleCustomDeptIds') {
+        formState[key as keyof FormState] = res.data[key];
+      }
     });
     formState.privileges = [...res.data.privileges, ...res.data.menus];
+    const articleScope = (res.data.dataScopes ?? []).find(
+      (item: { resourceType: string }) => item.resourceType === 'article',
+    );
+    formState.articleScopeType = articleScope?.scopeType ?? 'DEPT';
+    formState.articleCustomDeptIds = articleScope?.deptIds ?? [];
   };
   const show = (val: any) => {
     type.value = val.type;
     console.log({ type: type.value });
     getMenuPrivilegeTree();
+    loadDeptTree();
     if (type.value === 'edit') {
       currentId.value = val.id;
       getInfoHandle();
     } else {
+      Object.assign(formState, { ...defaultForm });
       resetForm();
     }
     visible.value = true;

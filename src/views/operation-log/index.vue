@@ -15,6 +15,7 @@
                   <a-input
                     v-model="formModel.username"
                     :placeholder="t('operationLog.form.placeholder.username')"
+                    allow-clear
                     @press-enter="search"
                   />
                 </a-form-item>
@@ -86,24 +87,24 @@
       <a-table
         :loading="loading"
         row-key="id"
-        :pagination="pagination"
+        :pagination="false"
         :data="tableData"
         :bordered="false"
-        @page-change="onPageChange"
+        scrollbar
+        :scroll="{ x: 1300, y: 600 }"
       >
         <template #columns>
-          <a-table-column :title="t('operationLog.table.id')" data-index="id" :width="70" />
           <a-table-column
             :title="t('operationLog.table.username')"
             data-index="username"
-            :width="120"
+            :width="90"
           />
-          <a-table-column :title="t('operationLog.table.module')" data-index="module" :width="120">
+          <a-table-column :title="t('operationLog.table.module')" data-index="module" :width="110">
             <template #cell="{ record }">
               <a-tag color="arcoblue">{{ record.module }}</a-tag>
             </template>
           </a-table-column>
-          <a-table-column :title="t('operationLog.table.action')" data-index="action" :width="100">
+          <a-table-column :title="t('operationLog.table.action')" data-index="action" :width="90">
             <template #cell="{ record }">
               <a-tag :color="actionColorMap[record.action] || 'gray'">
                 {{ t(`operationLog.table.action.${record.action}`) || record.action }}
@@ -127,6 +128,7 @@
             :title="t('operationLog.table.description')"
             data-index="description"
             :ellipsis="true"
+            :width="280"
           />
           <a-table-column :title="t('operationLog.table.ip')" data-index="ip" :width="130" />
           <a-table-column
@@ -149,7 +151,7 @@
               {{ $dayjs(record.createTime).format('YYYY-MM-DD HH:mm:ss') }}
             </template>
           </a-table-column>
-          <a-table-column :title="t('operationLog.table.requestBody')" :width="80">
+          <a-table-column :title="t('operationLog.table.requestBody')" :width="80" fixed="right">
             <template #cell="{ record }">
               <a-button
                 v-if="record.requestBody"
@@ -164,6 +166,13 @@
           </a-table-column>
         </template>
       </a-table>
+      <TablePagination
+        :total="pagination.total"
+        :current="pagination.current"
+        :page-size="pagination.pageSize"
+        @change="onPageChange"
+        @page-size-change="onPageSizeChange"
+      />
     </a-card>
 
     <!-- 请求体详情弹窗 -->
@@ -270,6 +279,14 @@
   const onPageChange = (current: number) => {
     formModel.value.page = current;
     pagination.current = current;
+    loadData();
+  };
+
+  const onPageSizeChange = (pageSize: number) => {
+    formModel.value.page = 1;
+    formModel.value.pageSize = pageSize;
+    pagination.current = 1;
+    pagination.pageSize = pageSize;
     loadData();
   };
 

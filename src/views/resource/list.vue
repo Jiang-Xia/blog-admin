@@ -102,6 +102,12 @@
   const changePage = (v: number) => {
     seachHandle(v);
   };
+  const onPageSizeChange = (pageSize: number) => {
+    searchForm.value.page = 1;
+    searchForm.value.pageSize = pageSize;
+    current.value = 1;
+    seachHandle(1);
+  };
   const menuSelect = (item: any) => {
     searchForm.value.type = item.type;
     seachHandle();
@@ -281,12 +287,12 @@
         <a-empty v-if="!imageList.length">{{ t('resource.empty') }}</a-empty>
       </section>
 
-      <a-pagination
+      <TablePagination
         :total="totalCount"
         :current="current"
         :page-size="searchForm.pageSize"
-        show-total
         @change="changePage"
+        @page-size-change="onPageSizeChange"
       />
     </div>
 

@@ -16,6 +16,7 @@
                   <a-input
                     v-model="formModel.privilegeName"
                     :placeholder="t('privilege.form.placeholder.name')"
+                    allow-clear
                   />
                 </a-form-item>
               </a-col>
@@ -24,6 +25,7 @@
                   <a-input
                     v-model="formModel.pathPattern"
                     :placeholder="t('privilege.form.placeholder.pathPattern')"
+                    allow-clear
                   />
                 </a-form-item>
               </a-col>
@@ -108,44 +110,45 @@
       <a-table
         :loading="loading"
         row-key="id"
-        :pagination="pagination"
+        :pagination="false"
         :data="renderData"
         :bordered="false"
-        @page-change="onPageChange"
+        scrollbar
+        :scroll="{ x: 1500, y: 600 }"
       >
         <template #columns>
           <a-table-column
-            min-width="130"
+            :width="130"
             :title="t('privilege.table.privilegeName')"
             data-index="privilegeName"
             align="center"
           />
           <a-table-column
-            min-width="130"
+            :width="130"
             :title="t('privilege.table.privilegeCode')"
             data-index="privilegeCode"
             align="center"
           />
           <a-table-column
-            min-width="130"
+            :width="130"
             :title="t('privilege.table.privilegePage')"
             data-index="privilegePage"
             align="center"
           />
           <a-table-column
-            min-width="130"
+            :width="130"
             :title="t('privilege.table.pathPattern')"
             data-index="pathPattern"
             align="center"
           />
           <a-table-column
-            min-width="180"
+            :width="120"
             :title="t('privilege.table.httpMethod')"
             data-index="httpMethod"
             align="center"
           />
           <a-table-column
-            min-width="100"
+            :width="100"
             :title="t('privilege.table.isPublic')"
             data-index="isPublic"
             align="center"
@@ -157,7 +160,7 @@
             </template>
           </a-table-column>
           <a-table-column
-            min-width="140"
+            :width="140"
             :title="t('privilege.table.requireOwnership')"
             data-index="requireOwnership"
             align="center"
@@ -169,7 +172,7 @@
             </template>
           </a-table-column>
           <a-table-column
-            min-width="100"
+            :width="100"
             :title="t('privilege.table.isVisible')"
             data-index="isVisible"
             align="center"
@@ -181,13 +184,13 @@
             </template>
           </a-table-column>
           <a-table-column
-            min-width="150"
+            :width="150"
             :title="t('privilege.table.description')"
             data-index="description"
             align="center"
           />
           <a-table-column
-            min-width="150"
+            :width="120"
             :title="t('privilege.table.operation')"
             data-index="operations"
             fixed="right"
@@ -216,6 +219,13 @@
           </a-table-column>
         </template>
       </a-table>
+      <TablePagination
+        :total="pagination.total"
+        :current="pagination.current"
+        :page-size="pagination.pageSize"
+        @change="onPageChange"
+        @page-size-change="onPageSizeChange"
+      />
     </a-card>
     <add-modal ref="addRef" @success="search"></add-modal>
   </div>
@@ -271,9 +281,17 @@
   const onPageChange = (current: number) => {
     getTableListHandle(current);
   };
+  const onPageSizeChange = (pageSize: number) => {
+    formModel.value.page = 1;
+    formModel.value.pageSize = pageSize;
+    pagination.current = 1;
+    pagination.pageSize = pageSize;
+    getTableListHandle(1);
+  };
   getTableListHandle();
   const reset = () => {
     formModel.value = generateFormModel();
+    search();
   };
   const delHandle = async (id: any) => {
     Modal.confirm({

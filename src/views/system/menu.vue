@@ -12,11 +12,12 @@
           >
             <a-row :gutter="16">
               <a-col :span="10">
-                <a-form-item :label="t('system.form.routeName')">
+                <a-form-item :label="t('menu.form.keyword')">
                   <a-input
-                    v-model="formModel.content"
-                    :placeholder="t('system.form.placeholder.routeName')"
-                    disabled
+                    v-model="formModel.keyword"
+                    :placeholder="t('menu.form.placeholder.keyword')"
+                    allow-clear
+                    @press-enter="search"
                   />
                 </a-form-item>
               </a-col>
@@ -57,32 +58,33 @@
       <a-table
         :loading="loading"
         row-key="id"
-        :pagination="pagination"
-        :data="renderData"
+        :pagination="false"
+        :data="tableData"
         :bordered="false"
-        @page-change="onPageChange"
+        scrollbar
+        :scroll="{ x: 980, y: 600 }"
       >
         <template #columns>
-          <a-table-column min-width="100" :title="t('system.table.menuId')" data-index="id" />
-          <a-table-column min-width="120" :title="t('system.table.menuEnName')" data-index="name" />
+          <a-table-column :width="100" :title="t('system.table.menuId')" data-index="id" />
+          <a-table-column :width="120" :title="t('system.table.menuEnName')" data-index="name" />
           <a-table-column
-            min-width="120"
+            :width="120"
             :title="t('system.table.menuCnName')"
             data-index="menuCnName"
           />
-          <a-table-column min-width="120" :title="t('system.table.menuPath')" data-index="path" />
+          <a-table-column :width="120" :title="t('system.table.menuPath')" data-index="path" />
           <a-table-column
-            min-width="120"
+            :width="160"
             :title="t('system.table.menuFilePath')"
             data-index="filePath"
           />
-          <a-table-column min-width="120" :title="t('system.table.menuIcon')" data-index="meta">
+          <a-table-column :width="100" :title="t('system.table.menuIcon')" data-index="meta">
             <template #cell="{ record }">
               <DynamicIcon v-if="record?.meta?.icon" :icon="record?.meta?.icon" />
             </template>
           </a-table-column>
           <a-table-column
-            min-width="120"
+            :width="100"
             :title="t('system.table.menuDisabled')"
             data-index="isDelete"
           >
@@ -105,7 +107,7 @@
             </template>
           </a-table-column>
           <a-table-column
-            min-width="100"
+            :width="120"
             :title="t('menu.table.operation')"
             data-index="operations"
             fixed="right"
@@ -123,13 +125,20 @@
           </a-table-column>
         </template>
       </a-table>
+      <TablePagination
+        :total="pagination.total"
+        :current="pagination.current"
+        :page-size="pagination.pageSize"
+        @change="onPageChange"
+        @page-size-change="onPageSizeChange"
+      />
     </a-card>
     <addMenu :ref="(el: any) => (addMenuRef = el)" @success="search"></addMenu>
   </div>
 </template>
 
 <script lang="ts" setup>
-  import { reactive, ref, h, compile } from 'vue';
+  import { reactive, ref, h, compile, computed, watch } from 'vue';
   import { useI18n } from 'vue-i18n';
   import useLoading from '@/hooks/loading';
   import type { Pagination } from '@/types/global';
@@ -146,7 +155,7 @@
       page: 1,
       pageSize: 10,
       total: 0,
-      content: '',
+      keyword: '',
     };
   };
   const { loading, setLoading } = useLoading(true);
@@ -166,20 +175,60 @@
     formModel.value.page = val;
     pagination.current = val;
     const res = await request.get('/admin/menu').then((res) => res.data);
-    // console.log(res);
     renderData.value = res;
     setLoading(false);
   };
+
+  const flattenMenus = (nodes: any[]): any[] => {
+    if (!Array.isArray(nodes)) return [];
+    return nodes.flatMap((node) => {
+      const children = node.children || [];
+      return [node, ...flattenMenus(children)];
+    });
+  };
+
+  const allMenus = computed(() => flattenMenus(renderData.value as any[]));
+
+  const filteredMenus = computed(() => {
+    const kw = formModel.value.keyword?.trim().toLowerCase();
+    if (!kw) return allMenus.value;
+    return allMenus.value.filter((menu) =>
+      [menu.name, menu.menuCnName, menu.path, menu.id, menu.filePath].some((value) =>
+        String(value || '')
+          .toLowerCase()
+          .includes(kw),
+      ),
+    );
+  });
+
+  const tableData = computed(() => {
+    const start = (pagination.current - 1) * pagination.pageSize;
+    return filteredMenus.value.slice(start, start + pagination.pageSize);
+  });
+  watch(
+    filteredMenus,
+    (list) => {
+      pagination.total = list.length;
+    },
+    { immediate: true },
+  );
   const search = () => {
     pagination.current = 1;
     getTableListHandle();
   };
   const onPageChange = (current: number) => {
-    getTableListHandle(current);
+    pagination.current = current;
+  };
+  const onPageSizeChange = (pageSize: number) => {
+    formModel.value.page = 1;
+    formModel.value.pageSize = pageSize;
+    pagination.current = 1;
+    pagination.pageSize = pageSize;
   };
   getTableListHandle();
   const reset = () => {
     formModel.value = generateFormModel();
+    search();
   };
   const delHandle = async (id: any) => {
     Modal.confirm({

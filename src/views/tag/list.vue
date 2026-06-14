@@ -16,6 +16,7 @@
                   <a-input
                     v-model="formModel.title"
                     :placeholder="t('tag.form.placeholder.name')"
+                    allow-clear
                   />
                 </a-form-item>
               </a-col>
@@ -57,29 +58,39 @@
       <a-table
         :loading="loading"
         row-key="id"
-        :pagination="pagination"
-        :data="renderData"
+        :pagination="false"
+        :data="tableData"
         :bordered="false"
-        @page-change="onPageChange"
+        scrollbar
+        :scroll="{ x: 700, y: 600 }"
       >
         <template #columns>
-          <a-table-column :title="t('tag.table.name')" data-index="label" />
-          <a-table-column :title="t('tag.table.articleCount')" data-index="articleCount">
+          <a-table-column :title="t('tag.table.name')" data-index="label" :width="160" />
+          <a-table-column
+            :title="t('tag.table.articleCount')"
+            data-index="articleCount"
+            :width="120"
+          >
             <template #cell="{ record }">
               <a-tag :color="record.color" size="small">{{ record.articleCount }}</a-tag>
             </template>
           </a-table-column>
-          <a-table-column :title="t('tag.table.color')" data-index="color">
+          <a-table-column :title="t('tag.table.color')" data-index="color" :width="120">
             <template #cell="{ record }">
               <a-tag :color="record.color" size="small">{{ record.color }}</a-tag>
             </template>
           </a-table-column>
-          <a-table-column :title="t('common.table.createTime')" data-index="createAt">
+          <a-table-column :title="t('common.table.createTime')" data-index="createAt" :width="180">
             <template #cell="{ record }">
               {{ formateDate(record.createAt) }}
             </template>
           </a-table-column>
-          <a-table-column :title="t('common.table.operation')" data-index="operations">
+          <a-table-column
+            :title="t('common.table.operation')"
+            data-index="operations"
+            :width="120"
+            fixed="right"
+          >
             <template #cell="{ record }">
               <a-space :size="8">
                 <a-button
@@ -104,6 +115,13 @@
           </a-table-column>
         </template>
       </a-table>
+      <TablePagination
+        :total="pagination.total"
+        :current="pagination.current"
+        :page-size="pagination.pageSize"
+        @change="onPageChange"
+        @page-size-change="onPageSizeChange"
+      />
       <CreateModal
         v-model:value="visibale"
         :type="t('tag.form.name')"
@@ -128,7 +146,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref, reactive } from 'vue';
+  import { ref, reactive, computed, watch } from 'vue';
   import { useI18n } from 'vue-i18n';
   import type { Pagination } from '@/types/global';
   import { Message, Modal } from '@arco-design/web-vue';
@@ -141,22 +159,15 @@
 
   const generateFormModel = () => {
     return {
-      page: 1,
-      category: '',
-      tags: [],
-      pageSize: 20,
-      total: 0,
       title: '',
-      description: '',
-      content: '',
-      uid: 1,
     };
   };
 
   const formModel = ref(generateFormModel());
   const basePagination: Pagination = {
     current: 1,
-    pageSize: 999,
+    pageSize: 10,
+    total: 0,
   };
   const pagination = reactive({
     ...basePagination,
@@ -171,12 +182,29 @@
     list: renderData,
     loadMore,
   } = useTableNoPageList('/tag', formModel.value);
+  watch(
+    () => renderData.value,
+    (list) => {
+      pagination.total = list.length;
+    },
+    { immediate: true },
+  );
+  const tableData = computed(() => {
+    const start = (pagination.current - 1) * pagination.pageSize;
+    return renderData.value.slice(start, start + pagination.pageSize);
+  });
   const search = () => {
     action.value = formModel.value;
+    pagination.current = 1;
     loadMore();
   };
   const onPageChange = (current: number) => {
-    search();
+    pagination.current = current;
+  };
+  const onPageSizeChange = (pageSize: number) => {
+    pagination.current = 1;
+    pagination.pageSize = pageSize;
+    formModel.value.pageSize = pageSize;
   };
   const reset = () => {
     formModel.value = generateFormModel();

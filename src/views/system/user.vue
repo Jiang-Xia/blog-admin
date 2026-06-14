@@ -12,18 +12,11 @@
           >
             <a-row :gutter="16">
               <a-col :span="6">
-                <a-form-item :label="t('user.form.mobile')">
-                  <a-input
-                    v-model="formModel.mobile"
-                    :placeholder="t('user.form.placeholder.mobile')"
-                  />
-                </a-form-item>
-              </a-col>
-              <a-col :span="6">
                 <a-form-item :label="t('user.form.username')">
                   <a-input
                     v-model="formModel.username"
                     :placeholder="t('user.form.placeholder.username')"
+                    allow-clear
                   />
                 </a-form-item>
               </a-col>
@@ -32,6 +25,7 @@
                   <a-input
                     v-model="formModel.nickname"
                     :placeholder="t('user.form.placeholder.nickname')"
+                    allow-clear
                   />
                 </a-form-item>
               </a-col>
@@ -72,27 +66,49 @@
       <a-table
         :loading="loading"
         row-key="id"
-        :pagination="pagination"
+        :pagination="false"
         :data="renderData"
         :bordered="false"
-        @page-change="onPageChange"
+        scrollbar
+        :scroll="{ x: 1400, y: 600 }"
       >
         <template #columns>
-          <a-table-column :title="t('user.table.mobile')" data-index="mobile" align="center" />
-          <a-table-column :title="t('system.table.avatar')" data-index="url" align="center">
+          <a-table-column
+            :title="t('user.table.username')"
+            data-index="username"
+            align="center"
+            :width="130"
+          />
+          <a-table-column
+            :title="t('system.table.avatar')"
+            data-index="url"
+            align="center"
+            :width="80"
+          >
             <template #cell="{ record }">
               <a-avatar>
                 <img :alt="record.avatar" :src="record.avatar" />
               </a-avatar>
             </template>
           </a-table-column>
-          <a-table-column :title="t('user.table.username')" data-index="username" align="center" />
-          <a-table-column :title="t('user.table.nickname')" data-index="nickname" />
-          <a-table-column :title="t('system.table.roleType')" data-index="role" />
+          <a-table-column :title="t('user.table.nickname')" data-index="nickname" :width="120" />
+          <a-table-column
+            :title="t('user.table.roles')"
+            data-index="roleNames"
+            align="center"
+            :width="150"
+          />
+          <a-table-column
+            :title="t('user.table.dept')"
+            data-index="deptName"
+            align="center"
+            :width="120"
+          />
           <a-table-column
             :title="t('user.table.createTime')"
             data-index="createTime"
             align="center"
+            :width="170"
           >
             <template #cell="{ record }">
               {{ formatDate(record.createTime) }}
@@ -102,12 +118,13 @@
             :title="t('system.table.updateTime')"
             data-index="updateTime"
             align="center"
+            :width="170"
           >
             <template #cell="{ record }">
               {{ formatDate(record.updateTime) }}
             </template>
           </a-table-column>
-          <a-table-column :title="t('system.table.locked')" data-index="status">
+          <a-table-column :title="t('system.table.locked')" data-index="status" :width="80">
             <template #cell="{ record }">
               <!-- :disabled="record.agreed" -->
               <a-switch
@@ -128,9 +145,23 @@
               </a-switch>
             </template>
           </a-table-column>
-          <a-table-column :title="t('user.table.operation')" data-index="operations">
+          <a-table-column
+            :title="t('user.table.operation')"
+            data-index="operations"
+            :width="200"
+            fixed="right"
+          >
             <template #cell="{ record }">
               <a-space :size="8">
+                <a-button
+                  v-permission="'user:edit'"
+                  size="mini"
+                  type="primary"
+                  :disabled="record.role === 'super'"
+                  @click="showModal('edit', record.id)"
+                >
+                  <icon-edit />
+                </a-button>
                 <a-button
                   v-permission="'user:delete'"
                   size="mini"
@@ -141,23 +172,12 @@
                   <icon-delete />
                 </a-button>
                 <a-button
-                  v-permission="'user:edit'"
-                  size="mini"
-                  type="primary"
-                  :disabled="record.role === 'super'"
-                  @click="showModal('edit', record.id)"
-                >
-                  {{ t('user.button.edit') }}
-                  <icon-edit />
-                </a-button>
-                <a-button
                   v-permission="'user:resetPassword'"
                   size="mini"
                   type="primary"
                   :disabled="record.role === 'super'"
                   @click="resetHandle(record)"
                 >
-                  {{ t('user.button.resetPassword') }}
                   <icon-refresh />
                 </a-button>
               </a-space>
@@ -165,6 +185,13 @@
           </a-table-column>
         </template>
       </a-table>
+      <TablePagination
+        :total="pagination.total"
+        :current="pagination.current"
+        :page-size="pagination.pageSize"
+        @change="onPageChange"
+        @page-size-change="onPageSizeChange"
+      />
     </a-card>
     <add-modal ref="addRef" @success="search"></add-modal>
   </div>
@@ -185,7 +212,6 @@
       page: 1,
       pageSize: 10,
       total: 0,
-      mobile: '',
       nickname: '',
       username: '',
     };
@@ -194,11 +220,12 @@
   const { t } = useI18n();
   interface User {
     id: string;
-    mobile: string;
     username: string;
     nickname: string;
     avatar: string;
-    role: string;
+    roleNames: string;
+    deptName: string;
+    role?: string;
     status: string;
     createTime?: string;
     updateTime?: string;
@@ -230,15 +257,23 @@
   const onPageChange = (current: number) => {
     getTableListHandle(current);
   };
+  const onPageSizeChange = (pageSize: number) => {
+    formModel.value.page = 1;
+    formModel.value.pageSize = pageSize;
+    pagination.current = 1;
+    pagination.pageSize = pageSize;
+    getTableListHandle(1);
+  };
   getTableListHandle();
   const reset = () => {
     formModel.value = generateFormModel();
+    search();
   };
   const delHandle = async (id: any) => {
     const record = renderData.value.find((item) => item.id === id);
     Modal.confirm({
       title: t('user.confirm.delete'),
-      content: `确定删除用户 ${record?.nickname || record?.mobile || '该用户'} 吗？`,
+      content: `确定删除用户 ${record?.nickname || record?.username || '该用户'} 吗？`,
       onOk: async () => {
         const res = await request.delete('/user', { params: { id } });
         Message.success(t('user.message.deleteSuccess'));
@@ -256,13 +291,13 @@
     addRef.value.show({ type, id });
   };
   const resetHandle = async (record: any) => {
-    const { mobile, nickname } = record;
-    const userName = record?.nickname || record?.mobile || t('user.label.thisUser');
+    const { username, nickname } = record;
+    const userName = record?.nickname || record?.username || t('user.label.thisUser');
     Modal.confirm({
       title: t('user.confirm.resetPassword'),
       content: t('user.confirm.resetPasswordContent', { user: userName }),
       onOk: async () => {
-        const res = await request.post('/user/resetPassword', { mobile, nickname });
+        const res = await request.post('/user/resetPassword', { username, nickname });
         Message.success(t('user.message.resetPasswordSuccess'));
       },
     });

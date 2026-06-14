@@ -22,12 +22,16 @@
         <a-input
           v-model="formState.username"
           :disabled="type === 'edit'"
-          :max-length="11"
+          :max-length="USERNAME_MAX_LENGTH"
           :placeholder="t('user.form.placeholder.username')"
         />
       </a-form-item>
       <a-form-item :label="t('user.form.nickname')" name="nickname" field="nickname">
-        <a-input v-model="formState.nickname" :placeholder="t('user.form.placeholder.nickname')" />
+        <a-input
+          v-model="formState.nickname"
+          :placeholder="t('user.form.placeholder.nickname')"
+          allow-clear
+        />
       </a-form-item>
       <a-form-item
         v-if="type !== 'edit'"
@@ -36,7 +40,11 @@
         field="password"
         :max-length="16"
       >
-        <a-input v-model="formState.password" :placeholder="t('user.form.placeholder.password')" />
+        <a-input
+          v-model="formState.password"
+          :placeholder="t('user.form.placeholder.password')"
+          allow-clear
+        />
       </a-form-item>
       <a-form-item
         v-if="type !== 'edit'"
@@ -48,6 +56,7 @@
         <a-input
           v-model="formState.passwordRepeat"
           :placeholder="t('user.form.placeholder.passwordRepeat')"
+          allow-clear
         />
       </a-form-item>
 
@@ -83,7 +92,11 @@
       </a-form-item>
 
       <a-form-item :label="t('user.form.avatar')" name="avatar" field="avatar">
-        <a-input v-model="formState.avatar" :placeholder="t('user.form.placeholder.avatar')" />
+        <a-input
+          v-model="formState.avatar"
+          :placeholder="t('user.form.placeholder.avatar')"
+          allow-clear
+        />
       </a-form-item>
 
       <a-form-item :label="t('user.form.intro')" name="intro" field="intro">
@@ -112,6 +125,7 @@
   import request from '@/api/request';
   import { adminCreateUser, adminUpdateUser } from '@/api/user';
   import { useI18n } from 'vue-i18n';
+  import { USERNAME_MAX_LENGTH, isRegisterAccount } from '@/utils/username';
 
   const { t } = useI18n();
   const type = ref('add');
@@ -122,7 +136,6 @@
     [propName: string]: string | number | undefined | any[];
   }
   interface FormState extends stringKey {
-    mobile: string;
     username: string;
     nickname: string;
     password: string;
@@ -133,7 +146,6 @@
     deptId?: string;
   }
   const defaultForm = {
-    mobile: '',
     username: '',
     nickname: '',
     password: '',
@@ -168,9 +180,19 @@
   };
   const rules = {
     username: [
-      { required: true, message: t('user.validate.username.required') },
-      { pattern: /^1[3-9]\d{9}$/, message: t('user.validate.username.pattern') },
-      { maxLength: 11, message: t('user.validate.username.maxLength') },
+      {
+        validator: (value: string, callback: (error?: string) => void) => {
+          if (!value) {
+            callback(t('user.validate.username.required'));
+            return;
+          }
+          if (!isRegisterAccount(value)) {
+            callback(t('user.validate.username.pattern'));
+            return;
+          }
+          callback();
+        },
+      },
     ],
     nickname: [
       { required: true, message: t('user.validate.nickname.required') },
@@ -276,10 +298,8 @@
     if (params.deptId) {
       params.deptId = parseInt(params.deptId);
     }
-    params.mobile = params.username;
-    // 在编辑模式下，移除手机号、用户名和密码字段，因为这些不能被修改
+    // 在编辑模式下，移除用户名和密码字段，因为这些不能被修改
     if (type.value === 'edit') {
-      delete params.mobile; // 编辑时不修改手机号
       delete params.username; // 编辑时不修改用户名
       delete params.password; // 编辑时不修改密码
     }

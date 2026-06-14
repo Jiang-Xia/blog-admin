@@ -9,7 +9,7 @@
     <!-- 登录方式切换 -->
     <div class="login-form-type-toggle">
       <a-radio-group v-model:model-value="loginType" type="button" size="small">
-        <a-radio value="mobile">{{ t('login.form.mobileLogin') }}</a-radio>
+        <a-radio value="account">{{ t('login.form.accountLogin') }}</a-radio>
         <a-radio value="email">{{ t('login.form.emailLogin') }}</a-radio>
       </a-radio-group>
     </div>
@@ -21,18 +21,34 @@
       layout="vertical"
       @submit="handleSubmit"
     >
-      <!-- 手机号登录表单 -->
-      <template v-if="loginType === 'mobile'">
+      <!-- 账号登录表单 -->
+      <template v-if="loginType === 'account'">
         <a-form-item
           field="username"
-          :rules="[{ required: true, message: t('login.form.userName.errMsg') }]"
+          :rules="[
+            { required: true, message: t('login.form.userName.errMsg') },
+            {
+              validator: (value: string, callback: (error?: string) => void) => {
+                if (!value) {
+                  callback(t('login.form.userName.errMsg'));
+                  return;
+                }
+                if (!isLoginAccount(value)) {
+                  callback(t('login.form.userName.pattern'));
+                  return;
+                }
+                callback();
+              },
+            },
+          ]"
           :validate-trigger="['change', 'blur']"
           hide-label
         >
           <a-input
             v-model="userInfo.username"
             :placeholder="t('login.form.userName.placeholder')"
-            :max-length="11"
+            allow-clear
+            :max-length="USERNAME_MAX_LENGTH"
           >
             <template #prefix>
               <icon-user />
@@ -65,6 +81,7 @@
           <a-input
             v-model="userInfo.authCode"
             :placeholder="t('login.form.imageCode.placeholder')"
+            allow-clear
             :max-length="6"
           >
             <template #suffix>
@@ -101,7 +118,11 @@
           :validate-trigger="['change', 'blur']"
           hide-label
         >
-          <a-input v-model="userInfo.email" :placeholder="t('login.form.email.placeholder')">
+          <a-input
+            v-model="userInfo.email"
+            allow-clear
+            :placeholder="t('login.form.email.placeholder')"
+          >
             <template #prefix>
               <icon-user />
             </template>
@@ -132,6 +153,7 @@
           <a-input-search
             v-model="userInfo.emailAuthCode"
             :placeholder="t('login.form.emailAuthCode.placeholder')"
+            allow-clear
             :max-length="6"
             search-button
             :disabled="emailCaptchaDisabled"
@@ -184,6 +206,7 @@
   import type { LoginData } from '@/api/user';
   import { getAuthCode, getEmailAuthCode } from '@/api/login';
   import { shouldRefreshGraphicCaptcha } from '@/constants/graphic-captcha-error';
+  import { USERNAME_MAX_LENGTH, isLoginAccount } from '@/utils/username';
 
   const router = useRouter();
   const { t } = useI18n();
@@ -192,8 +215,8 @@
   const userStore = useUserStore();
   const { query } = useRoute();
 
-  // 登录方式：mobile 或 email
-  const loginType = ref<'mobile' | 'email'>('mobile');
+  // 登录方式：account 或 email
+  const loginType = ref<'account' | 'email'>('account');
 
   const loginConfig = useStorage('login-config', {
     rememberAccount: true,
@@ -240,11 +263,12 @@
       try {
         // 根据登录方式准备登录数据
         let loginData: LoginData;
-        if (loginType.value === 'mobile') {
+        if (loginType.value === 'account') {
           loginData = {
             username: values.username,
             password: values.password,
             authCode: values.authCode,
+            captchaId: captchaId.value,
           };
         } else {
           // 邮箱登录数据
@@ -267,16 +291,17 @@
         const { rememberAccount } = loginConfig.value;
 
         // 保存登录信息
-        if (loginType.value === 'mobile') {
+        if (loginType.value === 'account') {
           loginConfig.value.username = rememberAccount ? values.username : '';
         } else {
           loginConfig.value.email = rememberAccount ? values.email : '';
         }
       } catch (err: any) {
         errorMessage.value = err?.message || '';
-        if (loginType.value === 'mobile' && shouldRefreshGraphicCaptcha(err?.bizCode)) {
+        if (loginType.value === 'account' && shouldRefreshGraphicCaptcha(err?.bizCode)) {
           void changeAuthCodeUrl();
           userInfo.authCode = '';
+          captchaId.value = '';
         }
       } finally {
         setLoading(false);
@@ -294,14 +319,17 @@
     try {
       const res = await getAuthCode();
       authCodeUrl.value = `data:image/svg+xml;base64,${res.captchaBase64}`;
+      captchaId.value = res.captchaId || '';
       authCodeLoadError.value = false;
     } catch {
       authCodeUrl.value = '';
+      captchaId.value = '';
       authCodeLoadError.value = true;
       // 错误提示由 axios 全局拦截器统一处理
     }
   };
   const authCodeLoadError = ref(false);
+  const captchaId = ref('');
   const changeAuthCodeUrlDebounced = useDebounceFn(() => {
     void changeAuthCodeUrl();
   }, 300);

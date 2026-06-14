@@ -1,6 +1,11 @@
 export default {
   // Friend Link Management
   'link.query.title': 'Link Query',
+  'link.form.placeholder.title': 'Search title',
+  'link.form.placeholder.url': 'Search URL',
+  'link.form.placeholder.status': 'Select status',
+  'link.status.approved': 'Approved',
+  'link.status.pending': 'Pending',
   'link.button.add': 'Add',
   'link.table.title': 'Title',
   'link.table.icon': 'Icon',

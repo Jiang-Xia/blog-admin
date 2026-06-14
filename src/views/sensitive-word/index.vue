@@ -15,6 +15,7 @@
                   <a-input
                     v-model="formModel.keyword"
                     :placeholder="t('sensitiveWord.form.placeholder.keyword')"
+                    allow-clear
                     @press-enter="search"
                   />
                 </a-form-item>
@@ -86,15 +87,32 @@
       <a-table
         :loading="loading"
         row-key="id"
-        :pagination="pagination"
+        :pagination="false"
         :data="tableData"
         :bordered="false"
-        @page-change="onPageChange"
+        scrollbar
+        :scroll="{ x: 1100, y: 600 }"
       >
         <template #columns>
-          <a-table-column :title="t('sensitiveWord.table.word')" data-index="word" />
-          <a-table-column :title="t('sensitiveWord.table.category')" data-index="category" />
-          <a-table-column :title="t('sensitiveWord.table.status')" data-index="status">
+          <a-table-column :title="t('sensitiveWord.table.word')" data-index="word" :width="140" />
+          <a-table-column
+            :title="t('sensitiveWord.table.category')"
+            data-index="category"
+            :width="120"
+          />
+          <a-table-column title="等级" data-index="level" :width="70" />
+          <a-table-column title="扣HP" data-index="hpPenalty" :width="70" />
+          <a-table-column title="需审核" data-index="needReview" :width="80">
+            <template #cell="{ record }">
+              {{ record.needReview === 1 ? '是' : '否' }}
+            </template>
+          </a-table-column>
+          <a-table-column title="动作" data-index="action" :width="90">
+            <template #cell="{ record }">
+              {{ record.action === 2 ? '拒绝' : record.action === 3 ? '仅记录' : '替换' }}
+            </template>
+          </a-table-column>
+          <a-table-column :title="t('sensitiveWord.table.status')" data-index="status" :width="100">
             <template #cell="{ record }">
               <a-tag :color="record.status === 1 ? 'green' : 'red'">
                 {{
@@ -105,7 +123,11 @@
               </a-tag>
             </template>
           </a-table-column>
-          <a-table-column :title="t('sensitiveWord.table.createTime')" data-index="createTime">
+          <a-table-column
+            :title="t('sensitiveWord.table.createTime')"
+            data-index="createTime"
+            :width="170"
+          >
             <template #cell="{ record }">
               {{ $dayjs(record.createTime).format('YYYY-MM-DD HH:mm:ss') }}
             </template>
@@ -113,7 +135,8 @@
           <a-table-column
             :title="t('sensitiveWord.table.operation')"
             data-index="operations"
-            :width="150"
+            :width="120"
+            fixed="right"
           >
             <template #cell="{ record }">
               <a-space :size="8">
@@ -128,6 +151,13 @@
           </a-table-column>
         </template>
       </a-table>
+      <TablePagination
+        :total="pagination.total"
+        :current="pagination.current"
+        :page-size="pagination.pageSize"
+        @change="onPageChange"
+        @page-size-change="onPageSizeChange"
+      />
     </a-card>
 
     <!-- 新增/编辑弹窗 -->
@@ -142,6 +172,7 @@
           <a-input
             v-model="modalForm.word"
             :placeholder="t('sensitiveWord.form.placeholder.word')"
+            allow-clear
           />
         </a-form-item>
         <a-form-item :label="t('sensitiveWord.form.categoryLabel')">
@@ -159,6 +190,27 @@
             <a-radio :value="1">{{ t('sensitiveWord.table.status.enabled') }}</a-radio>
             <a-radio :value="0">{{ t('sensitiveWord.table.status.disabled') }}</a-radio>
           </a-radio-group>
+        </a-form-item>
+        <a-form-item label="等级">
+          <a-select v-model="modalForm.level">
+            <a-option :value="1">1-重(拒绝)</a-option>
+            <a-option :value="2">2-中(正能量替换)</a-option>
+            <a-option :value="3">3-轻(仅记录)</a-option>
+          </a-select>
+        </a-form-item>
+        <a-form-item label="扣HP"> </a-form-item>
+        <a-form-item label="需审核">
+          <a-radio-group v-model="modalForm.needReview">
+            <a-radio :value="1">是</a-radio>
+            <a-radio :value="0">否</a-radio>
+          </a-radio-group>
+        </a-form-item>
+        <a-form-item label="动作">
+          <a-select v-model="modalForm.action">
+            <a-option :value="1">替换</a-option>
+            <a-option :value="2">拒绝</a-option>
+            <a-option :value="3">仅记录</a-option>
+          </a-select>
         </a-form-item>
       </a-form>
     </a-modal>
@@ -205,7 +257,15 @@
   const modalVisible = ref(false);
   const isEdit = ref(false);
   const editId = ref<number>(0);
-  const modalForm = ref({ word: '', category: '自定义', status: 1 });
+  const modalForm = ref({
+    word: '',
+    category: '自定义',
+    status: 1,
+    level: 2,
+    hpPenalty: 20,
+    needReview: 1,
+    action: 1,
+  });
 
   const loadData = async () => {
     setLoading(true);
@@ -238,17 +298,41 @@
     loadData();
   };
 
+  const onPageSizeChange = (pageSize: number) => {
+    formModel.value.page = 1;
+    formModel.value.pageSize = pageSize;
+    pagination.current = 1;
+    pagination.pageSize = pageSize;
+    loadData();
+  };
+
   const showCreateModal = () => {
     isEdit.value = false;
     editId.value = 0;
-    modalForm.value = { word: '', category: '自定义', status: 1 };
+    modalForm.value = {
+      word: '',
+      category: '自定义',
+      status: 1,
+      level: 2,
+      hpPenalty: 20,
+      needReview: 1,
+      action: 1,
+    };
     modalVisible.value = true;
   };
 
   const showEditModal = (record: any) => {
     isEdit.value = true;
     editId.value = record.id;
-    modalForm.value = { word: record.word, category: record.category, status: record.status };
+    modalForm.value = {
+      word: record.word,
+      category: record.category,
+      status: record.status,
+      level: record.level ?? 2,
+      hpPenalty: record.hpPenalty ?? 20,
+      needReview: record.needReview ?? 1,
+      action: record.action ?? 1,
+    };
     modalVisible.value = true;
   };
 

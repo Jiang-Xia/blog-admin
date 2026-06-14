@@ -14,7 +14,6 @@ import localeOperationLog from '@/views/operation-log/locale/en-US';
 import localeScheduledTask from '@/views/scheduled-task/locale/en-US';
 import localeTaskManage from '@/views/task-manage/locale/en-US';
 import localePayOrder from '@/views/pay-order/locale/en-US';
-
 import localeWorkplace from '@/views/dashboard/workplace/locale/en-US';
 import localeDatascreen from '@/views/dashboard/datascreen/locale/en-US';
 
@@ -94,6 +93,16 @@ export default {
 
   'menu.server.extApps': 'Extended Apps',
   'menu.server.payOrder': 'Payment',
+
+  'menu.server.rpgManage': 'RPG Management',
+  'menu.server.rpgAchievement': 'Achievements',
+  'menu.server.rpgQuest': 'Daily Quests',
+  'menu.server.rpgLottery': 'Lottery Pool',
+  'menu.server.rpgUser': 'User RPG Data',
+  'menu.server.rpgItemConfig': 'Item Config',
+  'menu.server.rpgActivity': 'Activities',
+  'menu.server.rpgGuild': 'Guilds',
+  'menu.server.rpgSocialLog': 'Tip & Social Logs',
 
   ...localeSettings,
   ...localeCommon,

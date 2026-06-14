@@ -25,6 +25,7 @@
           v-model="formState.deptName"
           :max-length="20"
           :placeholder="t('dept.form.placeholder.deptName')"
+          allow-clear
         />
       </a-form-item>
       <a-form-item :label="t('dept.form.deptCode')" name="deptCode" field="deptCode">
@@ -32,6 +33,7 @@
           v-model="formState.deptCode"
           :max-length="20"
           :placeholder="t('dept.form.placeholder.deptCode')"
+          allow-clear
         />
       </a-form-item>
       <a-form-item :label="t('dept.form.parentId')" name="parentId" field="parentId">
@@ -44,12 +46,17 @@
         />
       </a-form-item>
       <a-form-item :label="t('dept.form.leaderId')" name="leaderId" field="leaderId">
-        <a-input v-model="formState.leaderId" :placeholder="t('dept.form.placeholder.leaderId')" />
+        <a-input
+          v-model="formState.leaderId"
+          :placeholder="t('dept.form.placeholder.leaderId')"
+          allow-clear
+        />
       </a-form-item>
       <a-form-item :label="t('dept.form.leaderName')" name="leaderName" field="leaderName">
         <a-input
           v-model="formState.leaderName"
           :placeholder="t('dept.form.placeholder.leaderName')"
+          allow-clear
         />
       </a-form-item>
       <a-form-item :label="t('dept.form.orderNum')" name="orderNum" field="orderNum">

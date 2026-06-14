@@ -79,10 +79,11 @@ export const updateDept = async (data: Dept) => {
 };
 
 // 获取部门树形结构
-export const getDeptTree = async () => {
+export const getDeptTree = async (params?: DeptQueryParams) => {
   const res = await request({
     url: '/dept/tree',
     method: 'get',
+    params,
   });
   return res;
 };
