@@ -126,6 +126,25 @@
         }"
       >
         <template #columns>
+          <a-table-column :title="t('article.table.status')" data-index="status" :width="120">
+            <template #cell="{ record }">
+              <a-tag v-if="record.status === 'publish'" color="green">
+                {{ t('article.status.publish') }}
+              </a-tag>
+              <a-tag v-else-if="record.status === 'draft'" color="gray">
+                {{ t('article.status.draft') }}
+              </a-tag>
+              <a-tooltip
+                v-else-if="record.status === 'scheduled'"
+                :content="record.scheduledPublishAt"
+              >
+                <a-tag color="orangered">
+                  {{ t('article.status.scheduled') }}
+                </a-tag>
+              </a-tooltip>
+              <a-tag v-else color="blue">{{ record.status }}</a-tag>
+            </template>
+          </a-table-column>
           <a-table-column
             :title="t('article.table.title')"
             data-index="title"
@@ -170,6 +189,7 @@
               </span>
             </template>
           </a-table-column>
+          <a-table-column :title="t('article.table.author')" data-index="authorName" :width="100" />
           <a-table-column :title="t('article.table.dept')" data-index="deptName" :width="120" />
           <a-table-column :title="t('article.table.tag')" data-index="tag" :width="120">
             <template #cell="{ record }">
@@ -185,25 +205,6 @@
             data-index="commentCount"
             :width="80"
           />
-          <a-table-column :title="t('article.table.status')" data-index="status" :width="120">
-            <template #cell="{ record }">
-              <a-tag v-if="record.status === 'publish'" color="green">
-                {{ t('article.status.publish') }}
-              </a-tag>
-              <a-tag v-else-if="record.status === 'draft'" color="gray">
-                {{ t('article.status.draft') }}
-              </a-tag>
-              <a-tooltip
-                v-else-if="record.status === 'scheduled'"
-                :content="record.scheduledPublishAt"
-              >
-                <a-tag color="orangered">
-                  {{ t('article.status.scheduled') }}
-                </a-tag>
-              </a-tooltip>
-              <a-tag v-else color="blue">{{ record.status }}</a-tag>
-            </template>
-          </a-table-column>
           <a-table-column :title="t('article.table.updateTime')" data-index="uTime" :width="200" />
           <a-table-column :title="t('article.table.topping')" :width="60" fixed="right">
             <template #cell="{ record }">
@@ -294,6 +295,7 @@
   import type { Pagination } from '@/types/global';
   import { getArticleList, delArticle } from '@/api/article';
   import { getDeptTree } from '@/api/dept';
+  import { userInfo } from '@/api/login';
   import { Message, Modal } from '@arco-design/web-vue';
   import request from '@/api/request';
   import * as XLSX from 'xlsx';
@@ -333,6 +335,8 @@
     tag?: string;
     tagColor?: string;
     deptName?: string;
+    authorName?: string;
+    userInfo?: { nickname?: string };
     [k: string]: unknown;
   }
   const renderData = ref<ArticleRow[]>([]);
@@ -376,6 +380,7 @@
       renderData.value = (res.list as ArticleRow[]).map((v) => {
         v.tag = v.tags.map((it) => it.label).join();
         v.tagColor = v.tags[0]?.color;
+        v.authorName = v.userInfo?.nickname || '';
         return v;
       });
       pagination.total = res.pagination.total;
@@ -418,12 +423,23 @@
       }
     });
   };
-  getArticleListHandle();
+  const initPage = async () => {
+    await loadDeptTree();
+    try {
+      const user = await userInfo();
+      if (user?.deptId) {
+        formModel.value.deptId = user.deptId;
+      }
+    } catch {
+      // ignore
+    }
+    getArticleListHandle();
+  };
   const loadDeptTree = async () => {
     const res = await getDeptTree();
     deptTreeData.value = res.data ?? [];
   };
-  loadDeptTree();
+  initPage();
   const reset = () => {
     formModel.value = generateFormModel();
     search();

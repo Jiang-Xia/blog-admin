@@ -18,6 +18,7 @@ export default {
   'msgboard.table.nickname': 'Nickname',
   'msgboard.table.avatar': 'Avatar',
   'msgboard.table.comment': 'Comment Content',
+  'msgboard.table.createTime': 'Message Time',
   'msgboard.table.address': 'Website',
   'msgboard.button.search': 'Search',
   'msgboard.button.reset': 'Reset',

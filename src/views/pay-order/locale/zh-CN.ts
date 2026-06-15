@@ -15,6 +15,7 @@ export default {
   'payOrder.table.status': '订单状态',
   'payOrder.table.channel': '渠道',
   'payOrder.table.refundAmount': '退款金额',
+  'payOrder.table.payTime': '支付时间',
   'payOrder.table.createTime': '创建时间',
   'payOrder.table.updateTime': '更新时间',
   'payOrder.table.action': '操作',

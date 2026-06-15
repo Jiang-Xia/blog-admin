@@ -124,35 +124,30 @@
               {{ formatDate(record.updateTime) }}
             </template>
           </a-table-column>
-          <a-table-column :title="t('system.table.locked')" data-index="status" :width="80">
-            <template #cell="{ record }">
-              <!-- :disabled="record.agreed" -->
-              <a-switch
-                v-permission="'user:status'"
-                v-model="record.status"
-                active-color="red"
-                checked-value="locked"
-                unchecked-value="active"
-                :disabled="record.role === 'super'"
-                @change="onSwitchStatus(record)"
-              >
-                <template #checked-icon>
-                  <icon-lock />
-                </template>
-                <template #unchecked-icon>
-                  <icon-unlock />
-                </template>
-              </a-switch>
-            </template>
-          </a-table-column>
           <a-table-column
             :title="t('user.table.operation')"
             data-index="operations"
-            :width="200"
+            :width="260"
             fixed="right"
           >
             <template #cell="{ record }">
               <a-space :size="8">
+                <a-switch
+                  v-permission="'user:status'"
+                  v-model="record.status"
+                  active-color="red"
+                  checked-value="locked"
+                  unchecked-value="active"
+                  :disabled="record.role === 'super'"
+                  @change="onSwitchStatus(record)"
+                >
+                  <template #checked-icon>
+                    <icon-lock />
+                  </template>
+                  <template #unchecked-icon>
+                    <icon-unlock />
+                  </template>
+                </a-switch>
                 <a-button
                   v-permission="'user:edit'"
                   size="mini"

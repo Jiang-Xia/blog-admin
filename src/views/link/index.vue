@@ -85,6 +85,18 @@
         :scroll="{ x: 980, y: 600 }"
       >
         <template #columns>
+          <a-table-column :title="t('link.table.status')" data-index="url" :width="100">
+            <template #cell="{ record }">
+              <a-switch v-model="record.agreed" @change="onSwitchChange(record)">
+                <template #checked-icon>
+                  <icon-check />
+                </template>
+                <template #unchecked-icon>
+                  <icon-close />
+                </template>
+              </a-switch>
+            </template>
+          </a-table-column>
           <a-table-column :title="t('link.table.title')" data-index="title" :width="160" />
           <a-table-column
             :title="t('link.table.icon')"
@@ -104,17 +116,11 @@
               <a-link :href="record.url" target="_blank">{{ record.url }}</a-link>
             </template>
           </a-table-column>
-          <a-table-column :title="t('link.table.status')" data-index="url" :width="100">
+          <a-table-column :title="t('link.table.applyTime')" data-index="createTime" :width="170">
             <template #cell="{ record }">
-              <!-- :disabled="record.agreed" -->
-              <a-switch v-model="record.agreed" @change="onSwitchChange(record)">
-                <template #checked-icon>
-                  <icon-check />
-                </template>
-                <template #unchecked-icon>
-                  <icon-close />
-                </template>
-              </a-switch>
+              {{
+                record.createTime ? $dayjs(record.createTime).format('YYYY-MM-DD HH:mm:ss') : '-'
+              }}
             </template>
           </a-table-column>
           <a-table-column

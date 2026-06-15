@@ -12,6 +12,7 @@ export default {
   'link.table.description': 'Description',
   'link.table.website': 'Website',
   'link.table.status': 'Status',
+  'link.table.applyTime': 'Apply Time',
   'link.table.operation': 'Operation',
   'link.message.deleteSuccess': 'Delete Successful',
   'link.message.setSuccess': 'Set Successful',

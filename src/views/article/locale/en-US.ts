@@ -20,6 +20,7 @@ export default {
   'article.table.cover': 'Cover',
   'article.table.category': 'Category',
   'article.table.dept': 'Department',
+  'article.table.author': 'Author',
   'article.table.tag': 'Tag',
   'article.table.views': 'Views',
   'article.table.likes': 'Likes',

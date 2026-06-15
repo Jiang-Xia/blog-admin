@@ -79,6 +79,13 @@
         :scroll="{ x: 1000, y: 600 }"
       >
         <template #columns>
+          <a-table-column title="状态" data-index="active" :width="80">
+            <template #cell="{ record }">
+              <a-tag :color="record.active ? 'green' : 'red'">
+                {{ record.active ? '启用' : '禁用' }}
+              </a-tag>
+            </template>
+          </a-table-column>
           <a-table-column title="编码" data-index="code" :width="130" />
           <a-table-column title="名称" data-index="name" :width="120" />
           <a-table-column title="描述" data-index="description" :width="160" ellipsis tooltip />
@@ -98,13 +105,6 @@
             <template #cell="{ record }"> {{ (record.probability * 100).toFixed(1) }}% </template>
           </a-table-column>
           <a-table-column title="排序" data-index="sort" :width="60" align="center" />
-          <a-table-column title="状态" data-index="active" :width="80">
-            <template #cell="{ record }">
-              <a-tag :color="record.active ? 'green' : 'red'">
-                {{ record.active ? '启用' : '禁用' }}
-              </a-tag>
-            </template>
-          </a-table-column>
           <a-table-column title="操作" data-index="operations" :width="120" fixed="right">
             <template #cell="{ record }">
               <a-space :size="8">
@@ -283,6 +283,13 @@
     buff: 'Buff',
     ticket: '抽奖券',
     achievement: '成就',
+    title: '称号',
+    avatar_frame: '头像框',
+    pet: '宠物',
+    consumable: '消耗品',
+    equipment: '装备',
+    currency: '钻石',
+    unknown: '未知',
   };
 
   const RARITY_LABELS: Record<string, string> = {

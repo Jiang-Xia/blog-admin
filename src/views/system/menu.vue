@@ -65,28 +65,11 @@
         :scroll="{ x: 980, y: 600 }"
       >
         <template #columns>
-          <a-table-column :width="100" :title="t('system.table.menuId')" data-index="id" />
-          <a-table-column :width="120" :title="t('system.table.menuEnName')" data-index="name" />
-          <a-table-column
-            :width="120"
-            :title="t('system.table.menuCnName')"
-            data-index="menuCnName"
-          />
-          <a-table-column :width="120" :title="t('system.table.menuPath')" data-index="path" />
-          <a-table-column
-            :width="160"
-            :title="t('system.table.menuFilePath')"
-            data-index="filePath"
-          />
-          <a-table-column :width="100" :title="t('system.table.menuIcon')" data-index="meta">
-            <template #cell="{ record }">
-              <DynamicIcon v-if="record?.meta?.icon" :icon="record?.meta?.icon" />
-            </template>
-          </a-table-column>
           <a-table-column
             :width="100"
             :title="t('system.table.menuDisabled')"
             data-index="isDelete"
+            fixed="left"
           >
             <template #cell="{ record }">
               <a-switch
@@ -104,6 +87,24 @@
                   <icon-lock />
                 </template>
               </a-switch>
+            </template>
+          </a-table-column>
+          <a-table-column :width="100" :title="t('system.table.menuId')" data-index="id" />
+          <a-table-column :width="120" :title="t('system.table.menuEnName')" data-index="name" />
+          <a-table-column
+            :width="120"
+            :title="t('system.table.menuCnName')"
+            data-index="menuCnName"
+          />
+          <a-table-column :width="120" :title="t('system.table.menuPath')" data-index="path" />
+          <a-table-column
+            :width="160"
+            :title="t('system.table.menuFilePath')"
+            data-index="filePath"
+          />
+          <a-table-column :width="100" :title="t('system.table.menuIcon')" data-index="meta">
+            <template #cell="{ record }">
+              <DynamicIcon v-if="record?.meta?.icon" :icon="record?.meta?.icon" />
             </template>
           </a-table-column>
           <a-table-column

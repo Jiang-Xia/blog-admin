@@ -60,6 +60,13 @@
         :scroll="{ x: 1350, y: 600 }"
       >
         <template #columns>
+          <a-table-column :title="t('payOrder.table.status')" :width="100" align="center">
+            <template #cell="{ record }">
+              <a-tag :color="statusColorMap[record.status]" size="small">
+                {{ t(`payOrder.status.${record.status}`) }}
+              </a-tag>
+            </template>
+          </a-table-column>
           <a-table-column
             :title="t('payOrder.table.outTradeNo')"
             data-index="outTradeNo"
@@ -83,13 +90,6 @@
               <span style="font-weight: 600; color: #165dff">¥{{ record.totalAmount }}</span>
             </template>
           </a-table-column>
-          <a-table-column :title="t('payOrder.table.status')" :width="100" align="center">
-            <template #cell="{ record }">
-              <a-tag :color="statusColorMap[record.status]" size="small">
-                {{ t(`payOrder.status.${record.status}`) }}
-              </a-tag>
-            </template>
-          </a-table-column>
           <a-table-column :title="t('payOrder.table.channel')" :width="80" align="center">
             <template #cell="{ record }">
               {{ t(`payOrder.channel.${record.channel}`) }}
@@ -101,6 +101,15 @@
                 ¥{{ record.refundAmount }}
               </span>
               <span v-else>-</span>
+            </template>
+          </a-table-column>
+          <a-table-column :title="t('payOrder.table.payTime')" :width="170">
+            <template #cell="{ record }">
+              {{
+                record.status === 'PAID' && record.updateTime
+                  ? $dayjs(record.updateTime).format('YYYY-MM-DD HH:mm:ss')
+                  : '-'
+              }}
             </template>
           </a-table-column>
           <a-table-column :title="t('payOrder.table.createTime')" :width="170">

@@ -20,6 +20,7 @@ export default {
   'article.table.cover': '封面',
   'article.table.category': '分类',
   'article.table.dept': '所属机构',
+  'article.table.author': '作者',
   'article.table.tag': '标签',
   'article.table.views': '查看',
   'article.table.likes': '点赞',

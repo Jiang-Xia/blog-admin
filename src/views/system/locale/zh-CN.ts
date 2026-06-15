@@ -85,6 +85,7 @@ export default {
   'role.scopeType.DEPT': '本部门',
   'role.scopeType.DEPT_AND_CHILDREN': '本部门及下级',
   'role.scopeType.CUSTOM': '自定义机构',
+  'role.table.articleDataScope': '文章数据范围',
 
   // 权限管理
   'privilege.query.title': '权限查询',
@@ -114,7 +115,7 @@ export default {
   'privilege.method.all': '*(全部)',
   'privilege.table.privilegeName': '权限名',
   'privilege.table.privilegeCode': '权限识别码',
-  'privilege.table.privilegePage': '所属页面',
+  'privilege.table.privilegePageName': '所属页面名称',
   'privilege.table.pathPattern': '路径模式',
   'privilege.table.httpMethod': 'HTTP方法',
   'privilege.table.isPublic': '是否公开',
@@ -245,7 +246,7 @@ export default {
   'system.table.menuPath': '菜单路径',
   'system.table.menuFilePath': '菜单文件路径',
   'system.table.menuIcon': '菜单图标',
-  'system.table.menuDisabled': '菜单禁用状态',
+  'system.table.menuDisabled': '禁用状态',
   'system.table.roleId': '角色ID',
   'system.table.roleName': '角色名称',
   'system.table.roleDesc': '角色描述',

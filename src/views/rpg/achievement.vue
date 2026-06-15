@@ -79,6 +79,13 @@
         :scroll="{ x: 1200, y: 600 }"
       >
         <template #columns>
+          <a-table-column title="状态" data-index="active" :width="80">
+            <template #cell="{ record }">
+              <a-tag :color="record.active !== false ? 'green' : 'red'">
+                {{ record.active !== false ? '启用' : '禁用' }}
+              </a-tag>
+            </template>
+          </a-table-column>
           <a-table-column title="编码" data-index="code" :width="140" />
           <a-table-column title="名称" data-index="name" :width="120" />
           <a-table-column title="描述" data-index="description" :width="160" ellipsis tooltip />
@@ -88,7 +95,14 @@
             </template>
           </a-table-column>
           <a-table-column title="图标" data-index="icon" :width="110" />
-          <a-table-column title="达成条件" data-index="maxProgress" :width="90" align="center" />
+          <a-table-column
+            title="达成条件"
+            data-index="conditionText"
+            :width="180"
+            ellipsis
+            tooltip
+          />
+          <a-table-column title="目标次数" data-index="maxProgress" :width="90" align="center" />
           <a-table-column title="经验奖励" data-index="expReward" :width="90" align="center">
             <template #cell="{ record }">
               <span style="color: #f59e0b; font-weight: 600">+{{ record.expReward }}</span>
@@ -98,13 +112,6 @@
             <template #cell="{ record }">{{ record.isHidden ? '是' : '否' }}</template>
           </a-table-column>
           <a-table-column title="排序" data-index="sort" :width="60" align="center" />
-          <a-table-column title="状态" data-index="active" :width="80">
-            <template #cell="{ record }">
-              <a-tag :color="record.active !== false ? 'green' : 'red'">
-                {{ record.active !== false ? '启用' : '禁用' }}
-              </a-tag>
-            </template>
-          </a-table-column>
           <a-table-column title="操作" data-index="operations" :width="120" fixed="right">
             <template #cell="{ record }">
               <a-space :size="8">
@@ -177,15 +184,21 @@
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item label="达成次数"> </a-form-item>
+            <a-form-item label="达成次数">
+              <a-input-number v-model="modalForm.maxProgress" :min="1" style="width: 100%" />
+            </a-form-item>
           </a-col>
         </a-row>
         <a-row :gutter="16">
           <a-col :span="12">
-            <a-form-item label="经验奖励"> </a-form-item>
+            <a-form-item label="经验奖励">
+              <a-input-number v-model="modalForm.expReward" :min="0" style="width: 100%" />
+            </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item label="排序"> </a-form-item>
+            <a-form-item label="排序">
+              <a-input-number v-model="modalForm.sort" :min="0" style="width: 100%" />
+            </a-form-item>
           </a-col>
         </a-row>
         <a-row :gutter="16">
@@ -326,8 +339,8 @@
       description: record.description || '',
       category: record.category,
       icon: record.icon || 'trophy',
-      maxProgress: record.maxProgress,
-      expReward: record.expReward,
+      maxProgress: record.maxProgress ?? record.effectJson?.maxProgress ?? 1,
+      expReward: record.expReward ?? record.effectJson?.expReward ?? 10,
       sort: record.sort,
       active: record.active !== false,
       isHidden: record.isHidden ?? 0,
@@ -341,11 +354,18 @@
       return;
     }
     if (isEdit.value) {
-      const { code, ...data } = modalForm.value;
-      await updateAchievement(editId.value, data);
+      const { code, maxProgress, expReward, ...data } = modalForm.value;
+      await updateAchievement(editId.value, {
+        ...data,
+        effectJson: { maxProgress, expReward },
+      });
       Message.success('更新成功');
     } else {
-      await createAchievement(modalForm.value);
+      const { maxProgress, expReward, ...data } = modalForm.value;
+      await createAchievement({
+        ...data,
+        effectJson: { maxProgress, expReward },
+      });
       Message.success('新增成功');
     }
     modalVisible.value = false;

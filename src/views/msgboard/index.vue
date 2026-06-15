@@ -126,6 +126,11 @@
             ellipsis
           />
           <a-table-column
+            :title="t('msgboard.table.createTime')"
+            data-index="createAt"
+            :width="170"
+          />
+          <a-table-column
             :title="t('msgboard.table.address')"
             data-index="address"
             :width="200"

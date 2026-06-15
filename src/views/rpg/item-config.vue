@@ -69,6 +69,13 @@
         :scroll="{ x: 900, y: 600 }"
       >
         <template #columns>
+          <a-table-column title="状态" data-index="active" :width="80">
+            <template #cell="{ record }">
+              <a-tag :color="record.active ? 'green' : 'red'">
+                {{ record.active ? '启用' : '禁用' }}
+              </a-tag>
+            </template>
+          </a-table-column>
           <a-table-column title="编码" data-index="code" :width="140" />
           <a-table-column title="名称" data-index="name" :width="120" />
           <a-table-column title="类型" data-index="itemType" :width="100">
@@ -84,11 +91,17 @@
             </template>
           </a-table-column>
           <a-table-column title="排序" data-index="sort" :width="70" align="center" />
-          <a-table-column title="状态" data-index="active" :width="80">
+          <a-table-column title="扩展配置" data-index="effectJson" :width="100" align="center">
             <template #cell="{ record }">
-              <a-tag :color="record.active ? 'green' : 'red'">
-                {{ record.active ? '启用' : '禁用' }}
-              </a-tag>
+              <a-button
+                v-if="record.effectJson && Object.keys(record.effectJson).length"
+                size="mini"
+                type="text"
+                @click="showJsonDetail(record)"
+              >
+                查看
+              </a-button>
+              <span v-else>-</span>
             </template>
           </a-table-column>
           <a-table-column title="操作" :width="120" fixed="right">
@@ -193,6 +206,10 @@
         </a-row>
       </a-form>
     </a-modal>
+
+    <a-modal v-model:visible="jsonVisible" title="扩展配置" :width="640" :footer="false">
+      <pre class="json-preview">{{ jsonPreviewText }}</pre>
+    </a-modal>
   </div>
 </template>
 
@@ -270,6 +287,13 @@
     active: true,
   };
   const modalForm = ref({ ...defaultModalForm });
+  const jsonVisible = ref(false);
+  const jsonPreviewText = ref('');
+
+  const showJsonDetail = (record: any) => {
+    jsonPreviewText.value = JSON.stringify(record.effectJson || {}, null, 2);
+    jsonVisible.value = true;
+  };
 
   const loadData = async () => {
     setLoading(true);
@@ -359,5 +383,16 @@
         margin-left: 16px;
       }
     }
+  }
+  .json-preview {
+    max-height: 480px;
+    overflow: auto;
+    margin: 0;
+    padding: 12px;
+    background: var(--color-fill-2);
+    border-radius: 4px;
+    white-space: pre-wrap;
+    word-break: break-all;
+    font-size: 12px;
   }
 </style>

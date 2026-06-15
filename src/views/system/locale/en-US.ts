@@ -84,6 +84,7 @@ export default {
   'role.scopeType.DEPT': 'Current Department',
   'role.scopeType.DEPT_AND_CHILDREN': 'Department and Sub-departments',
   'role.scopeType.CUSTOM': 'Custom Departments',
+  'role.table.articleDataScope': 'Article Data Scope',
 
   // Privilege Management
   'privilege.query.title': 'Privilege Query',
@@ -123,7 +124,7 @@ export default {
   'privilege.validate.description.maxLength': 'Description cannot exceed 500 characters',
   'privilege.table.privilegeName': 'Privilege Name',
   'privilege.table.privilegeCode': 'Privilege Code',
-  'privilege.table.privilegePage': 'Privilege Page',
+  'privilege.table.privilegePageName': 'Page Name',
   'privilege.table.pathPattern': 'Path Pattern',
   'privilege.table.httpMethod': 'HTTP Method',
   'privilege.table.isPublic': 'Is Public',
@@ -241,7 +242,7 @@ export default {
   'system.table.menuPath': 'Menu Path',
   'system.table.menuFilePath': 'Menu File Path',
   'system.table.menuIcon': 'Menu Icon',
-  'system.table.menuDisabled': 'Menu Disabled Status',
+  'system.table.menuDisabled': 'Disabled',
   'system.table.roleId': 'Role ID',
   'system.table.roleName': 'Role Name',
   'system.table.roleDesc': 'Role Description',

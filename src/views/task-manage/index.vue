@@ -105,9 +105,10 @@
               />
             </template>
           </a-table-column>
-          <a-table-column :title="t('taskManage.table.running')" :width="80" align="center">
+          <a-table-column :title="t('taskManage.table.running')" :width="110" align="center">
             <template #cell="{ record }">
               <a-badge
+                class="running-badge"
                 :status="record.running ? 'processing' : 'default'"
                 :text="
                   record.running ? t('taskManage.status.running') : t('taskManage.status.stopped')
@@ -433,6 +434,14 @@
     font-size: 12px;
     color: var(--color-text-4);
     margin-left: 4px;
+  }
+
+  .running-badge {
+    white-space: nowrap;
+  }
+
+  :deep(.running-badge .arco-badge-status-text) {
+    white-space: nowrap;
   }
 
   :deep(.arco-table-th) {
