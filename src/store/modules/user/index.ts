@@ -102,7 +102,6 @@ const useUserStore = defineStore('user', {
             {
               email: emailLogin.email,
               verificationCode: emailLogin.verificationCode,
-              password: rsaEncrypt(emailLogin.password),
               admin: true,
             },
             'email',

@@ -92,11 +92,25 @@
       </a-form-item>
 
       <a-form-item :label="t('user.form.avatar')" name="avatar" field="avatar">
-        <a-input
-          v-model="formState.avatar"
-          :placeholder="t('user.form.placeholder.avatar')"
-          allow-clear
-        />
+        <a-space direction="vertical" fill>
+          <a-avatar v-if="formState.avatar" :size="64">
+            <img :src="avatarPreviewUrl" alt="avatar" />
+          </a-avatar>
+          <a-input
+            v-model="formState.avatar"
+            :placeholder="t('user.form.placeholder.avatar')"
+            allow-clear
+          />
+          <a-upload
+            :show-file-list="false"
+            accept="image/jpeg,image/png,image/webp"
+            :custom-request="onAvatarUpload"
+          >
+            <template #upload-button>
+              <a-button type="outline" size="small" :loading="avatarUploading"> 上传头像 </a-button>
+            </template>
+          </a-upload>
+        </a-space>
       </a-form-item>
 
       <a-form-item :label="t('user.form.intro')" name="intro" field="intro">
@@ -124,6 +138,7 @@
   import { useAppStore } from '@/store';
   import request from '@/api/request';
   import { adminCreateUser, adminUpdateUser } from '@/api/user';
+  import { uploadImage, parseUploadedUrl, resolveStaticUrl } from '@/api/resources';
   import { useI18n } from 'vue-i18n';
   import { USERNAME_MAX_LENGTH, isRegisterAccount } from '@/utils/username';
 
@@ -163,7 +178,10 @@
   const deptOptions = ref<Array<{ label: string; value: string }>>([]);
   const loadingRoles = ref(false);
   const loadingDepts = ref(false);
+  const avatarUploading = ref(false);
   const formState: FormState = reactive({ ...defaultForm });
+
+  const avatarPreviewUrl = computed(() => resolveStaticUrl(formState.avatar || ''));
   // 自定义异步校验
   const checkTitle = async (value: string, cb: (error?: string) => void) => {
     console.log(value);
@@ -361,6 +379,30 @@
 
   const resetForm = () => {
     formRef.value.resetFields();
+  };
+
+  const onAvatarUpload = async (option: {
+    fileItem: { file?: File };
+    onSuccess: (res?: unknown) => void;
+    onError: (err: unknown) => void;
+  }) => {
+    const file = option.fileItem.file;
+    if (!file) {
+      option.onError(new Error('无效文件'));
+      return;
+    }
+    avatarUploading.value = true;
+    try {
+      const res = await uploadImage(file, 'avatar');
+      formState.avatar = parseUploadedUrl(res);
+      option.onSuccess(res);
+      Message.success('头像上传成功');
+    } catch (err) {
+      option.onError(err);
+      Message.error('头像上传失败');
+    } finally {
+      avatarUploading.value = false;
+    }
   };
 
   // const ArticleInfo = ref({})

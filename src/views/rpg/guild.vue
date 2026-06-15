@@ -99,7 +99,11 @@
       >
         <template #columns>
           <a-table-column title="用户ID" data-index="uid" :width="80" />
-          <a-table-column title="昵称" data-index="nickname" :width="120" />
+          <a-table-column title="昵称" :width="140">
+            <template #cell="{ record }">
+              {{ formatMemberName(record) }}
+            </template>
+          </a-table-column>
           <a-table-column title="角色" data-index="role" :width="90" />
           <a-table-column title="加入时间" data-index="joinTime" :width="170">
             <template #cell="{ record }">
@@ -146,6 +150,7 @@
   const currentGuild = ref<any>(null);
 
   const formatLeaderName = (record: any) => record.leaderNickname || record.leaderUsername || '-';
+  const formatMemberName = (record: any) => record.nickname || record.username || '-';
 
   const loadData = async () => {
     setLoading(true);
@@ -210,7 +215,7 @@
   const handleRemoveMember = (member: any) => {
     Modal.confirm({
       title: '移除成员',
-      content: `确定将「${member.nickname || member.uid}」移出公会吗？`,
+      content: `确定将「${member.nickname || member.username || member.uid}」移出公会吗？`,
       onOk: async () => {
         await removeGuildMember(currentGuild.value.id, member.uid);
         Message.success('已移除');

@@ -133,7 +133,11 @@
       @ok="handleModalOk"
       @cancel="modalVisible = false"
     >
-      <a-form :model="modalForm" :label-col-props="{ span: 7 }" :wrapper-col-props="{ span: 17 }">
+      <a-form
+        :model="modalForm"
+        :label-col-props="{ flex: '84px' }"
+        :wrapper-col-props="{ flex: '1' }"
+      >
         <a-row :gutter="16">
           <a-col :span="12">
             <a-form-item label="编码" required>
@@ -179,7 +183,9 @@
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item label="排序"> </a-form-item>
+            <a-form-item label="排序">
+              <a-input-number v-model="modalForm.sort" :min="0" style="width: 100%" />
+            </a-form-item>
           </a-col>
         </a-row>
         <a-row :gutter="16">
@@ -191,6 +197,27 @@
           <a-col :span="12">
             <a-form-item label="分类">
               <a-input v-model="modalForm.category" placeholder="可选分类" allow-clear />
+            </a-form-item>
+          </a-col>
+        </a-row>
+        <a-row :gutter="16">
+          <a-col :span="24">
+            <a-form-item label="扩展配置" class="effect-form-item">
+              <div class="effect-guide">
+                <div class="effect-guide__summary">{{ effectGuide.summary }}</div>
+                <ul v-if="effectGuide.fields.length" class="effect-guide__fields">
+                  <li v-for="field in effectGuide.fields" :key="field">{{ field }}</li>
+                </ul>
+                <a-button size="mini" type="outline" @click="fillEffectTemplate"
+                  >填入示例模板</a-button
+                >
+              </div>
+              <a-textarea
+                v-model="modalForm.effectJsonText"
+                :placeholder="effectJsonPlaceholder"
+                :auto-size="{ minRows: 4, maxRows: 10 }"
+                allow-clear
+              />
             </a-form-item>
           </a-col>
         </a-row>
@@ -214,7 +241,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref, reactive } from 'vue';
+  import { ref, reactive, computed } from 'vue';
   import { Message, Modal } from '@arco-design/web-vue';
   import {
     IconEdit,
@@ -231,6 +258,7 @@
     deleteItemConfig,
   } from '@/api/rpg';
   import useLoading from '@/hooks/loading';
+  import { getItemEffectGuide } from '@/constants/rpg-item-effect';
 
   const ITEM_TYPE_LABELS: Record<string, string> = {
     title: '称号',
@@ -285,10 +313,41 @@
     rarity: 'common',
     sort: 10,
     active: true,
+    effectJsonText: '{}',
   };
   const modalForm = ref({ ...defaultModalForm });
   const jsonVisible = ref(false);
   const jsonPreviewText = ref('');
+
+  const effectGuide = computed(() => getItemEffectGuide(modalForm.value.itemType));
+  const effectJsonPlaceholder = computed(() => {
+    const example = JSON.stringify(effectGuide.value.example, null, 2);
+    return example === '{}' ? 'JSON 对象，通常可留空 {}' : example;
+  });
+
+  const isEffectJsonEmpty = (text?: string) => {
+    const trimmed = text?.trim();
+    if (!trimmed) return true;
+    try {
+      const parsed = JSON.parse(trimmed);
+      return (
+        parsed !== null &&
+        typeof parsed === 'object' &&
+        !Array.isArray(parsed) &&
+        Object.keys(parsed).length === 0
+      );
+    } catch {
+      return false;
+    }
+  };
+
+  const fillEffectTemplate = () => {
+    if (!isEffectJsonEmpty(modalForm.value.effectJsonText)) {
+      Message.warning('当前已有内容，请先清空后再填入模板');
+      return;
+    }
+    modalForm.value.effectJsonText = JSON.stringify(effectGuide.value.example, null, 2);
+  };
 
   const showJsonDetail = (record: any) => {
     jsonPreviewText.value = JSON.stringify(record.effectJson || {}, null, 2);
@@ -330,6 +389,35 @@
     loadData();
   };
 
+  const buildPayload = () => {
+    const text = modalForm.value.effectJsonText?.trim();
+    let effectJson: Record<string, any> | null = null;
+    if (text) {
+      try {
+        const parsed = JSON.parse(text);
+        if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
+          Message.warning('扩展配置必须是 JSON 对象');
+          return null;
+        }
+        effectJson = parsed;
+      } catch {
+        Message.warning('扩展配置 JSON 格式不正确');
+        return null;
+      }
+    }
+    return {
+      name: modalForm.value.name,
+      description: modalForm.value.description || '',
+      itemType: modalForm.value.itemType,
+      category: modalForm.value.category || '',
+      icon: modalForm.value.icon || 'default',
+      rarity: modalForm.value.rarity || 'common',
+      sort: modalForm.value.sort ?? 10,
+      active: modalForm.value.active,
+      effectJson,
+    };
+  };
+
   const showCreateModal = () => {
     isEdit.value = false;
     editId.value = 0;
@@ -339,7 +427,18 @@
   const showEditModal = (record: any) => {
     isEdit.value = true;
     editId.value = record.id;
-    modalForm.value = { ...defaultModalForm, ...record, active: record.active !== false };
+    modalForm.value = {
+      code: record.code,
+      name: record.name,
+      description: record.description || '',
+      itemType: record.itemType || 'title',
+      category: record.category || '',
+      icon: record.icon || 'default',
+      rarity: record.rarity || 'common',
+      sort: record.sort ?? 10,
+      active: record.active !== false,
+      effectJsonText: JSON.stringify(record.effectJson || {}, null, 2),
+    };
     modalVisible.value = true;
   };
 
@@ -348,12 +447,13 @@
       Message.warning('编码和名称不能为空');
       return;
     }
+    const payload = buildPayload();
+    if (!payload) return;
     if (isEdit.value) {
-      const { code, ...data } = modalForm.value;
-      await updateItemConfig(editId.value, data);
+      await updateItemConfig(editId.value, payload);
       Message.success('更新成功');
     } else {
-      await createItemConfig(modalForm.value);
+      await createItemConfig({ code: modalForm.value.code, ...payload });
       Message.success('创建成功');
     }
     modalVisible.value = false;
@@ -394,5 +494,37 @@
     white-space: pre-wrap;
     word-break: break-all;
     font-size: 12px;
+  }
+  .effect-form-item {
+    :deep(.arco-form-item-label-col) {
+      align-self: flex-start;
+      padding-top: 6px;
+    }
+    :deep(.arco-form-item-content) {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 100%;
+    }
+    .effect-guide,
+    :deep(.arco-textarea-wrapper) {
+      width: 100%;
+    }
+  }
+  .effect-guide {
+    padding: 10px 12px;
+    background: var(--color-fill-2);
+    border-radius: 4px;
+    font-size: 12px;
+    color: var(--color-text-2);
+  }
+  .effect-guide__summary {
+    margin-bottom: 6px;
+    color: var(--color-text-1);
+  }
+  .effect-guide__fields {
+    margin: 0 0 8px;
+    padding-left: 18px;
+    line-height: 1.6;
   }
 </style>
