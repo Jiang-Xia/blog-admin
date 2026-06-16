@@ -43,6 +43,24 @@
                   <template #icon><icon-refresh /></template>
                   {{ t('common.button.reset') }}
                 </a-button>
+                <template v-if="isSuperAdmin">
+                  <a-popconfirm
+                    :content="t('taskManage.confirm.clearPermissionCache')"
+                    @ok="handleClearPermissionCache"
+                  >
+                    <a-button :loading="clearingPermissionCache">
+                      {{ t('taskManage.action.clearPermissionCache') }}
+                    </a-button>
+                  </a-popconfirm>
+                  <a-popconfirm
+                    :content="t('taskManage.confirm.refreshTongjiToken')"
+                    @ok="handleRefreshTongjiToken"
+                  >
+                    <a-button :loading="refreshingTongjiToken">
+                      {{ t('taskManage.action.refreshTongjiToken') }}
+                    </a-button>
+                  </a-popconfirm>
+                </template>
               </a-space>
             </a-form-item>
           </a-form>
@@ -122,7 +140,7 @@
             :width="70"
             align="center"
           />
-          <a-table-column :title="t('taskManage.table.actions')" :width="160" fixed="right">
+          <a-table-column :title="t('taskManage.table.actions')" :width="200" fixed="right">
             <template #cell="{ record }">
               <a-space :size="8">
                 <a-button
@@ -132,6 +150,15 @@
                   :loading="triggerLoading[record.name]"
                 >
                   <template #icon><icon-play-arrow /></template>
+                </a-button>
+                <a-button
+                  v-if="isSuperAdmin && record.name === 'database_backup'"
+                  size="mini"
+                  type="primary"
+                  :loading="downloadingBackup"
+                  @click="handleDownloadBackup"
+                >
+                  <template #icon><icon-download /></template>
                 </a-button>
                 <a-button size="mini" type="primary" @click="handleEdit(record)">
                   <template #icon><icon-edit /></template>
@@ -205,10 +232,11 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref, reactive, onMounted, onUnmounted } from 'vue';
+  import { ref, reactive, onMounted, onUnmounted, computed } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { Message } from '@arco-design/web-vue';
   import type { Pagination } from '@/types/global';
+  import useUserStore from '@/store/modules/user';
   import {
     IconPlus,
     IconRefresh,
@@ -216,6 +244,7 @@
     IconPlayArrow,
     IconEdit,
     IconDelete,
+    IconDownload,
   } from '@arco-design/web-vue/es/icon';
   import {
     getAllTasks,
@@ -226,8 +255,17 @@
     stopTask,
     startTask,
     toggleLogRecording,
+    downloadDatabaseBackup,
+    clearPermissionCache,
+    refreshTongjiToken,
   } from '@/api/scheduled-task';
   import useLoading from '@/hooks/loading';
+
+  const userStore = useUserStore();
+  const isSuperAdmin = computed(() => userStore.roles?.some((r: { id: number }) => r.id === 1));
+  const downloadingBackup = ref(false);
+  const clearingPermissionCache = ref(false);
+  const refreshingTongjiToken = ref(false);
 
   const { t } = useI18n();
   const { loading, setLoading } = useLoading(false);
@@ -404,6 +442,45 @@
   };
 
   let refreshTimer: ReturnType<typeof setInterval> | null = null;
+
+  const handleDownloadBackup = async () => {
+    downloadingBackup.value = true;
+    try {
+      await downloadDatabaseBackup();
+      Message.success('下载成功');
+    } catch (e: any) {
+      Message.error(e?.message || '下载失败');
+    } finally {
+      downloadingBackup.value = false;
+    }
+  };
+
+  const handleClearPermissionCache = async () => {
+    clearingPermissionCache.value = true;
+    try {
+      const res: any = await clearPermissionCache();
+      const deleted = res.data?.deleted ?? 0;
+      Message.success(t('taskManage.message.clearPermissionCacheSuccess', { count: deleted }));
+    } catch (e: any) {
+      Message.error(
+        e?.response?.data?.message || t('taskManage.message.clearPermissionCacheFailed'),
+      );
+    } finally {
+      clearingPermissionCache.value = false;
+    }
+  };
+
+  const handleRefreshTongjiToken = async () => {
+    refreshingTongjiToken.value = true;
+    try {
+      await refreshTongjiToken();
+      Message.success(t('taskManage.message.refreshTongjiTokenSuccess'));
+    } catch (e: any) {
+      Message.error(e?.response?.data?.message || t('taskManage.message.refreshTongjiTokenFailed'));
+    } finally {
+      refreshingTongjiToken.value = false;
+    }
+  };
 
   onMounted(() => {
     loadTaskList();

@@ -336,7 +336,7 @@
     tagColor?: string;
     deptName?: string;
     authorName?: string;
-    userInfo?: { nickname?: string };
+    userInfo?: { nickname?: string; username?: string };
     [k: string]: unknown;
   }
   const renderData = ref<ArticleRow[]>([]);
@@ -380,7 +380,7 @@
       renderData.value = (res.list as ArticleRow[]).map((v) => {
         v.tag = v.tags.map((it) => it.label).join();
         v.tagColor = v.tags[0]?.color;
-        v.authorName = v.userInfo?.nickname || '';
+        v.authorName = v.authorName || v.userInfo?.nickname || v.userInfo?.username || '-';
         return v;
       });
       pagination.total = res.pagination.total;
@@ -493,6 +493,8 @@
           [t('article.excel.title')]: v.title,
           [t('article.excel.description')]: v.description,
           [t('article.excel.category')]: v.category?.label || '',
+          [t('article.excel.author')]:
+            v.authorName || v.userInfo?.nickname || v.userInfo?.username || '',
           [t('article.excel.tag')]: v.tags?.map((it) => it.label).join(', ') || v.tag || '',
           [t('article.excel.views')]: v.views || 0,
           [t('article.excel.likes')]: v.likes || 0,
@@ -517,6 +519,7 @@
         { wch: 30 }, // 标题
         { wch: 40 }, // 描述
         { wch: 15 }, // 分类
+        { wch: 12 }, // 作者
         { wch: 20 }, // 标签
         { wch: 10 }, // 查看数
         { wch: 10 }, // 点赞数

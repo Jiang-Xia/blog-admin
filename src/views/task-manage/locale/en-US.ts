@@ -15,6 +15,8 @@ export default {
   'taskManage.action.stop': 'Stop',
   'taskManage.action.start': 'Start',
   'taskManage.action.add': 'Add Task',
+  'taskManage.action.clearPermissionCache': 'Clear Permission Cache',
+  'taskManage.action.refreshTongjiToken': 'Refresh Baidu Analytics Token',
   'taskManage.logRecording': 'Log Recording',
   'taskManage.table.name': 'Task Name',
   'taskManage.table.description': 'Description',
@@ -42,6 +44,10 @@ export default {
   'taskManage.modal.addTitle': 'Add Task',
   'taskManage.modal.editTitle': 'Edit Task',
   'taskManage.confirm.delete': 'Are you sure to delete this task?',
+  'taskManage.confirm.clearPermissionCache':
+    'Clear permission-related Redis cache? The next request will reload from the database.',
+  'taskManage.confirm.refreshTongjiToken':
+    'Refresh Baidu Analytics access_token? Old tokens in Redis and memory will be cleared first.',
   'taskManage.message.triggerSuccess': 'Task executed successfully',
   'taskManage.message.triggerFailed': 'Task execution failed',
   'taskManage.message.stopSuccess': 'Task stopped',
@@ -55,4 +61,9 @@ export default {
   'taskManage.message.updateSuccess': 'Task updated successfully',
   'taskManage.message.deleteSuccess': 'Task deleted successfully',
   'taskManage.message.operateFailed': 'Operation failed',
+  'taskManage.message.clearPermissionCacheSuccess':
+    'Permission cache cleared ({count} keys removed)',
+  'taskManage.message.clearPermissionCacheFailed': 'Failed to clear permission cache',
+  'taskManage.message.refreshTongjiTokenSuccess': 'Baidu Analytics token refreshed',
+  'taskManage.message.refreshTongjiTokenFailed': 'Failed to refresh Baidu Analytics token',
 };

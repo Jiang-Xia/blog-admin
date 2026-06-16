@@ -61,16 +61,14 @@
       </a-form-item>
 
       <a-form-item :label="t('user.form.deptId')" name="deptId" field="deptId">
-        <a-select
+        <a-tree-select
           v-model="formState.deptId"
+          :data="deptTreeData"
           :loading="loadingDepts"
+          :field-names="{ key: 'id', title: 'deptName', children: 'children' }"
           :placeholder="t('user.form.placeholder.deptId')"
-          :filterable="true"
-        >
-          <a-option v-for="dept in deptOptions" :key="dept.value" :value="dept.value">
-            {{ dept.label }}
-          </a-option>
-        </a-select>
+          allow-clear
+        />
       </a-form-item>
 
       <a-form-item :label="t('user.form.roleIds')" name="roleIds" field="roleIds">
@@ -138,7 +136,8 @@
   import { useAppStore } from '@/store';
   import request from '@/api/request';
   import { adminCreateUser, adminUpdateUser } from '@/api/user';
-  import { uploadImage, parseUploadedUrl, resolveStaticUrl } from '@/api/resources';
+  import { uploadAvatar, parseUploadedUrl, resolveStaticUrl } from '@/api/resources';
+  import { getDeptTree } from '@/api/dept';
   import { useI18n } from 'vue-i18n';
   import { USERNAME_MAX_LENGTH, isRegisterAccount } from '@/utils/username';
 
@@ -175,7 +174,7 @@
   const currentId = ref('');
   const captchaUrl = ref('');
   const roleOptions = ref<Array<{ label: string; value: string; desc?: string }>>([]);
-  const deptOptions = ref<Array<{ label: string; value: string }>>([]);
+  const deptTreeData = ref<any[]>([]);
   const loadingRoles = ref(false);
   const loadingDepts = ref(false);
   const avatarUploading = ref(false);
@@ -364,11 +363,8 @@
   const loadDepts = async () => {
     try {
       loadingDepts.value = true;
-      const res = await request.get('/dept');
-      deptOptions.value = res.data.list.map((dept: any) => ({
-        label: dept.deptName,
-        value: String(dept.id),
-      }));
+      const res = await getDeptTree();
+      deptTreeData.value = res.data || [];
     } catch (error) {
       console.error('获取部门列表失败:', error);
       Message.error(t('user.message.getDeptsFailed'));
@@ -393,7 +389,7 @@
     }
     avatarUploading.value = true;
     try {
-      const res = await uploadImage(file, 'avatar');
+      const res = await uploadAvatar(file);
       formState.avatar = parseUploadedUrl(res);
       option.onSuccess(res);
       Message.success('头像上传成功');

@@ -1,7 +1,8 @@
 import request from '@/api/request';
 import { staticUrl } from '@/config';
+import { compressImageFile } from '@/utils/image-compress';
 
-export type UploadCategory = 'avatar' | 'cover' | 'article';
+export type UploadMediaCategory = 'avatar' | 'cover' | 'article';
 
 export const resolveStaticUrl = (path = ''): string => {
   if (!path) return '';
@@ -12,12 +13,22 @@ export const resolveStaticUrl = (path = ''): string => {
   return path;
 };
 
-export const uploadImage = (file: File, category: UploadCategory) => {
+const postUploadMedia = async (file: File, category: UploadMediaCategory) => {
+  const compressed = await compressImageFile(file, category);
   const form = new FormData();
-  form.append('fileContents', file);
+  form.append('fileContents', compressed);
   form.append('category', category);
-  return request.post(`/resources/uploadFile?category=${category}`, form);
+  return request.post(`/resources/upload-media?category=${category}`, form);
 };
+
+/** 修改头像（需登录） */
+export const uploadAvatar = (file: File) => postUploadMedia(file, 'avatar');
+
+/** 文章封面上传（需登录） */
+export const uploadCover = (file: File) => postUploadMedia(file, 'cover');
+
+/** 文章正文图片上传（需登录） */
+export const uploadArticleImage = (file: File) => postUploadMedia(file, 'article');
 
 export const parseUploadedPath = (res: unknown): string => {
   if (!res) return '';

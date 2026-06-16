@@ -52,6 +52,7 @@ export default {
   'article.excel.title': 'Title',
   'article.excel.description': 'Description',
   'article.excel.category': 'Category',
+  'article.excel.author': 'Author',
   'article.excel.tag': 'Tag',
   'article.excel.views': 'Views',
   'article.excel.likes': 'Likes',

@@ -52,6 +52,7 @@ export default {
   'article.excel.title': '标题',
   'article.excel.description': '描述',
   'article.excel.category': '分类',
+  'article.excel.author': '作者',
   'article.excel.tag': '标签',
   'article.excel.views': '查看数',
   'article.excel.likes': '点赞数',

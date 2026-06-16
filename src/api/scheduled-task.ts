@@ -105,3 +105,58 @@ export const toggleLogRecording = (taskName: string) => {
     method: 'patch',
   });
 };
+
+/** 清除权限相关 Redis 缓存（超级管理员） */
+export const clearPermissionCache = () => {
+  return request({
+    url: '/scheduled-task/cache/clear-permissions',
+    method: 'post',
+  });
+};
+
+/** 刷新百度统计 access_token（超级管理员） */
+export const refreshTongjiToken = () => {
+  return request({
+    url: '/scheduled-task/cache/refresh-tongji-token',
+    method: 'post',
+  });
+};
+
+// ======================== 数据库备份 ========================
+
+/** 下载最新数据库备份（超级管理员） */
+export const downloadDatabaseBackup = async () => {
+  const axios = (await import('axios')).default;
+  const { getToken } = await import('@/utils/auth');
+  const { baseUrl } = await import('@/config');
+  const token = getToken();
+  try {
+    const res = await axios.get(`${baseUrl}/scheduled-task/backups/download`, {
+      responseType: 'blob',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
+    const contentType = res.headers['content-type'] || '';
+    if (contentType.includes('application/json')) {
+      const text = await (res.data as Blob).text();
+      const err = JSON.parse(text);
+      throw new Error(err.message || '下载失败');
+    }
+    const disposition = res.headers['content-disposition'] || '';
+    const match = disposition.match(/filename="?([^"]+)"?/);
+    const fileName = match?.[1] || `myblog_backup_${Date.now()}.sql`;
+    const blob = new Blob([res.data], { type: 'application/sql' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = fileName;
+    link.click();
+    URL.revokeObjectURL(link.href);
+  } catch (e: any) {
+    const blob = e?.response?.data;
+    if (blob instanceof Blob && blob.type?.includes('application/json')) {
+      const text = await blob.text();
+      const err = JSON.parse(text);
+      throw new Error(err.message || '下载失败');
+    }
+    throw e;
+  }
+};

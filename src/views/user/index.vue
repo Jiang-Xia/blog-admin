@@ -2,7 +2,7 @@
   import { useUserStore } from '@/store/';
   import { ref, reactive, computed } from 'vue';
   import request from '@/api/request';
-  import { uploadImage, parseUploadedUrl, resolveStaticUrl } from '@/api/resources';
+  import { uploadAvatar, parseUploadedUrl, resolveStaticUrl } from '@/api/resources';
   import { Message, Modal } from '@arco-design/web-vue';
   import useUser from '@/hooks/user';
   import { useI18n } from 'vue-i18n';
@@ -73,7 +73,7 @@
     }
     avatarUploading.value = true;
     try {
-      const res = await uploadImage(file, 'avatar');
+      const res = await uploadAvatar(file);
       form.avatar = parseUploadedUrl(res);
       option.onSuccess(res);
       Message.success(t('user.message.updateSuccess'));

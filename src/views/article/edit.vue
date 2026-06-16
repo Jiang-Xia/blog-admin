@@ -150,7 +150,12 @@
   import { useI18n } from 'vue-i18n';
   import useLoading from '@/hooks/loading';
   import { getArticleInfo, createArticle, editArticle } from '@/api/article';
-  import { uploadImage, parseUploadedUrl, resolveStaticUrl } from '@/api/resources';
+  import {
+    uploadCover,
+    uploadArticleImage,
+    parseUploadedUrl,
+    resolveStaticUrl,
+  } from '@/api/resources';
   import { Message, Modal } from '@arco-design/web-vue';
   import { useRoute, useRouter } from 'vue-router';
   import type { ValidatedError } from '@arco-design/web-vue/es/form/interface';
@@ -301,7 +306,7 @@
     try {
       const urls = await Promise.all(
         files.map(async (file: File) => {
-          const res = await uploadImage(file, 'article');
+          const res = await uploadArticleImage(file);
           return parseUploadedUrl(res);
         }),
       );
@@ -323,7 +328,7 @@
     }
     coverUploading.value = true;
     try {
-      const res = await uploadImage(file, 'cover');
+      const res = await uploadCover(file);
       formState.cover = parseUploadedUrl(res);
       option.onSuccess(res);
       Message.success('封面上传成功');
