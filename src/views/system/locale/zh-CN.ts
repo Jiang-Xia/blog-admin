@@ -50,6 +50,7 @@ export default {
   'user.message.createSuccess': '新建成功！',
   'user.message.getRolesFailed': '获取角色列表失败',
   'user.message.getDeptsFailed': '获取部门列表失败',
+  'user.message.superAdminProtected': '超级管理员不可删除',
 
   // 角色管理
   'role.query.title': '角色查询',

@@ -51,6 +51,7 @@ export default {
   'user.message.createSuccess': 'Create Successfully!',
   'user.message.getRolesFailed': 'Failed to get role list',
   'user.message.getDeptsFailed': 'Failed to get department list',
+  'user.message.superAdminProtected': 'Super admin cannot be deleted',
 
   // Role Management
   'role.query.title': 'Role Query',

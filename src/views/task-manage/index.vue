@@ -151,15 +151,6 @@
                 >
                   <template #icon><icon-play-arrow /></template>
                 </a-button>
-                <a-button
-                  v-if="isSuperAdmin && record.name === 'database_backup'"
-                  size="mini"
-                  type="primary"
-                  :loading="downloadingBackup"
-                  @click="handleDownloadBackup"
-                >
-                  <template #icon><icon-download /></template>
-                </a-button>
                 <a-button size="mini" type="primary" @click="handleEdit(record)">
                   <template #icon><icon-edit /></template>
                 </a-button>
@@ -171,6 +162,15 @@
                     <template #icon><icon-delete /></template>
                   </a-button>
                 </a-popconfirm>
+                <a-button
+                  v-if="isSuperAdmin && record.name === 'database_backup'"
+                  size="mini"
+                  type="primary"
+                  :loading="downloadingBackup"
+                  @click="handleDownloadBackup"
+                >
+                  <template #icon><icon-download /></template>
+                </a-button>
               </a-space>
             </template>
           </a-table-column>

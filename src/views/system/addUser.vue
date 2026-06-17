@@ -157,7 +157,7 @@
     avatar?: string;
     intro?: string;
     roleIds?: string[];
-    deptId?: string;
+    deptId?: number;
   }
   const defaultForm = {
     username: '',
@@ -423,28 +423,22 @@
     }
 
     // 处理用户的部门信息
-    if (userData.deptId) {
-      formState.deptId = String(userData.deptId);
-    } else {
-      formState.deptId = undefined;
-    }
+    const deptId = userData.deptId ?? userData.dept?.id;
+    formState.deptId = deptId != null ? Number(deptId) : undefined;
 
     // 编辑时不需要验证码，所以清空
     formState.authCode = '';
   };
-  const show = (val: any) => {
+  const show = async (val: any) => {
     type.value = val.type;
-    console.log({ type: type.value });
+    visible.value = true;
+    await Promise.all([loadRoles(), loadDepts()]);
     if (type.value === 'edit') {
       currentId.value = val.id;
-      getInfoHandle();
+      await getInfoHandle();
     } else {
       resetForm();
     }
-    // 加载角色和部门列表
-    loadRoles();
-    loadDepts();
-    visible.value = true;
   };
   const handleOk = () => {
     visible.value = false;
