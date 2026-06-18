@@ -1,6 +1,13 @@
 import request from '@/api/request';
 import { staticUrl } from '@/config';
 import { compressImageFile } from '@/utils/image-compress';
+import {
+  isSameAvatarContent,
+  isSameCoverContent,
+  toStaticPath,
+  computeFileSha256,
+} from '@/utils/file-hash';
+import { Message } from '@arco-design/web-vue';
 
 export type UploadMediaCategory = 'avatar' | 'cover' | 'article';
 
@@ -14,18 +21,32 @@ export const resolveStaticUrl = (path = ''): string => {
 };
 
 const postUploadMedia = async (file: File, category: UploadMediaCategory) => {
+  const contentHash = await computeFileSha256(file);
   const compressed = await compressImageFile(file, category);
   const form = new FormData();
   form.append('fileContents', compressed);
+  form.append('contentHash', contentHash);
   form.append('category', category);
   return request.post(`/resources/upload-media?category=${category}`, form);
 };
 
 /** 修改头像（需登录） */
-export const uploadAvatar = (file: File) => postUploadMedia(file, 'avatar');
+export const uploadAvatar = async (file: File, currentAvatarUrl?: string) => {
+  if (currentAvatarUrl && (await isSameAvatarContent(file, currentAvatarUrl))) {
+    Message.info('头像未变更');
+    return [{ url: toStaticPath(currentAvatarUrl) }];
+  }
+  return postUploadMedia(file, 'avatar');
+};
 
 /** 文章封面上传（需登录） */
-export const uploadCover = (file: File) => postUploadMedia(file, 'cover');
+export const uploadCover = async (file: File, currentCoverUrl?: string) => {
+  if (currentCoverUrl && (await isSameCoverContent(file, currentCoverUrl))) {
+    Message.info('封面未变更');
+    return [{ url: toStaticPath(currentCoverUrl) }];
+  }
+  return postUploadMedia(file, 'cover');
+};
 
 /** 文章正文图片上传（需登录） */
 export const uploadArticleImage = (file: File) => postUploadMedia(file, 'article');

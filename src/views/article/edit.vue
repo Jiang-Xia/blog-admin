@@ -156,6 +156,7 @@
     parseUploadedUrl,
     resolveStaticUrl,
   } from '@/api/resources';
+  import { toStaticPath } from '@/utils/file-hash';
   import { Message, Modal } from '@arco-design/web-vue';
   import { useRoute, useRouter } from 'vue-router';
   import type { ValidatedError } from '@arco-design/web-vue/es/form/interface';
@@ -328,10 +329,13 @@
     }
     coverUploading.value = true;
     try {
-      const res = await uploadCover(file);
+      const prevPath = toStaticPath(formState.cover || '');
+      const res = await uploadCover(file, formState.cover);
       formState.cover = parseUploadedUrl(res);
       option.onSuccess(res);
-      Message.success('封面上传成功');
+      if (toStaticPath(formState.cover) !== prevPath) {
+        Message.success('封面上传成功');
+      }
     } catch (err) {
       option.onError(err);
       Message.error('封面上传失败');
