@@ -137,6 +137,7 @@
   import request from '@/api/request';
   import { adminCreateUser, adminUpdateUser } from '@/api/user';
   import { uploadAvatar, parseUploadedUrl, resolveStaticUrl } from '@/api/resources';
+  import { toStaticPath } from '@/utils/file-hash';
   import { getDeptTree } from '@/api/dept';
   import { useI18n } from 'vue-i18n';
   import { USERNAME_MAX_LENGTH, isRegisterAccount } from '@/utils/username';
@@ -389,10 +390,13 @@
     }
     avatarUploading.value = true;
     try {
-      const res = await uploadAvatar(file);
+      const prevPath = toStaticPath(formState.avatar || '');
+      const res = await uploadAvatar(file, formState.avatar);
       formState.avatar = parseUploadedUrl(res);
       option.onSuccess(res);
-      Message.success('头像上传成功');
+      if (toStaticPath(formState.avatar) !== prevPath) {
+        Message.success('头像上传成功');
+      }
     } catch (err) {
       option.onError(err);
       Message.error('头像上传失败');

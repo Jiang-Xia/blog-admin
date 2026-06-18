@@ -3,6 +3,7 @@
   import { ref, reactive, computed } from 'vue';
   import request from '@/api/request';
   import { uploadAvatar, parseUploadedUrl, resolveStaticUrl } from '@/api/resources';
+  import { toStaticPath } from '@/utils/file-hash';
   import { Message, Modal } from '@arco-design/web-vue';
   import useUser from '@/hooks/user';
   import { useI18n } from 'vue-i18n';
@@ -73,10 +74,13 @@
     }
     avatarUploading.value = true;
     try {
-      const res = await uploadAvatar(file);
+      const prevPath = toStaticPath(form.avatar || '');
+      const res = await uploadAvatar(file, form.avatar);
       form.avatar = parseUploadedUrl(res);
       option.onSuccess(res);
-      Message.success(t('user.message.updateSuccess'));
+      if (toStaticPath(form.avatar) !== prevPath) {
+        Message.success(t('user.message.updateSuccess'));
+      }
     } catch (err) {
       option.onError(err);
       Message.error('头像上传失败');
