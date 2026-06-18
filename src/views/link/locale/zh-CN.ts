@@ -12,6 +12,7 @@ export default {
   'link.table.description': '描述',
   'link.table.website': '网址',
   'link.table.status': '状态',
+  'link.table.applyTime': '申请时间',
   'link.table.operation': '操作',
   'link.message.deleteSuccess': '删除成功',
   'link.message.setSuccess': '设置成功',

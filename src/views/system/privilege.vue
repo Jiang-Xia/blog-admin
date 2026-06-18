@@ -131,8 +131,8 @@
           />
           <a-table-column
             :width="130"
-            :title="t('privilege.table.privilegePage')"
-            data-index="privilegePage"
+            :title="t('privilege.table.privilegePageName')"
+            data-index="privilegePageName"
             align="center"
           />
           <a-table-column

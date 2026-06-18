@@ -48,7 +48,7 @@
             v-model="userInfo.username"
             :placeholder="t('login.form.userName.placeholder')"
             allow-clear
-            :max-length="USERNAME_MAX_LENGTH"
+            :max-length="LOGIN_ACCOUNT_MAX_LENGTH"
           >
             <template #prefix>
               <icon-user />
@@ -129,22 +129,6 @@
           </a-input>
         </a-form-item>
         <a-form-item
-          field="emailPassword"
-          :rules="[{ required: true, message: t('login.form.emailPassword.errMsg') }]"
-          :validate-trigger="['change', 'blur']"
-          hide-label
-        >
-          <a-input-password
-            v-model="userInfo.emailPassword"
-            :placeholder="t('login.form.emailPassword.placeholder')"
-            allow-clear
-          >
-            <template #prefix>
-              <icon-lock />
-            </template>
-          </a-input-password>
-        </a-form-item>
-        <a-form-item
           field="emailAuthCode"
           :rules="[{ required: true, message: t('login.form.emailAuthCode.errMsg') }]"
           :validate-trigger="['change', 'blur']"
@@ -206,7 +190,7 @@
   import type { LoginData } from '@/api/user';
   import { getAuthCode, getEmailAuthCode } from '@/api/login';
   import { shouldRefreshGraphicCaptcha } from '@/constants/graphic-captcha-error';
-  import { USERNAME_MAX_LENGTH, isLoginAccount } from '@/utils/username';
+  import { LOGIN_ACCOUNT_MAX_LENGTH, isLoginAccount } from '@/utils/username';
 
   const router = useRouter();
   const { t } = useI18n();
@@ -236,7 +220,6 @@
     password: '',
     authCode: '',
     email: loginConfig.value.email,
-    emailPassword: '',
     emailAuthCode: '',
   });
 
@@ -271,10 +254,8 @@
             captchaId: captchaId.value,
           };
         } else {
-          // 邮箱登录数据
           loginData = {
             email: values.email,
-            password: values.emailPassword,
             verificationCode: values.emailAuthCode,
           };
         }

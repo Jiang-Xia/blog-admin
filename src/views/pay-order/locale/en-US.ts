@@ -15,6 +15,7 @@ export default {
   'payOrder.table.status': 'Status',
   'payOrder.table.channel': 'Channel',
   'payOrder.table.refundAmount': 'Refund Amount',
+  'payOrder.table.payTime': 'Paid At',
   'payOrder.table.createTime': 'Created',
   'payOrder.table.updateTime': 'Updated',
   'payOrder.table.action': 'Action',

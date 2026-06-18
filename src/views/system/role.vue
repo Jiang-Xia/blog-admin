@@ -76,7 +76,17 @@
             align="center"
             :width="160"
           />
-          <a-table-column :title="t('system.table.roleDesc')" data-index="roleDesc" :width="340" />
+          <a-table-column :title="t('system.table.roleDesc')" data-index="roleDesc" :width="240" />
+          <a-table-column
+            :title="t('role.table.articleDataScope')"
+            data-index="articleDataScope"
+            align="center"
+            :width="160"
+          >
+            <template #cell="{ record }">
+              {{ record.articleDataScope ? t(`role.scopeType.${record.articleDataScope}`) : '-' }}
+            </template>
+          </a-table-column>
           <a-table-column
             :title="t('role.table.operation')"
             data-index="operations"

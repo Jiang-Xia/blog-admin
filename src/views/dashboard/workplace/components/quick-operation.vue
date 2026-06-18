@@ -35,10 +35,10 @@
   const router = useRouter();
   const { t } = useI18n();
   const links = [
-    { i18n: 'workplace.fileManagement', icon: 'icon-file', url: '/resource/list' },
-    { i18n: 'workplace.articleList', icon: 'icon-storage', url: '/article/list' },
-    { i18n: 'workplace.menuSettings', icon: 'icon-settings', url: '/system/userManage' },
-    { i18n: 'workplace.userManagement', icon: 'icon-user', url: '/system/menuManage' },
+    { i18n: 'workplace.fileManagement', icon: 'icon-file', url: '/content/resource/list' },
+    { i18n: 'workplace.articleList', icon: 'icon-storage', url: '/content/article/list' },
+    { i18n: 'workplace.menuSettings', icon: 'icon-settings', url: '/system/menuManage' },
+    { i18n: 'workplace.userManagement', icon: 'icon-user', url: '/system/userManage' },
   ];
 </script>
 

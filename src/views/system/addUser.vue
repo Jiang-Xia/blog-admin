@@ -61,16 +61,14 @@
       </a-form-item>
 
       <a-form-item :label="t('user.form.deptId')" name="deptId" field="deptId">
-        <a-select
+        <a-tree-select
           v-model="formState.deptId"
+          :data="deptTreeData"
           :loading="loadingDepts"
+          :field-names="{ key: 'id', title: 'deptName', children: 'children' }"
           :placeholder="t('user.form.placeholder.deptId')"
-          :filterable="true"
-        >
-          <a-option v-for="dept in deptOptions" :key="dept.value" :value="dept.value">
-            {{ dept.label }}
-          </a-option>
-        </a-select>
+          allow-clear
+        />
       </a-form-item>
 
       <a-form-item :label="t('user.form.roleIds')" name="roleIds" field="roleIds">
@@ -92,11 +90,25 @@
       </a-form-item>
 
       <a-form-item :label="t('user.form.avatar')" name="avatar" field="avatar">
-        <a-input
-          v-model="formState.avatar"
-          :placeholder="t('user.form.placeholder.avatar')"
-          allow-clear
-        />
+        <a-space direction="vertical" fill>
+          <a-avatar v-if="formState.avatar" :size="64">
+            <img :src="avatarPreviewUrl" alt="avatar" />
+          </a-avatar>
+          <a-input
+            v-model="formState.avatar"
+            :placeholder="t('user.form.placeholder.avatar')"
+            allow-clear
+          />
+          <a-upload
+            :show-file-list="false"
+            accept="image/jpeg,image/png,image/webp"
+            :custom-request="onAvatarUpload"
+          >
+            <template #upload-button>
+              <a-button type="outline" size="small" :loading="avatarUploading"> 上传头像 </a-button>
+            </template>
+          </a-upload>
+        </a-space>
       </a-form-item>
 
       <a-form-item :label="t('user.form.intro')" name="intro" field="intro">
@@ -124,6 +136,9 @@
   import { useAppStore } from '@/store';
   import request from '@/api/request';
   import { adminCreateUser, adminUpdateUser } from '@/api/user';
+  import { uploadAvatar, parseUploadedUrl, resolveStaticUrl } from '@/api/resources';
+  import { toStaticPath } from '@/utils/file-hash';
+  import { getDeptTree } from '@/api/dept';
   import { useI18n } from 'vue-i18n';
   import { USERNAME_MAX_LENGTH, isRegisterAccount } from '@/utils/username';
 
@@ -143,7 +158,7 @@
     avatar?: string;
     intro?: string;
     roleIds?: string[];
-    deptId?: string;
+    deptId?: number;
   }
   const defaultForm = {
     username: '',
@@ -160,10 +175,13 @@
   const currentId = ref('');
   const captchaUrl = ref('');
   const roleOptions = ref<Array<{ label: string; value: string; desc?: string }>>([]);
-  const deptOptions = ref<Array<{ label: string; value: string }>>([]);
+  const deptTreeData = ref<any[]>([]);
   const loadingRoles = ref(false);
   const loadingDepts = ref(false);
+  const avatarUploading = ref(false);
   const formState: FormState = reactive({ ...defaultForm });
+
+  const avatarPreviewUrl = computed(() => resolveStaticUrl(formState.avatar || ''));
   // 自定义异步校验
   const checkTitle = async (value: string, cb: (error?: string) => void) => {
     console.log(value);
@@ -346,11 +364,8 @@
   const loadDepts = async () => {
     try {
       loadingDepts.value = true;
-      const res = await request.get('/dept');
-      deptOptions.value = res.data.list.map((dept: any) => ({
-        label: dept.deptName,
-        value: String(dept.id),
-      }));
+      const res = await getDeptTree();
+      deptTreeData.value = res.data || [];
     } catch (error) {
       console.error('获取部门列表失败:', error);
       Message.error(t('user.message.getDeptsFailed'));
@@ -361,6 +376,33 @@
 
   const resetForm = () => {
     formRef.value.resetFields();
+  };
+
+  const onAvatarUpload = async (option: {
+    fileItem: { file?: File };
+    onSuccess: (res?: unknown) => void;
+    onError: (err: unknown) => void;
+  }) => {
+    const file = option.fileItem.file;
+    if (!file) {
+      option.onError(new Error('无效文件'));
+      return;
+    }
+    avatarUploading.value = true;
+    try {
+      const prevPath = toStaticPath(formState.avatar || '');
+      const res = await uploadAvatar(file, formState.avatar);
+      formState.avatar = parseUploadedUrl(res);
+      option.onSuccess(res);
+      if (toStaticPath(formState.avatar) !== prevPath) {
+        Message.success('头像上传成功');
+      }
+    } catch (err) {
+      option.onError(err);
+      Message.error('头像上传失败');
+    } finally {
+      avatarUploading.value = false;
+    }
   };
 
   // const ArticleInfo = ref({})
@@ -385,28 +427,22 @@
     }
 
     // 处理用户的部门信息
-    if (userData.deptId) {
-      formState.deptId = String(userData.deptId);
-    } else {
-      formState.deptId = undefined;
-    }
+    const deptId = userData.deptId ?? userData.dept?.id;
+    formState.deptId = deptId != null ? Number(deptId) : undefined;
 
     // 编辑时不需要验证码，所以清空
     formState.authCode = '';
   };
-  const show = (val: any) => {
+  const show = async (val: any) => {
     type.value = val.type;
-    console.log({ type: type.value });
+    visible.value = true;
+    await Promise.all([loadRoles(), loadDepts()]);
     if (type.value === 'edit') {
       currentId.value = val.id;
-      getInfoHandle();
+      await getInfoHandle();
     } else {
       resetForm();
     }
-    // 加载角色和部门列表
-    loadRoles();
-    loadDepts();
-    visible.value = true;
   };
   const handleOk = () => {
     visible.value = false;

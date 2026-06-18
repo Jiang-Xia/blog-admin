@@ -1,7 +1,9 @@
 <script setup lang="ts">
   import { useUserStore } from '@/store/';
-  import { ref, reactive } from 'vue';
+  import { ref, reactive, computed } from 'vue';
   import request from '@/api/request';
+  import { uploadAvatar, parseUploadedUrl, resolveStaticUrl } from '@/api/resources';
+  import { toStaticPath } from '@/utils/file-hash';
   import { Message, Modal } from '@arco-design/web-vue';
   import useUser from '@/hooks/user';
   import { useI18n } from 'vue-i18n';
@@ -25,6 +27,9 @@
     avatar,
   });
   const modalForm = ref(Modal);
+  const avatarUploading = ref(false);
+
+  const avatarDisplayUrl = computed(() => resolveStaticUrl(form.avatar || ''));
 
   const handleClick = () => {
     visible.value = true;
@@ -56,6 +61,33 @@
   const handleCancel = () => {
     visible.value = false;
   };
+
+  const onAvatarUpload = async (option: {
+    fileItem: { file?: File };
+    onSuccess: (res?: unknown) => void;
+    onError: (err: unknown) => void;
+  }) => {
+    const file = option.fileItem.file;
+    if (!file) {
+      option.onError(new Error('无效文件'));
+      return;
+    }
+    avatarUploading.value = true;
+    try {
+      const prevPath = toStaticPath(form.avatar || '');
+      const res = await uploadAvatar(file, form.avatar);
+      form.avatar = parseUploadedUrl(res);
+      option.onSuccess(res);
+      if (toStaticPath(form.avatar) !== prevPath) {
+        Message.success(t('user.message.updateSuccess'));
+      }
+    } catch (err) {
+      option.onError(err);
+      Message.error('头像上传失败');
+    } finally {
+      avatarUploading.value = false;
+    }
+  };
   // 修改除了密码之外的信息
   const handleFinish = async (values: any) => {
     // console.log('values', values)
@@ -77,7 +109,7 @@
   <div class="my-info">
     <div class="center">
       <a-avatar>
-        <img v-if="form.avatar" :src="form.avatar" />
+        <img v-if="form.avatar" :src="avatarDisplayUrl" />
         <template v-else>{{ form.nickname }}</template>
       </a-avatar>
     </div>
@@ -106,11 +138,24 @@
           />
         </a-form-item>
         <a-form-item field="avatar" :label="t('user.form.avatar')">
-          <a-input
-            v-model="form.avatar"
-            :placeholder="t('user.form.placeholder.avatar')"
-            allow-clear
-          />
+          <a-space direction="vertical" fill>
+            <a-input
+              v-model="form.avatar"
+              :placeholder="t('user.form.placeholder.avatar')"
+              allow-clear
+            />
+            <a-upload
+              :show-file-list="false"
+              accept="image/jpeg,image/png,image/webp"
+              :custom-request="onAvatarUpload"
+            >
+              <template #upload-button>
+                <a-button type="outline" size="small" :loading="avatarUploading">
+                  上传头像
+                </a-button>
+              </template>
+            </a-upload>
+          </a-space>
         </a-form-item>
         <a-form-item field="homepage" :label="t('user.form.homepage')">
           <a-input

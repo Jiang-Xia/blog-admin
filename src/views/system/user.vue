@@ -124,40 +124,35 @@
               {{ formatDate(record.updateTime) }}
             </template>
           </a-table-column>
-          <a-table-column :title="t('system.table.locked')" data-index="status" :width="80">
-            <template #cell="{ record }">
-              <!-- :disabled="record.agreed" -->
-              <a-switch
-                v-permission="'user:status'"
-                v-model="record.status"
-                active-color="red"
-                checked-value="locked"
-                unchecked-value="active"
-                :disabled="record.role === 'super'"
-                @change="onSwitchStatus(record)"
-              >
-                <template #checked-icon>
-                  <icon-lock />
-                </template>
-                <template #unchecked-icon>
-                  <icon-unlock />
-                </template>
-              </a-switch>
-            </template>
-          </a-table-column>
           <a-table-column
             :title="t('user.table.operation')"
             data-index="operations"
-            :width="200"
+            :width="260"
             fixed="right"
           >
             <template #cell="{ record }">
               <a-space :size="8">
+                <a-switch
+                  v-permission="'user:status'"
+                  v-model="record.status"
+                  active-color="red"
+                  checked-value="locked"
+                  unchecked-value="active"
+                  :disabled="record.role === 'super'"
+                  @change="onSwitchStatus(record)"
+                >
+                  <template #checked-icon>
+                    <icon-lock />
+                  </template>
+                  <template #unchecked-icon>
+                    <icon-unlock />
+                  </template>
+                </a-switch>
                 <a-button
                   v-permission="'user:edit'"
                   size="mini"
                   type="primary"
-                  :disabled="record.role === 'super'"
+                  :disabled="false"
                   @click="showModal('edit', record.id)"
                 >
                   <icon-edit />
@@ -167,7 +162,8 @@
                   size="mini"
                   type="primary"
                   status="danger"
-                  @click="delHandle(record.id)"
+                  :disabled="record.role === 'super'"
+                  @click="delHandle(record)"
                 >
                   <icon-delete />
                 </a-button>
@@ -269,19 +265,24 @@
     formModel.value = generateFormModel();
     search();
   };
-  const delHandle = async (id: any) => {
-    const record = renderData.value.find((item) => item.id === id);
+  const delHandle = async (record: any) => {
+    if (record.role === 'super') {
+      Message.warning(t('user.message.superAdminProtected'));
+      return;
+    }
+    const { id } = record;
     Modal.confirm({
       title: t('user.confirm.delete'),
       content: `确定删除用户 ${record?.nickname || record?.username || '该用户'} 吗？`,
       onOk: async () => {
-        const res = await request.delete('/user', { params: { id } });
+        await request.delete('/user', { params: { id } });
         Message.success(t('user.message.deleteSuccess'));
         getTableListHandle();
       },
     });
   };
   const onSwitchStatus = async (record: any) => {
+    if (record.role === 'super') return;
     const { status, id } = record;
     const res = await request.patch(`/user/status`, { status, id });
     Message.success(t('common.message.setSuccess'));
@@ -291,6 +292,7 @@
     addRef.value.show({ type, id });
   };
   const resetHandle = async (record: any) => {
+    if (record.role === 'super') return;
     const { username, nickname } = record;
     const userName = record?.nickname || record?.username || t('user.label.thisUser');
     Modal.confirm({

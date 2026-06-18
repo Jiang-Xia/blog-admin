@@ -22,9 +22,17 @@ const openEncrypt =
       return true;
     }
   })();
+const isMultipartBody = (body: unknown): body is FormData => {
+  return typeof FormData !== 'undefined' && body instanceof FormData;
+};
+
 // 加密请求 body
 const encryptMsg = (body: any, url: string) => {
   const bool = url.includes('encrypt');
+  // FormData 不能 JSON 序列化，加密会破坏 multipart 文件上传
+  if (bool && body && isMultipartBody(body)) {
+    return body;
+  }
   if (bool && body) {
     // console.log('encryptMsg-body====>', JSON.stringify(body));
     body = aesEncrypt(JSON.stringify(body));

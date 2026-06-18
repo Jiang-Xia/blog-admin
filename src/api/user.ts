@@ -11,7 +11,6 @@ export interface AccountLoginData {
 
 export interface EmailLoginData {
   email: string;
-  password: string;
   verificationCode: string;
 }
 

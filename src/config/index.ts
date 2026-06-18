@@ -7,7 +7,6 @@ const config: configState = {
 };
 
 let url: string;
-let imgUrl: string;
 // let url2: string;
 const mode = import.meta.env.MODE;
 const metaEnv = import.meta.env;
@@ -17,11 +16,13 @@ if (mode === 'development') {
 // x-api 后端服务
 if (mode === 'production') {
   url = metaEnv.VITE_API_BASE_URL;
-  imgUrl = url;
 } else {
   url = metaEnv.VITE_PREFIX_PATH;
-  imgUrl = metaEnv.VITE_API_STATIC_URL;
 }
+// 静态资源域名（与 blog-server /static 挂载一致）
+const imgUrl =
+  metaEnv.VITE_API_STATIC_URL ||
+  (mode === 'production' ? 'https://jiang-xia.top/x-api/blog-server' : 'http://localhost:5000');
 export const baseUrl: string = url;
 export const staticUrl: string = imgUrl;
 export default config;

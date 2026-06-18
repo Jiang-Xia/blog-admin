@@ -13,6 +13,8 @@ export default {
   'taskManage.action.stop': '停止',
   'taskManage.action.start': '启动',
   'taskManage.action.add': '新增任务',
+  'taskManage.action.clearPermissionCache': '清除权限缓存',
+  'taskManage.action.refreshTongjiToken': '刷新百度统计 Token',
   'taskManage.logRecording': '记录日志',
   'taskManage.table.name': '任务标识',
   'taskManage.table.description': '描述',
@@ -40,6 +42,10 @@ export default {
   'taskManage.modal.addTitle': '新增任务',
   'taskManage.modal.editTitle': '编辑任务',
   'taskManage.confirm.delete': '确定删除该任务吗？',
+  'taskManage.confirm.clearPermissionCache':
+    '确定清除权限相关 Redis 缓存吗？清除后下次请求将重新从数据库加载。',
+  'taskManage.confirm.refreshTongjiToken':
+    '确定刷新百度统计 access_token 吗？将清除 Redis 与内存中的旧 token 并重新换取。',
   'taskManage.message.triggerSuccess': '任务执行成功',
   'taskManage.message.triggerFailed': '任务执行失败',
   'taskManage.message.stopSuccess': '任务已停止',
@@ -53,4 +59,8 @@ export default {
   'taskManage.message.updateSuccess': '任务更新成功',
   'taskManage.message.deleteSuccess': '任务删除成功',
   'taskManage.message.operateFailed': '操作失败',
+  'taskManage.message.clearPermissionCacheSuccess': '权限缓存已清除（共 {count} 个键）',
+  'taskManage.message.clearPermissionCacheFailed': '清除权限缓存失败',
+  'taskManage.message.refreshTongjiTokenSuccess': '百度统计 Token 已刷新',
+  'taskManage.message.refreshTongjiTokenFailed': '刷新百度统计 Token 失败',
 };

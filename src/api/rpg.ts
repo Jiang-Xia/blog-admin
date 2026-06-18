@@ -195,6 +195,14 @@ export const deleteGuild = (id: number) => {
   return request({ url: `/admin/rpg/guilds/${id}`, method: 'delete' });
 };
 
+export const getGuildMembers = (id: number) => {
+  return request({ url: `/admin/rpg/guilds/${id}/members`, method: 'get' });
+};
+
+export const removeGuildMember = (guildId: number, uid: number) => {
+  return request({ url: `/admin/rpg/guilds/${guildId}/members/${uid}`, method: 'delete' });
+};
+
 // ========== 打赏/社交流水 ==========
 
 export const getTipLogList = (params: Record<string, any>) => {

@@ -40,12 +40,31 @@
             </a-form-item>
 
             <a-form-item :label="t('article.form.cover')" name="cover" field="cover">
-              <a-input
-                v-model="formState.cover"
-                autocomplete="off"
-                :placeholder="t('article.form.placeholder.coverUrl')"
-                allow-clear
-              />
+              <a-space direction="vertical" fill>
+                <a-input
+                  v-model="formState.cover"
+                  autocomplete="off"
+                  :placeholder="t('article.form.placeholder.coverUrl')"
+                  allow-clear
+                />
+                <a-upload
+                  :show-file-list="false"
+                  accept="image/jpeg,image/png,image/webp"
+                  :custom-request="onCoverUpload"
+                >
+                  <template #upload-button>
+                    <a-button type="outline" size="small" :loading="coverUploading">
+                      上传封面
+                    </a-button>
+                  </template>
+                </a-upload>
+                <img
+                  v-if="formState.cover"
+                  :src="coverPreviewUrl"
+                  alt="封面预览"
+                  class="cover-preview"
+                />
+              </a-space>
             </a-form-item>
 
             <a-form-item :label="t('article.form.category')" name="category" field="category">
@@ -130,9 +149,14 @@
   import { computed, ref, reactive } from 'vue';
   import { useI18n } from 'vue-i18n';
   import useLoading from '@/hooks/loading';
-  import { staticUrl } from '@/config';
   import { getArticleInfo, createArticle, editArticle } from '@/api/article';
-  import request from '@/api/request';
+  import {
+    uploadCover,
+    uploadArticleImage,
+    parseUploadedUrl,
+    resolveStaticUrl,
+  } from '@/api/resources';
+  import { toStaticPath } from '@/utils/file-hash';
   import { Message, Modal } from '@arco-design/web-vue';
   import { useRoute, useRouter } from 'vue-router';
   import type { ValidatedError } from '@arco-design/web-vue/es/form/interface';
@@ -176,7 +200,10 @@
   const { list: categoryOptions } = useTableNoPageList('/category', {});
   const { list: tagsOptions } = useTableNoPageList('/tag', {});
   const formRef = ref();
+  const coverUploading = ref(false);
   const formState: FormState = reactive({ ...defaultForm });
+
+  const coverPreviewUrl = computed(() => resolveStaticUrl(formState.cover));
   // 自定义异步校验
   const checkTitle = async (value: string, cb: (error?: string) => void) => {
     console.log(value);
@@ -277,31 +304,44 @@
   // 上传图片功能
   const onUploadImg = async (files: File[], callback: (urls: string[]) => void) => {
     loading.value = true;
-    const res = await Promise.all(
-      files.map((file: File) => {
-        return new Promise((rev, rej) => {
-          const form = new FormData();
-          form.append('fileContents', file);
-          form.append('data', 'd5561c87-f189-4dc1-a28d-ba862a50f01f');
-          request({
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
-            url: '/resources/uploadFile',
-            method: 'post',
-            data: form,
-          })
-            .then((res) => rev(res))
-            .catch((error) => rej(error));
-        });
-      }),
-    );
-    loading.value = false;
-    callback(
-      res.map((item: any) => {
-        return staticUrl + item.data[0].url;
-      }),
-    );
+    try {
+      const urls = await Promise.all(
+        files.map(async (file: File) => {
+          const res = await uploadArticleImage(file);
+          return parseUploadedUrl(res);
+        }),
+      );
+      callback(urls);
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  const onCoverUpload = async (option: {
+    fileItem: { file?: File };
+    onSuccess: (res?: unknown) => void;
+    onError: (err: unknown) => void;
+  }) => {
+    const file = option.fileItem.file;
+    if (!file) {
+      option.onError(new Error('无效文件'));
+      return;
+    }
+    coverUploading.value = true;
+    try {
+      const prevPath = toStaticPath(formState.cover || '');
+      const res = await uploadCover(file, formState.cover);
+      formState.cover = parseUploadedUrl(res);
+      option.onSuccess(res);
+      if (toStaticPath(formState.cover) !== prevPath) {
+        Message.success('封面上传成功');
+      }
+    } catch (err) {
+      option.onError(err);
+      Message.error('封面上传失败');
+    } finally {
+      coverUploading.value = false;
+    }
   };
 </script>
 
@@ -340,5 +380,15 @@
         flex-wrap: nowrap;
       }
     }
+  }
+
+  .cover-preview {
+    display: block;
+    max-width: 280px;
+    max-height: 158px;
+    margin-top: 8px;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid var(--color-border-2);
   }
 </style>

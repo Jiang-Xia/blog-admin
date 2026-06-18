@@ -18,6 +18,7 @@ export default {
   'msgboard.table.nickname': '昵称',
   'msgboard.table.avatar': '头像',
   'msgboard.table.comment': '评论内容',
+  'msgboard.table.createTime': '留言时间',
   'msgboard.table.address': '网址',
   'msgboard.button.search': '搜索',
   'msgboard.button.reset': '重置',
