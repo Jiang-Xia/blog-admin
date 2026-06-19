@@ -15,13 +15,16 @@
 
 </div>
 
+> **三端说明**：本仓库（管理端）与 [blog-home-nuxt](https://github.com/Jiang-Xia/blog-home-nuxt) 为 **MIT 开源**；后端 **blog-server 闭源**。  
+> 完整部署、源码授权与付费合作 → **[jiang-xia.top/open-source](https://jiang-xia.top/open-source)**
+
 ## 📖 项目简介
 
 Blog Admin 是一个基于 **Vue3**、**TypeScript**、**Vite** 和 **Arco Design Vue** 构建的现代化博客后台管理系统。该系统采用最新的前端技术栈，为个人博客提供完整的文章管理、用户管理、内容分类、标签管理、RPG 游戏化运营等核心功能。
 
 本仓库为博客三端架构中的**管理后台**，配套服务：
-- 后端 API：[blog-server](../blog-server)
-- 博客前台：[blog-home-nuxt](../blog-home-nuxt)
+- 博客前台：[blog-home-nuxt](https://github.com/Jiang-Xia/blog-home-nuxt)（MIT 开源）
+- 后端 API：**blog-server 闭源**，说明与授权见 [开源与合作](https://jiang-xia.top/open-source)
 
 ## ✨ 核心特性
 
@@ -100,7 +103,7 @@ src/
 ### 环境要求
 - Node.js >= 20.19.3
 - npm >= 10.8.2 或 yarn >= 1.22.0
-- 已启动的 [blog-server](../blog-server)
+- 已启动的 blog-server 后端（闭源，需自行授权获取或对接兼容 API）
 
 ### 环境配置
 
@@ -224,7 +227,7 @@ yarn type-check
 | `/ext-apps/rpg/guild` | 公会管理 | 公会列表与删除 |
 | `/ext-apps/rpg/social-log` | 社交流水 | 打赏/社交互动记录 |
 
-详细后端文档见 [blog-server RPG 技术文档](../blog-server/src/modules/rpg/RPG-TECH.md)。
+RPG 管理端接口与后端实现文档在 **blog-server 源码授权** 后提供；公开 Issue 可讨论管理端 UI 与联调问题。
 
 ## 🎨 界面预览
 
@@ -246,12 +249,13 @@ yarn type-check
 
 ## 📄 开源协议
 
-本项目基于 [MIT License](./LICENSE) 开源协议。
+本项目（blog-admin）基于 [MIT License](./LICENSE) 开源。  
+后端 blog-server **不在此协议范围内**，获取方式见 [开源与合作](https://jiang-xia.top/open-source)。
 
 ## 📚 相关文档
 
-- [blog-server README](../blog-server/README.md) - 后端 API 与部署
-- [blog-server RPG 技术文档](../blog-server/src/modules/rpg/RPG-TECH.md) - RPG 管理端接口
+- [blog-home-nuxt README](https://github.com/Jiang-Xia/blog-home-nuxt) - 博客前台
+- [开源与合作（闭源边界 · 付费套餐）](https://jiang-xia.top/open-source)
 
 ## 👨‍💻 作者
 
