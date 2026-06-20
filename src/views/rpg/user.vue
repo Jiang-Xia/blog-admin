@@ -408,14 +408,14 @@
     uid: 0,
     nickname: '',
     amount: 100,
-    reason: 'admin_test',
+    reason: '钻石充值',
   });
 
   const openRecharge = (record: any) => {
     rechargeForm.uid = record.uid;
     rechargeForm.nickname = record.nickname || record.username || String(record.uid);
     rechargeForm.amount = 100;
-    rechargeForm.reason = 'admin_test';
+    rechargeForm.reason = '钻石充值';
     rechargeVisible.value = true;
   };
 

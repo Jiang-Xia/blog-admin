@@ -58,6 +58,9 @@
                     </a-button>
                   </template>
                 </a-upload>
+                <span class="cover-hint">{{
+                  t('article.form.coverHint', { size: coverSizeLabel })
+                }}</span>
                 <img
                   v-if="formState.cover"
                   :src="coverPreviewUrl"
@@ -157,6 +160,7 @@
     resolveStaticUrl,
   } from '@/api/resources';
   import { toStaticPath } from '@/utils/file-hash';
+  import { COVER_IMAGE, coverAspectRatio } from '@/utils/image-compress';
   import { Message, Modal } from '@arco-design/web-vue';
   import { useRoute, useRouter } from 'vue-router';
   import type { ValidatedError } from '@arco-design/web-vue/es/form/interface';
@@ -201,6 +205,7 @@
   const { list: tagsOptions } = useTableNoPageList('/tag', {});
   const formRef = ref();
   const coverUploading = ref(false);
+  const coverSizeLabel = `${COVER_IMAGE.maxWidth}×${COVER_IMAGE.maxHeight}`;
   const formState: FormState = reactive({ ...defaultForm });
 
   const coverPreviewUrl = computed(() => resolveStaticUrl(formState.cover));
@@ -382,10 +387,17 @@
     }
   }
 
+  .cover-hint {
+    display: block;
+    font-size: 12px;
+    color: var(--color-text-3);
+    line-height: 1.4;
+  }
+
   .cover-preview {
     display: block;
-    max-width: 280px;
-    max-height: 158px;
+    width: 280px;
+    aspect-ratio: v-bind(coverAspectRatio);
     margin-top: 8px;
     object-fit: cover;
     border-radius: 4px;
