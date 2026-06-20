@@ -79,10 +79,12 @@
           hide-label
         >
           <a-input
-            v-model="userInfo.authCode"
+            :model-value="userInfo.authCode"
             :placeholder="t('login.form.imageCode.placeholder')"
             allow-clear
-            :max-length="6"
+            :max-length="GRAPHIC_CAPTCHA_LENGTH"
+            :input-attrs="graphicCaptchaNativeInputAttrs"
+            @update:model-value="onGraphicCaptchaModelUpdate"
           >
             <template #suffix>
               <template v-if="authCodeUrl && !authCodeLoadError">
@@ -135,13 +137,15 @@
           hide-label
         >
           <a-input-search
-            v-model="userInfo.emailAuthCode"
+            :model-value="userInfo.emailAuthCode"
             :placeholder="t('login.form.emailAuthCode.placeholder')"
             allow-clear
-            :max-length="6"
+            :max-length="EMAIL_VERIFICATION_CODE_LENGTH"
+            :input-attrs="emailVerificationCodeNativeInputAttrs"
             search-button
             :disabled="emailCaptchaDisabled"
             :loading="emailLoading"
+            @update:model-value="onEmailAuthCodeModelUpdate"
             @search="getEmailCaptcha"
           >
             <template #prefix>
@@ -178,7 +182,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref, reactive, onUnmounted } from 'vue';
+  import { ref, reactive, onUnmounted, watch } from 'vue';
   import { useDebounceFn } from '@vueuse/core';
   import { useRoute, useRouter } from 'vue-router';
   import { Message } from '@arco-design/web-vue';
@@ -190,6 +194,16 @@
   import type { LoginData } from '@/api/user';
   import { getAuthCode, getEmailAuthCode } from '@/api/login';
   import { shouldRefreshGraphicCaptcha } from '@/constants/graphic-captcha-error';
+  import {
+    createSanitizedModelUpdater,
+    EMAIL_VERIFICATION_CODE_LENGTH,
+    emailVerificationCodeNativeInputAttrs,
+    GRAPHIC_CAPTCHA_LENGTH,
+    graphicCaptchaNativeInputAttrs,
+    sanitizeEmailVerificationCodeInput,
+    sanitizeGraphicCaptchaInput,
+    watchCaptchaInput,
+  } from '@/utils/captcha-input';
   import { LOGIN_ACCOUNT_MAX_LENGTH, isLoginAccount } from '@/utils/username';
 
   const router = useRouter();
@@ -222,6 +236,30 @@
     email: loginConfig.value.email,
     emailAuthCode: '',
   });
+
+  watchCaptchaInput(
+    () => userInfo.authCode,
+    (value) => {
+      userInfo.authCode = value;
+    },
+    sanitizeGraphicCaptchaInput,
+    watch,
+  );
+  watchCaptchaInput(
+    () => userInfo.emailAuthCode,
+    (value) => {
+      userInfo.emailAuthCode = value;
+    },
+    sanitizeEmailVerificationCodeInput,
+    watch,
+  );
+
+  const onGraphicCaptchaModelUpdate = createSanitizedModelUpdater((value) => {
+    userInfo.authCode = value;
+  }, sanitizeGraphicCaptchaInput);
+  const onEmailAuthCodeModelUpdate = createSanitizedModelUpdater((value) => {
+    userInfo.emailAuthCode = value;
+  }, sanitizeEmailVerificationCodeInput);
 
   const ticket = ref(query.ticket as string);
   if (ticket.value) {
