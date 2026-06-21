@@ -17,7 +17,8 @@
     "type-check": "vue-tsc --build",
     "lint": "eslint . --fix",
     "format": "prettier --write src/",
-    "test": "vitest run"
+    "test": "vitest run",
+    "deploy": "powershell -ExecutionPolicy Bypass -File deploy/pm2/deploy.ps1"
   },
   "lint-staged": {
     "*.{js,ts,jsx,tsx}": [
