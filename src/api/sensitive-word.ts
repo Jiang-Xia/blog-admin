@@ -12,7 +12,15 @@ export const getSensitiveWordList = (params: Record<string, any>) => {
 };
 
 /** 新增敏感词 */
-export const createSensitiveWord = (data: { word: string; category?: string }) => {
+export const createSensitiveWord = (data: {
+  word: string;
+  category?: string;
+  status?: number;
+  level?: number;
+  hpPenalty?: number;
+  needReview?: number;
+  action?: number;
+}) => {
   return request({
     url: '/sensitive-word',
     method: 'post',

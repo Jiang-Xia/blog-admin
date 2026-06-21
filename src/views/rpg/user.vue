@@ -129,7 +129,7 @@
               </a-tag>
             </template>
           </a-table-column>
-          <a-table-column title="操作" data-index="operations" :width="140" fixed="right">
+          <a-table-column title="操作" data-index="operations" :width="220" fixed="right">
             <template #cell="{ record }">
               <a-space :size="4">
                 <a-button size="mini" type="primary" @click="showDetail(record)">
@@ -143,6 +143,24 @@
                   @click="openRecharge(record)"
                 >
                   充值
+                </a-button>
+                <a-button
+                  v-if="isSuperAdmin"
+                  size="mini"
+                  type="outline"
+                  status="danger"
+                  @click="openDeduct(record)"
+                >
+                  扣减
+                </a-button>
+                <a-button
+                  v-if="isSuperAdmin && isBanned(record)"
+                  size="mini"
+                  type="outline"
+                  status="success"
+                  @click="handleUnban(record)"
+                >
+                  解禁
                 </a-button>
               </a-space>
             </template>
@@ -301,6 +319,35 @@
         </a-form-item>
       </a-form>
     </a-modal>
+
+    <a-modal
+      v-model:visible="deductVisible"
+      title="扣减钻石"
+      :ok-loading="deductLoading"
+      @ok="submitDeduct"
+      @cancel="deductVisible = false"
+    >
+      <a-form :model="deductForm" layout="vertical">
+        <a-form-item label="用户">
+          <span>{{ deductForm.nickname || deductForm.uid }}</span>
+        </a-form-item>
+        <a-form-item label="当前钻石">
+          <span>{{ deductForm.currentCurrency ?? 0 }}</span>
+        </a-form-item>
+        <a-form-item label="扣减数量" required>
+          <a-input-number
+            v-model="deductForm.amount"
+            :min="1"
+            :max="100000"
+            placeholder="1~100000"
+            style="width: 100%"
+          />
+        </a-form-item>
+        <a-form-item label="备注">
+          <a-input v-model="deductForm.reason" placeholder="可选，如：违规扣减" allow-clear />
+        </a-form-item>
+      </a-form>
+    </a-modal>
   </div>
 </template>
 
@@ -308,8 +355,15 @@
   import { ref, reactive, computed } from 'vue';
   import type { Pagination } from '@/types/global';
   import { IconSearch, IconRefresh, IconEye } from '@arco-design/web-vue/es/icon';
-  import { Message } from '@arco-design/web-vue';
-  import { getUserRpgList, getUserRpgDetail, getRpgStats, rechargeDiamonds } from '@/api/rpg';
+  import { Message, Modal } from '@arco-design/web-vue';
+  import {
+    getUserRpgList,
+    getUserRpgDetail,
+    getRpgStats,
+    rechargeDiamonds,
+    deductDiamonds,
+    unbanRpgUser,
+  } from '@/api/rpg';
   import useLoading from '@/hooks/loading';
   import useUserStore from '@/store/modules/user';
 
@@ -411,6 +465,16 @@
     reason: '钻石充值',
   });
 
+  const deductVisible = ref(false);
+  const deductLoading = ref(false);
+  const deductForm = reactive({
+    uid: 0,
+    nickname: '',
+    currentCurrency: 0,
+    amount: 10,
+    reason: '钻石扣减',
+  });
+
   const openRecharge = (record: any) => {
     rechargeForm.uid = record.uid;
     rechargeForm.nickname = record.nickname || record.username || String(record.uid);
@@ -436,6 +500,46 @@
     } finally {
       rechargeLoading.value = false;
     }
+  };
+
+  const openDeduct = (record: any) => {
+    deductForm.uid = record.uid;
+    deductForm.nickname = record.nickname || record.username || String(record.uid);
+    deductForm.currentCurrency = record.currency ?? 0;
+    deductForm.amount = 10;
+    deductForm.reason = '钻石扣减';
+    deductVisible.value = true;
+  };
+
+  const submitDeduct = async () => {
+    if (!deductForm.amount || deductForm.amount < 1) {
+      Message.warning('请输入有效扣减数量');
+      return;
+    }
+    deductLoading.value = true;
+    try {
+      await deductDiamonds(deductForm.uid, {
+        amount: deductForm.amount,
+        reason: deductForm.reason,
+      });
+      Message.success('扣减成功');
+      deductVisible.value = false;
+      loadData();
+    } finally {
+      deductLoading.value = false;
+    }
+  };
+
+  const handleUnban = (record: any) => {
+    Modal.confirm({
+      title: '确认解禁',
+      content: `确定解除用户 ${record.nickname || record.username || record.uid} 的禁言状态？`,
+      onOk: async () => {
+        await unbanRpgUser(record.uid);
+        Message.success('解禁成功');
+        loadData();
+      },
+    });
   };
 
   const showDetail = async (record: any) => {
