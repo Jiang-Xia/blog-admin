@@ -135,9 +135,17 @@ yarn dev
 ### 生产构建
 ```bash
 npm run build
-# 或
-yarn build
 ```
+
+### 一键部署（生产静态）
+
+与 blog-server 同机：`admin.jiang-xia.top` → `/opt/jxapp/front/blog-admin`
+
+```powershell
+npm run deploy
+```
+
+build 直接读根目录 `.env.production`；SSH 见 `deploy/pm2/deploy.local.env`。详见 [deploy/pm2/README.md](deploy/pm2/README.md)。
 
 ### 代码检查
 ```bash
