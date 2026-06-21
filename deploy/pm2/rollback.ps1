@@ -1,22 +1,19 @@
 # =============================================================================
-# blog-admin Windows 本地部署入口（静态站点，无 PM2）
-# 用法：npm run deploy
-#
-# 流程：[1] Vite build → [2] 打 tar(dist) → [3] 上传 → [4] 远程解压
-# env：读根目录 .env.production（build 时打进 JS，不打进 tar）
+# blog-admin Windows 回滚入口（静态站点）
+# 用法：npm run rollback / npm run rollback:list
 # =============================================================================
 
 param(
-  [string]$EnvFileName = 'deploy.local.env'
+  [string]$EnvFileName = 'deploy.local.env',
+  [string]$BackupName = '',
+  [switch]$List
 )
 
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'ssh-lib.ps1')
 
-$Root = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 $EnvFile = Join-Path $PSScriptRoot $EnvFileName
-$PackDir = Join-Path $PSScriptRoot '.pack'
-$RemoteScript = Join-Path $PSScriptRoot 'remote-deploy.sh'
+$RemoteScript = Join-Path $PSScriptRoot 'remote-rollback.sh'
 
 if (-not (Test-Path $EnvFile)) {
   throw "Missing $EnvFile — copy deploy.local.env.example to deploy.local.env"
@@ -37,25 +34,14 @@ $DeployPort = if ($cfg['DEPLOY_PORT']) { $cfg['DEPLOY_PORT'] } else { '22' }
 $DeployPassword = $cfg['DEPLOY_PASSWORD']
 $RemoteDir = $cfg['DEPLOY_REMOTE_DIR']
 $HostKey = $cfg['DEPLOY_HOSTKEY']
-$TarName = if ($cfg['DEPLOY_TAR_NAME']) { $cfg['DEPLOY_TAR_NAME'] } else { 'blog-admin.tar.gz' }
-Assert-SafeTarName $TarName
 
 if (-not $DeployHost -or -not $DeployUser -or -not $RemoteDir) {
   throw 'deploy.local.env needs DEPLOY_HOST, DEPLOY_USER, DEPLOY_REMOTE_DIR'
 }
 
-$envProd = Join-Path $Root '.env.production'
-if (-not (Test-Path $envProd)) {
-  throw 'Missing .env.production in project root'
-}
-
 function Find-Executable {
   param([string]$Name)
-  $paths = @(
-    $Name,
-    "$env:ProgramFiles\PuTTY\$Name.exe",
-    "${env:ProgramFiles(x86)}\PuTTY\$Name.exe"
-  )
+  $paths = @($Name, "$env:ProgramFiles\PuTTY\$Name.exe", "${env:ProgramFiles(x86)}\PuTTY\$Name.exe")
   foreach ($p in $paths) {
     if (Test-Path $p) { return $p }
     $cmd = Get-Command $p -ErrorAction SilentlyContinue
@@ -98,45 +84,24 @@ function Copy-ToRemote {
   }
 }
 
-Write-Host "==> Remote static dir: $RemoteDir"
-Write-Host "==> Build env: .env.production (project root)"
+Copy-ToRemote $RemoteScript '/tmp/remote-rollback.sh'
 
-# [1/4] 本地 Vite 生产构建
-Write-Host '==> [1/4] Build'
-Push-Location $Root
-npm ci --ignore-scripts   # 跳过 husky postinstall
-npm run build
-Pop-Location
+Assert-BackupFileName $BackupName
+$eRemoteDir = Escape-ShellSingleQuoted $RemoteDir
+$envPrefix = "DEPLOY_REMOTE_DIR='$eRemoteDir'"
 
-if (-not (Test-Path (Join-Path $Root 'dist/index.html'))) {
-  throw 'Build failed: dist/index.html not found'
+if ($List) {
+  Invoke-Remote "chmod +x /tmp/remote-rollback.sh && ${envPrefix} DEPLOY_ROLLBACK_LIST=1 bash /tmp/remote-rollback.sh"
+  exit 0
 }
 
-# [2/4] 仅打包 dist 目录内容（tar 根即 index.html）
-Write-Host '==> [2/4] Pack tar (dist only)'
-if (-not (Test-Path $PackDir)) { New-Item -ItemType Directory -Path $PackDir | Out-Null }
-$tarLocal = Join-Path $PackDir $TarName
-if (Test-Path $tarLocal) { Remove-Item -Force $tarLocal }
-Push-Location (Join-Path $Root 'dist')
-tar -czf $tarLocal .
-Pop-Location
-$tarSize = [math]::Round((Get-Item $tarLocal).Length / 1MB, 2)
-Write-Host "==> Tar: $tarLocal ($tarSize MB)"
+$backupArg = if ($BackupName) { " '$(Escape-ShellSingleQuoted $BackupName)'" } else { '' }
+Write-Host "==> Rollback: $RemoteDir"
+if ($BackupName) { Write-Host "==> Backup: $BackupName" } else { Write-Host '==> Backup: latest' }
 
-# [3/4] 上传
-Write-Host '==> [3/4] Upload'
-$remoteTar = "/tmp/$TarName"
-Copy-ToRemote $tarLocal $remoteTar
-Copy-ToRemote $RemoteScript '/tmp/remote-deploy.sh'
-
-# [4/4] 远程：备份 → 清空 → 解压
-Write-Host '==> [4/4] Remote extract'
-$eRemoteDir = Escape-ShellSingleQuoted $RemoteDir
-$eRemoteTar = Escape-ShellSingleQuoted $remoteTar
-$remoteCmd = "chmod +x /tmp/remote-deploy.sh && DEPLOY_REMOTE_DIR='$eRemoteDir' DEPLOY_TAR_PATH='$eRemoteTar' bash /tmp/remote-deploy.sh"
-Invoke-Remote $remoteCmd
+Invoke-Remote "chmod +x /tmp/remote-rollback.sh && ${envPrefix} bash /tmp/remote-rollback.sh${backupArg}"
 
 Write-Host '==> Verify'
 Invoke-Remote "test -f '$eRemoteDir/index.html' && echo 'index.html OK'"
 
-Write-Host '==> Deploy finished — https://admin.jiang-xia.top/'
+Write-Host '==> Rollback finished'

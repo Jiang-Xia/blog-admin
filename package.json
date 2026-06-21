@@ -18,7 +18,9 @@
     "lint": "eslint . --fix",
     "format": "prettier --write src/",
     "test": "vitest run",
-    "deploy": "powershell -ExecutionPolicy Bypass -File deploy/pm2/deploy.ps1"
+    "deploy": "powershell -ExecutionPolicy Bypass -File deploy/pm2/deploy.ps1",
+    "rollback": "powershell -ExecutionPolicy Bypass -File deploy/pm2/rollback.ps1",
+    "rollback:list": "powershell -ExecutionPolicy Bypass -File deploy/pm2/rollback.ps1 -List"
   },
   "lint-staged": {
     "*.{js,ts,jsx,tsx}": [
