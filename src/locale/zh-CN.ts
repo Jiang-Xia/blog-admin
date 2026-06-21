@@ -57,6 +57,7 @@ export default {
 
   'menu.server.user': '个人中心',
   'menu.server.userSet': '用户设置',
+  'menu.server.menuSet': '菜单设置',
 
   'menu.server.link': '友情链接',
   'menu.server.linkList': '友链列表',

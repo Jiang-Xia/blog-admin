@@ -114,6 +114,7 @@ export default {
   'common.message.downloadFail': '下载失败',
   'common.message.copySuccess': '复制成功',
   'common.message.copyFail': '复制失败',
+  'common.message.setSuccess': '设置成功',
 
   // 确认提示
   'common.confirm.delete': '确定要删除吗？',

@@ -221,3 +221,20 @@ export const rechargeDiamonds = (uid: number, data: { amount: number; reason?: s
     data,
   });
 };
+
+/** 超管扣减钻石 */
+export const deductDiamonds = (uid: number, data: { amount: number; reason?: string }) => {
+  return request({
+    url: `/admin/rpg/users/${uid}/currency/deduct`,
+    method: 'post',
+    data,
+  });
+};
+
+/** 超管解禁 RPG 用户 */
+export const unbanRpgUser = (uid: number) => {
+  return request({
+    url: `/admin/rpg/users/${uid}/unban`,
+    method: 'post',
+  });
+};

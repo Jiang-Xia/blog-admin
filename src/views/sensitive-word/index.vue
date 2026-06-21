@@ -101,7 +101,11 @@
             :width="120"
           />
           <a-table-column title="等级" data-index="level" :width="70" />
-          <a-table-column title="扣HP" data-index="hpPenalty" :width="70" />
+          <a-table-column title="扣HP" data-index="hpPenalty" :width="70">
+            <template #cell="{ record }">
+              {{ record.hpPenalty ?? 0 }}
+            </template>
+          </a-table-column>
           <a-table-column title="需审核" data-index="needReview" :width="80">
             <template #cell="{ record }">
               {{ record.needReview === 1 ? '是' : '否' }}
@@ -198,7 +202,9 @@
             <a-option :value="3">3-轻(仅记录)</a-option>
           </a-select>
         </a-form-item>
-        <a-form-item label="扣HP"> </a-form-item>
+        <a-form-item label="扣HP">
+          <a-input-number v-model="modalForm.hpPenalty" :min="0" :max="100" style="width: 100%" />
+        </a-form-item>
         <a-form-item label="需审核">
           <a-radio-group v-model="modalForm.needReview">
             <a-radio :value="1">是</a-radio>
@@ -345,7 +351,15 @@
       await updateSensitiveWord(editId.value, modalForm.value);
       Message.success(t('sensitiveWord.message.updateSuccess'));
     } else {
-      await createSensitiveWord({ word: modalForm.value.word, category: modalForm.value.category });
+      await createSensitiveWord({
+        word: modalForm.value.word,
+        category: modalForm.value.category,
+        status: modalForm.value.status,
+        level: modalForm.value.level,
+        hpPenalty: modalForm.value.hpPenalty,
+        needReview: modalForm.value.needReview,
+        action: modalForm.value.action,
+      });
       Message.success(t('sensitiveWord.message.createSuccess'));
     }
     modalVisible.value = false;

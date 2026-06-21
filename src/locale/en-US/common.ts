@@ -114,6 +114,7 @@ export default {
   'common.message.downloadFail': 'Download Failed',
   'common.message.copySuccess': 'Copy Successful',
   'common.message.copyFail': 'Copy Failed',
+  'common.message.setSuccess': 'Set Successful',
 
   // Confirmation
   'common.confirm.delete': 'Are you sure to delete?',

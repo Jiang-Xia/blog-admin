@@ -34,6 +34,7 @@ export default {
   'workplace.popularContent.video': 'video',
   'workplace.categoriesPercent': 'Categories Percent',
   'workplace.pecs': 'pecs',
+  'workplace.unit.times': 'times',
   'workplace.recentArticles': 'Recent Articles',
   'workplace.websiteVisits': 'Website Visits (Last 14 Days)',
   'workplace.viewMore': 'View More',

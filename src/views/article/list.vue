@@ -175,9 +175,19 @@
           <a-table-column :title="t('article.table.cover')" data-index="category" :width="100">
             <template #cell="{ record }">
               <a-popover title="">
-                <a-image width="40" height="40" :src="record.cover" />
+                <a-image
+                  :width="coverThumbWidth"
+                  :height="coverThumbHeight"
+                  fit="cover"
+                  :src="record.cover"
+                />
                 <template #content>
-                  <a-image width="200" height="200" :src="record.cover" />
+                  <a-image
+                    :width="coverPreviewWidth"
+                    :height="coverPreviewHeight"
+                    fit="cover"
+                    :src="record.cover"
+                  />
                 </template>
               </a-popover>
             </template>
@@ -299,6 +309,16 @@
   import { Message, Modal } from '@arco-design/web-vue';
   import request from '@/api/request';
   import * as XLSX from 'xlsx';
+  import { COVER_IMAGE } from '@/utils/image-compress';
+
+  const coverThumbWidth = 56;
+  const coverThumbHeight = Math.round(
+    (coverThumbWidth * COVER_IMAGE.maxHeight) / COVER_IMAGE.maxWidth,
+  );
+  const coverPreviewWidth = 240;
+  const coverPreviewHeight = Math.round(
+    (coverPreviewWidth * COVER_IMAGE.maxHeight) / COVER_IMAGE.maxWidth,
+  );
 
   const router = useRouter();
   const deptTreeData = ref<any[]>([]);

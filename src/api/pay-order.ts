@@ -44,3 +44,21 @@ export const queryPayOrder = (params: Record<string, any>) => {
     params,
   });
 };
+
+/** 批量删除订单（仅删除本地记录） */
+export const deletePayOrders = (ids: number[]) => {
+  return request({
+    url: '/pay/order/delete',
+    method: 'post',
+    data: { ids },
+  });
+};
+
+/** 标记博客充值单已手工发钻 */
+export const markPayOrderRechargeFulfilled = (outTradeNo: string) => {
+  return request({
+    url: '/pay/order/mark-recharge-fulfilled',
+    method: 'post',
+    data: { out_trade_no: outTradeNo },
+  });
+};
