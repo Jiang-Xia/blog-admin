@@ -33,6 +33,28 @@
                 allow-clear
               />
             </a-form-item>
+            <a-form-item :label="t('payOrder.form.orderSource')">
+              <a-select
+                v-model="searchForm.orderSource"
+                :placeholder="t('payOrder.form.placeholder.orderSource')"
+                allow-clear
+                style="width: 160px"
+                @change="onOrderSourceChange"
+              >
+                <a-option value="">{{ t('payOrder.orderSource.all') }}</a-option>
+                <a-option value="rpg_recharge">{{
+                  t('payOrder.orderSource.rpgRecharge')
+                }}</a-option>
+              </a-select>
+            </a-form-item>
+            <a-form-item v-if="showRechargeFilters" :label="t('payOrder.form.rechargeUid')">
+              <a-input
+                v-model="searchForm.rechargeUid"
+                :placeholder="t('payOrder.form.placeholder.rechargeUid')"
+                allow-clear
+                style="width: 120px"
+              />
+            </a-form-item>
             <a-form-item>
               <a-space>
                 <a-button type="primary" @click="handleSearch">
@@ -49,6 +71,32 @@
         </a-col>
       </a-row>
 
+      <a-row style="margin-bottom: 16px">
+        <a-col :span="16">
+          <a-space>
+            <a-button
+              type="primary"
+              status="danger"
+              :disabled="selectedRowKeys.length === 0"
+              :loading="deleteLoading"
+              @click="handleBatchDelete"
+            >
+              <template #icon><icon-delete /></template>
+              {{ t('payOrder.button.delete') }}
+            </a-button>
+            <a-button v-if="selectedRowKeys.length > 0" type="outline" @click="clearSelection">
+              <template #icon><icon-close /></template>
+              {{ t('payOrder.button.clearSelection') }}
+            </a-button>
+          </a-space>
+        </a-col>
+        <a-col :span="8" style="text-align: right">
+          <span v-if="selectedRowKeys.length > 0" style="color: #165dff; font-weight: 500">
+            {{ t('payOrder.message.selectedCount', { count: selectedRowKeys.length }) }}
+          </span>
+        </a-col>
+      </a-row>
+
       <!-- 表格 -->
       <a-table
         :loading="loading"
@@ -56,8 +104,10 @@
         :pagination="false"
         :data="tableData"
         :bordered="false"
+        :row-selection="rowSelection"
+        v-model:selected-keys="selectedRowKeys"
         scrollbar
-        :scroll="{ x: 1350, y: 600 }"
+        :scroll="{ x: 1580, y: 600 }"
       >
         <template #columns>
           <a-table-column :title="t('payOrder.table.status')" :width="100" align="center">
@@ -85,6 +135,54 @@
             :width="160"
             :ellipsis="true"
           />
+          <a-table-column :title="t('payOrder.table.orderSource')" :width="108" align="center">
+            <template #cell="{ record }">
+              <a-tag v-if="record.orderSource === 'rpg_recharge'" color="purple" size="small">
+                {{ t('payOrder.orderSource.rpgRecharge') }}
+              </a-tag>
+              <a-tag v-else color="gray" size="small">
+                {{ t('payOrder.orderSource.external') }}
+              </a-tag>
+            </template>
+          </a-table-column>
+          <a-table-column
+            v-if="showRechargeColumns"
+            :title="t('payOrder.table.rechargeUid')"
+            :width="96"
+            align="center"
+          >
+            <template #cell="{ record }">
+              <span v-if="record.rechargeInfo?.uid" style="font-weight: 600; color: #722ed1">
+                {{ record.rechargeInfo.uid }}
+              </span>
+              <span v-else>-</span>
+            </template>
+          </a-table-column>
+          <a-table-column
+            v-if="showRechargeColumns"
+            :title="t('payOrder.table.rechargeDiamonds')"
+            :width="96"
+            align="center"
+          >
+            <template #cell="{ record }">
+              <span v-if="record.rechargeInfo"> 💎 {{ record.rechargeInfo.diamonds ?? '-' }} </span>
+              <span v-else>-</span>
+            </template>
+          </a-table-column>
+          <a-table-column
+            v-if="showRechargeColumns"
+            :title="t('payOrder.table.rechargeFulfilled')"
+            :width="96"
+            align="center"
+          >
+            <template #cell="{ record }">
+              <template v-if="record.rechargeInfo">
+                <a-tag v-if="record.rechargeInfo.fulfilled" color="green" size="small">已发</a-tag>
+                <a-tag v-else color="orangered" size="small">未发</a-tag>
+              </template>
+              <span v-else>-</span>
+            </template>
+          </a-table-column>
           <a-table-column :title="t('payOrder.table.totalAmount')" :width="100" align="right">
             <template #cell="{ record }">
               <span style="font-weight: 600; color: #165dff">¥{{ record.totalAmount }}</span>
@@ -119,9 +217,18 @@
               }}
             </template>
           </a-table-column>
-          <a-table-column :title="t('payOrder.table.action')" :width="220" fixed="right">
+          <a-table-column :title="t('payOrder.table.action')" :width="300" fixed="right">
             <template #cell="{ record }">
-              <a-space>
+              <a-space wrap>
+                <a-button
+                  v-if="canRechargeOrder(record)"
+                  type="text"
+                  size="small"
+                  status="warning"
+                  @click="openRecharge(record)"
+                >
+                  {{ t('payOrder.action.recharge') }}
+                </a-button>
                 <!-- 只有已支付才能退款 -->
                 <a-button
                   v-if="record.status === 'PAID'"
@@ -215,6 +322,40 @@
         </a-form-item>
       </a-form>
     </a-modal>
+
+    <a-modal
+      v-model:visible="rechargeVisible"
+      :title="t('payOrder.recharge.title')"
+      :ok-text="t('payOrder.recharge.confirm')"
+      :ok-loading="rechargeLoading"
+      @ok="submitRecharge"
+      @cancel="rechargeVisible = false"
+    >
+      <a-form :model="rechargeForm" layout="vertical">
+        <a-form-item :label="t('payOrder.recharge.user')">
+          <span>uid: {{ rechargeForm.uid }}</span>
+        </a-form-item>
+        <a-form-item :label="t('payOrder.recharge.order')">
+          <span>{{ rechargeForm.outTradeNo }}</span>
+        </a-form-item>
+        <a-form-item :label="t('payOrder.recharge.amount')" required>
+          <a-input-number
+            v-model="rechargeForm.amount"
+            :min="1"
+            :max="100000"
+            :placeholder="t('payOrder.recharge.placeholder.amount')"
+            style="width: 100%"
+          />
+        </a-form-item>
+        <a-form-item :label="t('payOrder.recharge.reason')">
+          <a-input
+            v-model="rechargeForm.reason"
+            :placeholder="t('payOrder.recharge.placeholder.reason')"
+            allow-clear
+          />
+        </a-form-item>
+      </a-form>
+    </a-modal>
   </div>
 </template>
 
@@ -222,9 +363,20 @@
   import { ref, reactive, computed, onMounted } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { Message, Modal } from '@arco-design/web-vue';
-  import { getPayOrderList, refundPayOrder, closePayOrder, queryPayOrder } from '@/api/pay-order';
+  import {
+    getPayOrderList,
+    refundPayOrder,
+    closePayOrder,
+    queryPayOrder,
+    deletePayOrders,
+    markPayOrderRechargeFulfilled,
+  } from '@/api/pay-order';
+  import { rechargeDiamonds } from '@/api/rpg';
+  import useUserStore from '@/store/modules/user';
 
   const { t } = useI18n();
+  const userStore = useUserStore();
+  const isSuperAdmin = computed(() => userStore.roles?.some((r: { id: number }) => r.id === 1));
 
   // 状态颜色映射
   const statusColorMap: Record<string, string> = {
@@ -240,11 +392,23 @@
     outTradeNo: '',
     status: undefined as string | undefined,
     subject: '',
+    orderSource: '' as '' | 'rpg_recharge',
+    rechargeUid: '',
   });
+
+  const showRechargeFilters = computed(() => searchForm.orderSource === 'rpg_recharge');
+  const showRechargeColumns = showRechargeFilters;
 
   // 表格数据
   const loading = ref(false);
+  const deleteLoading = ref(false);
   const tableData = ref<any[]>([]);
+  const selectedRowKeys = ref<(string | number)[]>([]);
+  const rowSelection = reactive({
+    type: 'checkbox',
+    showCheckedAll: true,
+    onlyCurrent: false,
+  });
   const pagination = reactive({
     total: 0,
     current: 1,
@@ -259,6 +423,50 @@
     refundAmount: 0,
     refundReason: '',
   });
+
+  const rechargeVisible = ref(false);
+  const rechargeLoading = ref(false);
+  const rechargeForm = reactive({
+    uid: 0,
+    outTradeNo: '',
+    amount: 0,
+    reason: '',
+  });
+
+  /** 博客充值单且未发钻：展示超管补钻按钮（现阶段不校验支付状态，因小程序自建单号本地可能仍为 PENDING） */
+  const canRechargeOrder = (record: any) =>
+    isSuperAdmin.value &&
+    record.orderSource === 'rpg_recharge' &&
+    record.rechargeInfo?.uid &&
+    !record.rechargeInfo?.fulfilled;
+
+  const openRecharge = (record: any) => {
+    rechargeForm.uid = Number(record.rechargeInfo.uid);
+    rechargeForm.outTradeNo = record.outTradeNo;
+    rechargeForm.amount = Number(record.rechargeInfo.diamonds) || 1;
+    rechargeForm.reason = `支付补钻 ${record.outTradeNo}`;
+    rechargeVisible.value = true;
+  };
+
+  const submitRecharge = async () => {
+    if (!rechargeForm.amount || rechargeForm.amount < 1) {
+      Message.warning(t('payOrder.recharge.invalidAmount'));
+      return;
+    }
+    rechargeLoading.value = true;
+    try {
+      await rechargeDiamonds(rechargeForm.uid, {
+        amount: rechargeForm.amount,
+        reason: rechargeForm.reason,
+      });
+      await markPayOrderRechargeFulfilled(rechargeForm.outTradeNo);
+      Message.success(t('payOrder.recharge.success'));
+      rechargeVisible.value = false;
+      loadData();
+    } finally {
+      rechargeLoading.value = false;
+    }
+  };
 
   /** 当前订单剩余可退金额 */
   const maxRefundAmount = computed(() => {
@@ -279,6 +487,10 @@
       if (searchForm.outTradeNo) params.outTradeNo = searchForm.outTradeNo;
       if (searchForm.status) params.status = searchForm.status;
       if (searchForm.subject) params.subject = searchForm.subject;
+      if (searchForm.orderSource) params.bizType = searchForm.orderSource;
+      if (showRechargeFilters.value && searchForm.rechargeUid) {
+        params.rechargeUid = searchForm.rechargeUid;
+      }
 
       const res = (await getPayOrderList(params)) as any;
       const responseData = res?.data || res;
@@ -296,10 +508,18 @@
     loadData();
   };
 
+  const onOrderSourceChange = () => {
+    if (searchForm.orderSource !== 'rpg_recharge') {
+      searchForm.rechargeUid = '';
+    }
+  };
+
   const handleReset = () => {
     searchForm.outTradeNo = '';
     searchForm.status = undefined;
     searchForm.subject = '';
+    searchForm.orderSource = '';
+    searchForm.rechargeUid = '';
     handleSearch();
   };
 
@@ -312,6 +532,36 @@
     pagination.pageSize = pageSize;
     pagination.current = 1;
     loadData();
+  };
+
+  const clearSelection = () => {
+    selectedRowKeys.value = [];
+  };
+
+  /** 批量删除订单（仅删除本地记录） */
+  const handleBatchDelete = () => {
+    if (selectedRowKeys.value.length === 0) {
+      Message.warning(t('payOrder.delete.empty'));
+      return;
+    }
+    Modal.warning({
+      title: t('payOrder.delete.title'),
+      content: t('payOrder.delete.confirm', { count: selectedRowKeys.value.length }),
+      async onOk() {
+        deleteLoading.value = true;
+        try {
+          const res = (await deletePayOrders(selectedRowKeys.value)) as any;
+          const data = res?.data || res;
+          Message.success(data?.message || t('payOrder.delete.success'));
+          clearSelection();
+          loadData();
+        } catch (err) {
+          console.error('删除订单失败', err);
+        } finally {
+          deleteLoading.value = false;
+        }
+      },
+    });
   };
 
   /** 退款（支持部分退款） */
