@@ -1,10 +1,6 @@
 #!/bin/bash
 # =============================================================================
-# blog-admin 远程部署脚本（静态前端，无 PM2）
-# 由本地 deploy.ps1 通过 SSH 调用
-#
-# 流程：备份当前 dist → 清空静态目录 → 解压新 tar → 删除临时 tar
-# Nginx 直接读 DEPLOY_REMOTE_DIR，如 /opt/jxapp/front/blog-admin
+# blog-admin 远程部署（方案 B：releases + current，Nginx 指向 current/）
 # =============================================================================
 
 set -euo pipefail
@@ -12,56 +8,78 @@ set -euo pipefail
 : "${DEPLOY_REMOTE_DIR:?}"
 : "${DEPLOY_TAR_PATH:?}"
 
-BACKUP_DIR="${DEPLOY_REMOTE_DIR}/releases/backups"
+source /tmp/release-lib.sh
+
 BACKUP_KEEP="${DEPLOY_BACKUP_KEEP:-5}"
 
-# -----------------------------------------------------------------------------
-# 备份：打包目录下除 releases/ 外的所有顶层项（即当前静态站点）
-# -----------------------------------------------------------------------------
-backup_before_deploy() {
+migrate_legacy_layout_if_needed() {
+  if [[ -L "$CURRENT_LINK" || -e "$CURRENT_LINK" ]]; then
+    return 0
+  fi
   if [[ ! -f "${DEPLOY_REMOTE_DIR}/index.html" ]]; then
-    echo "==> skip backup (no existing release)"
     return 0
   fi
 
-  local items=()
-  local name
+  local ts rid name
+  ts="$(release_new_id)"
+  rid="$(release_dir_for "$ts")"
+  mkdir -p "$rid"
+
   for name in "${DEPLOY_REMOTE_DIR}"/*; do
-    # releases/ 存历史备份，不能打进备份包也不能被清空
     [[ "$(basename "$name")" == "releases" ]] && continue
+    [[ "$(basename "$name")" == "current" ]] && continue
+    mv "$name" "$rid/"
+  done
+
+  release_switch "$rid"
+  echo "==> migrated legacy layout -> ${rid}"
+}
+
+backup_before_deploy() {
+  local active items=() name
+  active="$(release_get_active 2>/dev/null || true)"
+
+  if [[ -z "$active" || ! -f "${active}/index.html" ]]; then
+    echo "==> skip backup (no active release)"
+    return 0
+  fi
+
+  for name in "${active}"/*; do
     items+=("$(basename "$name")")
   done
 
   if ((${#items[@]} == 0)); then
-    echo "==> skip backup (empty release dir)"
+    echo "==> skip backup (empty active release)"
     return 0
   fi
 
   mkdir -p "$BACKUP_DIR"
   local ts backup_file
-  ts=$(date +%Y%m%d-%H%M%S)
+  ts="$(release_new_id)"
   backup_file="${BACKUP_DIR}/backup-${ts}.tar.gz"
   echo "==> backup: ${backup_file}"
-  tar -czf "$backup_file" -C "${DEPLOY_REMOTE_DIR}" "${items[@]}"
-
-  ls -1t "$BACKUP_DIR"/backup-*.tar.gz 2>/dev/null | tail -n +$((BACKUP_KEEP + 1)) | while IFS= read -r f; do
-    [[ -n "$f" ]] && rm -f "$f"
-  done
+  tar -czf "$backup_file" -C "$active" "${items[@]}"
+  release_prune_backups
   echo "==> backup kept: latest ${BACKUP_KEEP}"
 }
 
+mkdir -p "$RELEASES_ROOT" "$BACKUP_DIR"
+
+migrate_legacy_layout_if_needed
 backup_before_deploy
 
-# 步骤 2：清空静态目录（保留 releases/ 备份目录）
-echo "==> clean: ${DEPLOY_REMOTE_DIR}"
-mkdir -p "${DEPLOY_REMOTE_DIR}"
-find "${DEPLOY_REMOTE_DIR}" -mindepth 1 -maxdepth 1 ! -name releases -exec rm -rf {} +
+local_ts="$(release_new_id)"
+release_path="$(release_dir_for "$local_ts")"
+mkdir -p "$release_path"
 
-# 步骤 3：解压 tar 内容到静态根（tar 内为 dist 根下的 index.html、assets/ 等）
-echo "==> extract: ${DEPLOY_TAR_PATH} -> ${DEPLOY_REMOTE_DIR}"
-tar -xzf "${DEPLOY_TAR_PATH}" -C "${DEPLOY_REMOTE_DIR}"
+echo "==> extract: ${DEPLOY_TAR_PATH} -> ${release_path}"
+tar -xzf "${DEPLOY_TAR_PATH}" -C "$release_path"
+
+echo "==> activate release (atomic symlink switch)"
+release_switch "$release_path"
+release_cleanup
 
 rm -f "${DEPLOY_TAR_PATH}"
 
 echo "==> done"
-ls -la "${DEPLOY_REMOTE_DIR}" | head -10
+test -f "${CURRENT_LINK}/index.html" && echo "index.html OK"

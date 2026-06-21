@@ -1,13 +1,14 @@
 #!/bin/bash
 # =============================================================================
-# blog-admin 远程回滚脚本（静态前端）
+# blog-admin 远程回滚（方案 B：解压到新 release → 切 current）
 # =============================================================================
 
 set -euo pipefail
 
 : "${DEPLOY_REMOTE_DIR:?}"
 
-BACKUP_DIR="${DEPLOY_REMOTE_DIR}/releases/backups"
+source /tmp/release-lib.sh
+
 BACKUP_ARG="${1:-}"
 BACKUP_NAME_PATTERN='^backup-[0-9]{8}-[0-9]{6}\.tar\.gz$'
 
@@ -48,6 +49,10 @@ resolve_backup_file() {
 if [[ "${DEPLOY_ROLLBACK_LIST:-}" == "1" ]]; then
   echo "Available backups in ${BACKUP_DIR}:"
   ls -1t "${BACKUP_DIR}"/backup-*.tar.gz 2>/dev/null || echo "(none)"
+  echo ""
+  echo "Available releases in ${RELEASES_ROOT}:"
+  ls -1dt "${RELEASES_ROOT}"/*/ 2>/dev/null | grep -E '/[0-9]{8}-[0-9]{6}/$' || echo "(none)"
+  echo "Current -> $(readlink -f "$CURRENT_LINK" 2>/dev/null || echo '(not set)')"
   exit 0
 fi
 
@@ -60,12 +65,15 @@ assert_backup_in_dir "$BACKUP_FILE"
 
 echo "==> rollback from: ${BACKUP_FILE}"
 
-echo "==> clean: ${DEPLOY_REMOTE_DIR}"
-mkdir -p "${DEPLOY_REMOTE_DIR}"
-find "${DEPLOY_REMOTE_DIR}" -mindepth 1 -maxdepth 1 ! -name releases -exec rm -rf {} +
+local_ts="$(release_new_id)"
+release_path="$(release_dir_for "$local_ts")"
+mkdir -p "$release_path"
 
-echo "==> extract backup -> ${DEPLOY_REMOTE_DIR}"
-tar -xzf "${BACKUP_FILE}" -C "${DEPLOY_REMOTE_DIR}"
+echo "==> extract backup -> ${release_path}"
+tar -xzf "${BACKUP_FILE}" -C "$release_path"
+
+echo "==> activate rollback release"
+release_switch "$release_path"
 
 echo "==> rollback done"
-test -f "${DEPLOY_REMOTE_DIR}/index.html" && echo "index.html OK"
+test -f "${CURRENT_LINK}/index.html" && echo "index.html OK"

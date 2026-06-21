@@ -12,6 +12,7 @@ param(
 
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'ssh-lib.ps1')
+Initialize-DeployConsoleEncoding
 
 $Root = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 $EnvFile = Join-Path $PSScriptRoot $EnvFileName
@@ -127,16 +128,17 @@ Write-Host "==> Tar: $tarLocal ($tarSize MB)"
 Write-Host '==> [3/4] Upload'
 $remoteTar = "/tmp/$TarName"
 Copy-ToRemote $tarLocal $remoteTar
+Copy-ToRemote (Join-Path $PSScriptRoot 'release-lib.sh') '/tmp/release-lib.sh'
 Copy-ToRemote $RemoteScript '/tmp/remote-deploy.sh'
 
-# [4/4] 远程：备份 → 清空 → 解压
-Write-Host '==> [4/4] Remote extract'
+# [4/4] 远程：备份 → 新 release → 切 current
+Write-Host '==> [4/4] Remote: release -> switch current'
 $eRemoteDir = Escape-ShellSingleQuoted $RemoteDir
 $eRemoteTar = Escape-ShellSingleQuoted $remoteTar
 $remoteCmd = "chmod +x /tmp/remote-deploy.sh && DEPLOY_REMOTE_DIR='$eRemoteDir' DEPLOY_TAR_PATH='$eRemoteTar' bash /tmp/remote-deploy.sh"
 Invoke-Remote $remoteCmd
 
 Write-Host '==> Verify'
-Invoke-Remote "test -f '$eRemoteDir/index.html' && echo 'index.html OK'"
+Invoke-Remote "test -f '$eRemoteDir/current/index.html' && echo 'index.html OK'"
 
-Write-Host '==> Deploy finished — https://admin.jiang-xia.top/'
+Write-Host '==> Deploy finished - https://admin.jiang-xia.top/'
