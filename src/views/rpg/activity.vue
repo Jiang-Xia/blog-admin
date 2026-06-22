@@ -182,22 +182,48 @@
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item label="海报URL">
-              <a-input
-                v-model="modalForm.posterUrl"
-                placeholder="/images/rpg/poster.png"
-                allow-clear
-              />
-            </a-form-item>
-          </a-col>
-        </a-row>
-        <a-row :gutter="16">
-          <a-col :span="12">
             <a-form-item label="状态">
               <a-radio-group v-model="modalForm.active">
                 <a-radio :value="true">启用</a-radio>
                 <a-radio :value="false">禁用</a-radio>
               </a-radio-group>
+            </a-form-item>
+          </a-col>
+        </a-row>
+        <a-row :gutter="16">
+          <a-col :span="12">
+            <a-form-item label="海报">
+              <a-upload
+                :show-file-list="false"
+                accept="image/jpeg,image/png,image/webp"
+                :custom-request="onPosterUpload"
+              >
+                <template #upload-button>
+                  <div
+                    class="poster-thumb"
+                    :class="{ 'is-loading': posterUploading, 'has-image': !!modalForm.posterUrl }"
+                  >
+                    <img v-if="posterPreviewUrl" :src="posterPreviewUrl" alt="海报预览" />
+                    <div v-else class="poster-thumb-empty">
+                      <icon-plus :size="18" />
+                      <span>点击上传</span>
+                    </div>
+                    <div v-if="posterUploading" class="poster-thumb-mask">
+                      <a-spin :size="16" />
+                    </div>
+                  </div>
+                </template>
+              </a-upload>
+              <span class="poster-hint">建议 {{ posterSizeLabel }}，JPG / PNG / WebP</span>
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="链接">
+              <a-input
+                v-model="modalForm.posterUrl"
+                placeholder="上传后自动填充，也可手动填写 URL"
+                allow-clear
+              />
             </a-form-item>
           </a-col>
         </a-row>
@@ -207,8 +233,11 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref, reactive } from 'vue';
+  import { ref, reactive, computed } from 'vue';
   import { Message, Modal } from '@arco-design/web-vue';
+  import { uploadCover, parseUploadedUrl, resolveStaticUrl } from '@/api/resources';
+  import { toStaticPath } from '@/utils/file-hash';
+  import { COVER_IMAGE, coverAspectRatio } from '@/utils/image-compress';
   import {
     IconEdit,
     IconDelete,
@@ -255,6 +284,36 @@
     active: true,
   };
   const modalForm = ref({ ...defaultModalForm });
+  const posterUploading = ref(false);
+  const posterSizeLabel = `${COVER_IMAGE.maxWidth}×${COVER_IMAGE.maxHeight}`;
+  const posterPreviewUrl = computed(() => resolveStaticUrl(modalForm.value.posterUrl));
+
+  const onPosterUpload = async (option: {
+    fileItem: { file?: File };
+    onSuccess: (res?: unknown) => void;
+    onError: (err: unknown) => void;
+  }) => {
+    const file = option.fileItem.file;
+    if (!file) {
+      option.onError(new Error('无效文件'));
+      return;
+    }
+    posterUploading.value = true;
+    try {
+      const prevPath = toStaticPath(modalForm.value.posterUrl || '');
+      const res = await uploadCover(file, modalForm.value.posterUrl);
+      modalForm.value.posterUrl = parseUploadedUrl(res);
+      option.onSuccess(res);
+      if (toStaticPath(modalForm.value.posterUrl) !== prevPath) {
+        Message.success('海报上传成功');
+      }
+    } catch (err) {
+      option.onError(err);
+      Message.error('海报上传失败');
+    } finally {
+      posterUploading.value = false;
+    }
+  };
 
   const loadData = async () => {
     setLoading(true);
@@ -347,5 +406,68 @@
         margin-left: 16px;
       }
     }
+  }
+
+  :deep(.arco-upload) {
+    display: block;
+    width: 100%;
+  }
+
+  .poster-thumb {
+    position: relative;
+    width: 100%;
+    aspect-ratio: v-bind(coverAspectRatio);
+    overflow: hidden;
+    border: 1px dashed var(--color-border-3);
+    border-radius: 6px;
+    background: var(--color-fill-2);
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+
+    &:hover:not(.is-loading) {
+      border-color: rgb(var(--primary-6));
+    }
+
+    &.has-image {
+      border-style: solid;
+    }
+
+    img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  .poster-thumb-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    height: 100%;
+    padding: 8px;
+    color: var(--color-text-3);
+    font-size: 12px;
+    line-height: 1.3;
+    text-align: center;
+  }
+
+  .poster-thumb-mask {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.45);
+  }
+
+  .poster-hint {
+    display: block;
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--color-text-3);
+    line-height: 1.4;
   }
 </style>
