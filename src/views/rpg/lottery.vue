@@ -1,47 +1,59 @@
 <template>
   <div class="container">
     <a-card class="general-card" title="抽奖奖池管理">
-      <a-row>
-        <a-col :flex="1">
-          <a-form
-            :model="formModel"
-            :label-col-props="{ span: 6 }"
-            :wrapper-col-props="{ span: 18 }"
-            label-align="left"
-          >
-            <a-row :gutter="16">
-              <a-col :span="8">
-                <a-form-item label="关键词">
-                  <a-input
-                    v-model="formModel.keyword"
-                    placeholder="请输入奖品名称"
-                    allow-clear
-                    @press-enter="search"
-                  />
-                </a-form-item>
-              </a-col>
-              <a-col :span="8">
-                <a-form-item label="稀有度">
-                  <a-select v-model="formModel.rarity" placeholder="请选择稀有度" allow-clear>
-                    <a-option value="common">普通</a-option>
-                    <a-option value="rare">稀有</a-option>
-                    <a-option value="epic">史诗</a-option>
-                    <a-option value="legendary">传说</a-option>
-                  </a-select>
-                </a-form-item>
-              </a-col>
-              <a-col :span="8">
-                <a-form-item label="状态">
-                  <a-select v-model="formModel.active" allow-clear>
-                    <a-option value="true">启用</a-option>
-                    <a-option value="false">禁用</a-option>
-                  </a-select>
-                </a-form-item>
-              </a-col>
-            </a-row>
-          </a-form>
-        </a-col>
-        <a-col :span="5" style="text-align: right">
+      <a-form
+        :model="formModel"
+        layout="horizontal"
+        :label-col-props="{ flex: '76px' }"
+        :wrapper-col-props="{ flex: '1' }"
+        label-align="right"
+        class="pool-filter-form"
+      >
+        <a-row :gutter="16">
+          <a-col :span="6">
+            <a-form-item label="关键词">
+              <a-input
+                v-model="formModel.keyword"
+                placeholder="奖品名称或编码"
+                allow-clear
+                @press-enter="search"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="6">
+            <a-form-item label="物品类型">
+              <a-select v-model="formModel.itemType" placeholder="全部类型" allow-clear>
+                <a-option value="title">称号</a-option>
+                <a-option value="avatar_frame">头像框</a-option>
+                <a-option value="pet">宠物</a-option>
+                <a-option value="consumable">消耗品</a-option>
+                <a-option value="buff">Buff</a-option>
+                <a-option value="achievement">成就</a-option>
+                <a-option value="equipment">装备</a-option>
+                <a-option value="currency">钻石</a-option>
+              </a-select>
+            </a-form-item>
+          </a-col>
+          <a-col :span="6">
+            <a-form-item label="稀有度">
+              <a-select v-model="formModel.rarity" placeholder="全部稀有度" allow-clear>
+                <a-option value="common">普通</a-option>
+                <a-option value="rare">稀有</a-option>
+                <a-option value="epic">史诗</a-option>
+                <a-option value="legendary">传说</a-option>
+              </a-select>
+            </a-form-item>
+          </a-col>
+          <a-col :span="6">
+            <a-form-item label="状态">
+              <a-select v-model="formModel.active" allow-clear placeholder="全部状态">
+                <a-option value="true">启用</a-option>
+                <a-option value="false">禁用</a-option>
+              </a-select>
+            </a-form-item>
+          </a-col>
+        </a-row>
+        <a-form-item label=" " class="filter-actions-item">
           <a-space :size="8">
             <a-button type="primary" @click="search">
               <template #icon><icon-search /></template>
@@ -52,8 +64,8 @@
               重置
             </a-button>
           </a-space>
-        </a-col>
-      </a-row>
+        </a-form-item>
+      </a-form>
 
       <a-divider style="margin-top: 0" />
 
@@ -76,7 +88,7 @@
         :data="tableData"
         :bordered="false"
         scrollbar
-        :scroll="{ x: 1000, y: 600 }"
+        :scroll="{ x: 1100, y: 600 }"
       >
         <template #columns>
           <a-table-column title="状态" data-index="active" :width="80">
@@ -86,7 +98,14 @@
               </a-tag>
             </template>
           </a-table-column>
-          <a-table-column title="编码" data-index="code" :width="130" />
+          <a-table-column title="关联" data-index="itemLinked" :width="90">
+            <template #cell="{ record }">
+              <a-tag :color="record.itemLinked === false ? 'red' : 'green'">
+                {{ record.itemLinked === false ? '未关联' : '已关联' }}
+              </a-tag>
+            </template>
+          </a-table-column>
+          <a-table-column title="物品编码" data-index="itemCode" :width="140" />
           <a-table-column title="名称" data-index="name" :width="120" />
           <a-table-column title="描述" data-index="description" :width="160" ellipsis tooltip />
           <a-table-column title="类型" data-index="type" :width="80">
@@ -130,43 +149,63 @@
 
     <a-modal
       v-model:visible="modalVisible"
-      :title="isEdit ? '编辑奖品' : '新增奖品'"
-      :width="720"
+      :title="isEdit ? '编辑奖池条目' : '新增奖池条目'"
+      :width="640"
       @ok="handleModalOk"
       @cancel="modalVisible = false"
     >
-      <a-form :model="modalForm" :label-col-props="{ span: 7 }" :wrapper-col-props="{ span: 17 }">
+      <a-alert v-if="!isEdit" type="info" class="pool-modal-tip">
+        奖池奖品须从「系统物品」选择，名称/描述/发放逻辑由系统物品决定。
+      </a-alert>
+      <a-form
+        :model="modalForm"
+        layout="horizontal"
+        :label-col-props="{ flex: '96px' }"
+        :wrapper-col-props="{ flex: '1' }"
+        class="pool-modal-form"
+      >
+        <a-form-item label="系统物品" required>
+          <a-select
+            v-model="modalForm.itemCode"
+            placeholder="请选择系统物品"
+            allow-search
+            allow-clear
+            :disabled="isEdit"
+            :loading="itemOptionsLoading"
+            @change="onItemCodeChange"
+          >
+            <a-option
+              v-for="item in itemOptions"
+              :key="item.code"
+              :value="item.code"
+              :label="`${item.name} (${item.code})`"
+            >
+              {{ item.name }} ({{ item.code }}) · {{ itemTypeLabel(item.itemType) }}
+            </a-option>
+          </a-select>
+        </a-form-item>
+
+        <template v-if="selectedItem">
+          <a-divider orientation="left">物品信息</a-divider>
+          <a-descriptions :column="2" size="small" bordered class="pool-item-preview">
+            <a-descriptions-item label="名称">{{ selectedItem.name }}</a-descriptions-item>
+            <a-descriptions-item label="类型">
+              {{ itemTypeLabel(selectedItem.itemType) }}
+            </a-descriptions-item>
+            <a-descriptions-item label="编码">{{ selectedItem.code }}</a-descriptions-item>
+            <a-descriptions-item label="物品稀有度">
+              {{ rarityLabel(selectedItem.rarity) }}
+            </a-descriptions-item>
+            <a-descriptions-item label="描述" :span="2">
+              {{ selectedItem.description || '—' }}
+            </a-descriptions-item>
+          </a-descriptions>
+        </template>
+
+        <a-divider orientation="left">奖池配置</a-divider>
         <a-row :gutter="16">
           <a-col :span="12">
-            <a-form-item label="编码" required>
-              <a-input v-model="modalForm.code" placeholder="奖品编码" :disabled="isEdit" />
-            </a-form-item>
-          </a-col>
-          <a-col :span="12">
-            <a-form-item label="名称" required>
-              <a-input v-model="modalForm.name" placeholder="奖品名称" allow-clear />
-            </a-form-item>
-          </a-col>
-        </a-row>
-        <a-row :gutter="16">
-          <a-col :span="12">
-            <a-form-item label="描述">
-              <a-input v-model="modalForm.description" placeholder="奖品描述" allow-clear />
-            </a-form-item>
-          </a-col>
-          <a-col :span="12">
-            <a-form-item label="奖品类型">
-              <a-select v-model="modalForm.type">
-                <a-option value="exp">经验</a-option>
-                <a-option value="buff">Buff</a-option>
-                <a-option value="ticket">抽奖券</a-option>
-              </a-select>
-            </a-form-item>
-          </a-col>
-        </a-row>
-        <a-row :gutter="16">
-          <a-col :span="12">
-            <a-form-item label="稀有度">
+            <a-form-item label="展示稀有度">
               <a-select v-model="modalForm.rarity">
                 <a-option value="common">普通</a-option>
                 <a-option value="rare">稀有</a-option>
@@ -176,21 +215,24 @@
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item label="概率(0-1)">
+            <a-form-item label="概率">
               <a-input-number
                 v-model="modalForm.probability"
                 :min="0"
                 :max="1"
                 :step="0.01"
                 :precision="2"
-                placeholder="0到1之间的小数"
+                placeholder="0 ~ 1"
+                style="width: 100%"
               />
             </a-form-item>
           </a-col>
         </a-row>
         <a-row :gutter="16">
           <a-col :span="12">
-            <a-form-item label="排序"> </a-form-item>
+            <a-form-item label="排序">
+              <a-input-number v-model="modalForm.sort" :min="0" :step="1" style="width: 100%" />
+            </a-form-item>
           </a-col>
           <a-col :span="12">
             <a-form-item label="状态">
@@ -259,7 +301,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref, reactive } from 'vue';
+  import { ref, reactive, computed } from 'vue';
   import type { Pagination } from '@/types/global';
   import { Message, Modal } from '@arco-design/web-vue';
   import {
@@ -275,8 +317,18 @@
     updateLotteryPool,
     deleteLotteryPool,
     getLotteryRecordList,
+    getItemConfigList,
   } from '@/api/rpg';
   import useLoading from '@/hooks/loading';
+
+  interface ItemOption {
+    code: string;
+    name: string;
+    description: string;
+    itemType: string;
+    rarity: string;
+    active: boolean;
+  }
 
   const POOL_TYPE_LABELS: Record<string, string> = {
     exp: '经验',
@@ -292,6 +344,17 @@
     unknown: '未知',
   };
 
+  const ITEM_TYPE_LABELS: Record<string, string> = {
+    title: '称号',
+    avatar_frame: '头像框',
+    pet: '宠物',
+    consumable: '消耗品',
+    buff: 'Buff',
+    achievement: '成就',
+    equipment: '装备',
+    currency: '钻石',
+  };
+
   const RARITY_LABELS: Record<string, string> = {
     common: '普通',
     rare: '稀有',
@@ -300,6 +363,7 @@
   };
 
   const poolTypeLabel = (type: string) => POOL_TYPE_LABELS[type] || type;
+  const itemTypeLabel = (type: string) => ITEM_TYPE_LABELS[type] || type;
   const rarityLabel = (rarity: string) => RARITY_LABELS[rarity] || rarity;
   const rarityColor = (rarity: string) => {
     const map: Record<string, string> = {
@@ -315,6 +379,7 @@
 
   const generateFormModel = () => ({
     keyword: '',
+    itemType: undefined as string | undefined,
     rarity: undefined as string | undefined,
     active: undefined as string | undefined,
     page: 1,
@@ -330,17 +395,38 @@
   const isEdit = ref(false);
   const editId = ref<number>(0);
   const defaultModalForm = {
-    code: '',
-    name: '',
-    description: '',
-    type: 'exp',
+    itemCode: '',
     rarity: 'common',
     probability: 0.1,
-    rewardData: {},
     sort: 10,
     active: true,
   };
   const modalForm = ref({ ...defaultModalForm });
+
+  const itemOptions = ref<ItemOption[]>([]);
+  const itemOptionsLoading = ref(false);
+
+  const selectedItem = computed(() =>
+    itemOptions.value.find((item) => item.code === modalForm.value.itemCode),
+  );
+
+  /** 加载可选系统物品（仅启用项，供奖池关联） */
+  const loadItemOptions = async () => {
+    itemOptionsLoading.value = true;
+    try {
+      const res: any = await getItemConfigList({ page: 1, pageSize: 500 });
+      itemOptions.value = (res.data.list || []).filter((item: ItemOption) => item.active);
+    } finally {
+      itemOptionsLoading.value = false;
+    }
+  };
+
+  const onItemCodeChange = (code: string) => {
+    const item = itemOptions.value.find((entry) => entry.code === code);
+    if (item && !isEdit.value) {
+      modalForm.value.rarity = item.rarity || 'common';
+    }
+  };
 
   const loadData = async () => {
     setLoading(true);
@@ -381,45 +467,59 @@
     loadData();
   };
 
-  const showCreateModal = () => {
+  const showCreateModal = async () => {
     isEdit.value = false;
     editId.value = 0;
     modalForm.value = { ...defaultModalForm };
     modalVisible.value = true;
+    await loadItemOptions();
   };
 
-  const showEditModal = (record: any) => {
+  const showEditModal = async (record: any) => {
     isEdit.value = true;
     editId.value = record.id;
+    await loadItemOptions();
     modalForm.value = {
-      code: record.code,
-      name: record.name,
-      description: record.description || '',
-      type: record.type,
+      itemCode: record.itemCode || record.code,
       rarity: record.rarity,
       probability: record.probability,
-      rewardData: record.rewardData || {},
       sort: record.sort,
       active: record.active,
     };
     modalVisible.value = true;
   };
 
+  const buildPoolPayload = () => ({
+    itemCode: modalForm.value.itemCode,
+    probability: modalForm.value.probability,
+    rarity: modalForm.value.rarity,
+    sort: modalForm.value.sort,
+    active: modalForm.value.active,
+  });
+
   const handleModalOk = async () => {
-    if (!modalForm.value.code || !modalForm.value.name) {
-      Message.warning('编码和名称不能为空');
+    if (!modalForm.value.itemCode) {
+      Message.warning('请选择系统物品');
       return;
     }
-    if (isEdit.value) {
-      const { code, ...data } = modalForm.value;
-      await updateLotteryPool(editId.value, data);
-      Message.success('更新成功');
-    } else {
-      await createLotteryPool(modalForm.value);
-      Message.success('新增成功');
+    if (modalForm.value.probability == null) {
+      Message.warning('请填写概率');
+      return;
     }
-    modalVisible.value = false;
-    loadData();
+    try {
+      if (isEdit.value) {
+        const { itemCode, ...data } = buildPoolPayload();
+        await updateLotteryPool(editId.value, data);
+        Message.success('更新成功');
+      } else {
+        await createLotteryPool(buildPoolPayload());
+        Message.success('新增成功');
+      }
+      modalVisible.value = false;
+      loadData();
+    } catch {
+      // 错误由 request 拦截器提示
+    }
   };
 
   const handleDelete = (record: any) => {
@@ -493,5 +593,53 @@
   }
   .arco-card-body {
     min-height: 30vh;
+  }
+
+  .pool-filter-form {
+    :deep(.arco-form-item) {
+      margin-bottom: 16px;
+    }
+
+    :deep(.arco-form-item-label) {
+      white-space: nowrap;
+    }
+
+    :deep(.arco-select),
+    :deep(.arco-input-wrapper) {
+      width: 100%;
+    }
+  }
+
+  .filter-actions-item {
+    margin-bottom: 0;
+
+    :deep(.arco-form-item-label-col) {
+      visibility: hidden;
+    }
+  }
+
+  .pool-modal-tip {
+    margin-bottom: 16px;
+  }
+
+  .pool-modal-form {
+    :deep(.arco-divider-text-left) {
+      margin: 4px 0 12px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--color-text-2);
+    }
+
+    :deep(.arco-row) {
+      width: 100%;
+    }
+
+    :deep(.arco-form-item) {
+      margin-bottom: 16px;
+    }
+  }
+
+  .pool-item-preview {
+    margin-bottom: 4px;
   }
 </style>
