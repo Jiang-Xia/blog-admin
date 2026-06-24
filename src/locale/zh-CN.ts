@@ -104,6 +104,9 @@ export default {
   'menu.server.rpgGuild': '公会管理',
   'menu.server.rpgSocialLog': '打赏社交流水',
 
+  'menu.server.ragManage': 'RAG 知识库',
+  'menu.server.ragIndex': 'RAG 管理',
+
   ...localeSettings,
   ...localeCommon,
   ...localeMessageBox,

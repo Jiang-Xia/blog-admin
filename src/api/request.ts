@@ -109,6 +109,10 @@ request.interceptors.response.use(
     const { status } = response; // http自带状态码
     // if the custom code is not 20000, it is judged as an error.
     if ((status >= 200 && status < 300) || status === 304) {
+      if (res?.code !== undefined && res.code !== 200) {
+        Message.error(res.message || 'Error');
+        return Promise.reject(new Error(res.message || 'Error'));
+      }
       return res;
     }
     Message.error({

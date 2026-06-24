@@ -6,7 +6,7 @@
  * @Description:
  * @FilePath: \blog-admin\src\utils\request.ts
  */
-import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, { type AxiosResponse, type InternalAxiosRequestConfig } from 'axios';
 // import router from '@/router/'
 // import { useStore } from '@/store';
 import { Message } from '@arco-design/web-vue';
@@ -28,7 +28,7 @@ const $axios = axios.create({
   baseURL: '',
 });
 $axios.interceptors.request.use(
-  (config: AxiosRequestConfig) => {
+  (config: InternalAxiosRequestConfig) => {
     // openLoading()
     const token = getToken();
     config.headers = {};

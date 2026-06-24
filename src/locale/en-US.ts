@@ -104,6 +104,9 @@ export default {
   'menu.server.rpgGuild': 'Guilds',
   'menu.server.rpgSocialLog': 'Tip & Social Logs',
 
+  'menu.server.ragManage': 'RAG Knowledge Base',
+  'menu.server.ragIndex': 'RAG Management',
+
   ...localeSettings,
   ...localeCommon,
   ...localeMessageBox,

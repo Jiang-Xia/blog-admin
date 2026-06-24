@@ -201,6 +201,60 @@
           </a-col>
         </a-row>
         <a-row :gutter="16">
+          <a-col :span="12">
+            <a-form-item label="图标图">
+              <a-upload
+                :show-file-list="false"
+                accept="image/png,image/webp,image/jpeg,image/svg+xml"
+                :custom-request="onIconUpload"
+              >
+                <template #upload-button>
+                  <div
+                    class="asset-thumb"
+                    :class="{ 'is-loading': iconUploading, 'has-image': !!iconPreviewUrl }"
+                  >
+                    <img v-if="iconPreviewUrl" :src="iconPreviewUrl" alt="图标预览" />
+                    <div v-else class="asset-thumb-empty">
+                      <icon-plus :size="18" />
+                      <span>上传 icon</span>
+                    </div>
+                    <div v-if="iconUploading" class="asset-thumb-mask">
+                      <a-spin :size="16" />
+                    </div>
+                  </div>
+                </template>
+              </a-upload>
+              <span class="asset-hint">rpgAssets/itemIcon/{图标ID}.*</span>
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="背景图">
+              <a-upload
+                :show-file-list="false"
+                accept="image/png,image/webp,image/jpeg,image/svg+xml"
+                :custom-request="onBgUpload"
+              >
+                <template #upload-button>
+                  <div
+                    class="asset-thumb"
+                    :class="{ 'is-loading': bgUploading, 'has-image': !!bgPreviewUrl }"
+                  >
+                    <img v-if="bgPreviewUrl" :src="bgPreviewUrl" alt="背景预览" />
+                    <div v-else class="asset-thumb-empty">
+                      <icon-plus :size="18" />
+                      <span>上传背景</span>
+                    </div>
+                    <div v-if="bgUploading" class="asset-thumb-mask">
+                      <a-spin :size="16" />
+                    </div>
+                  </div>
+                </template>
+              </a-upload>
+              <span class="asset-hint">rpgAssets/itemBg/{图标ID}.*</span>
+            </a-form-item>
+          </a-col>
+        </a-row>
+        <a-row :gutter="16">
           <a-col :span="24">
             <a-form-item label="扩展配置" class="effect-form-item">
               <div class="effect-guide">
@@ -241,6 +295,10 @@
 </template>
 
 <script lang="ts" setup>
+  /**
+   * 系统物品管理：CRUD + icon/bg 上传
+   * 上传落盘 blog-server/public/rpgAssets/，文件名 = 图标 ID 字段
+   */
   import { ref, reactive, computed } from 'vue';
   import { Message, Modal } from '@arco-design/web-vue';
   import {
@@ -256,7 +314,9 @@
     createItemConfig,
     updateItemConfig,
     deleteItemConfig,
+    uploadItemAsset,
   } from '@/api/rpg';
+  import { resolveStaticUrl } from '@/api/resources';
   import useLoading from '@/hooks/loading';
   import { getItemEffectGuide } from '@/constants/rpg-item-effect';
 
@@ -318,6 +378,61 @@
   const modalForm = ref({ ...defaultModalForm });
   const jsonVisible = ref(false);
   const jsonPreviewText = ref('');
+  const iconUploading = ref(false);
+  const bgUploading = ref(false);
+  const iconPreviewUrl = ref('');
+  const bgPreviewUrl = ref('');
+
+  /** 编辑弹窗打开时，按 icon 键拼预览 URL（默认 png，上传后以接口返回为准） */
+  const syncAssetPreview = () => {
+    const key = modalForm.value.icon?.trim();
+    if (!key || key === 'default') {
+      iconPreviewUrl.value = '';
+      bgPreviewUrl.value = '';
+      return;
+    }
+    iconPreviewUrl.value = resolveStaticUrl(`/static/rpgAssets/itemIcon/${key}.png`);
+    bgPreviewUrl.value = resolveStaticUrl(`/static/rpgAssets/itemBg/${key}.png`);
+  };
+
+  /** 上传 icon/bg 至 blog-server；需先填图标 ID，成功后刷新预览 URL */
+  const uploadAsset = async (
+    option: { fileItem: { file?: File }; onSuccess: () => void; onError: (e: Error) => void },
+    assetType: 'icon' | 'bg',
+  ) => {
+    const icon = modalForm.value.icon?.trim();
+    if (!icon || icon === 'default') {
+      Message.warning('请先填写图标 ID');
+      option.onError(new Error('missing icon'));
+      return;
+    }
+    const file = option.fileItem.file;
+    if (!file) {
+      option.onError(new Error('missing file'));
+      return;
+    }
+    const loadingRef = assetType === 'icon' ? iconUploading : bgUploading;
+    loadingRef.value = true;
+    try {
+      const res: any = await uploadItemAsset(file, icon, assetType);
+      const url = res?.data?.url || res?.url;
+      if (assetType === 'icon') {
+        iconPreviewUrl.value = resolveStaticUrl(url);
+      } else {
+        bgPreviewUrl.value = resolveStaticUrl(url);
+      }
+      Message.success(assetType === 'icon' ? '图标上传成功' : '背景上传成功');
+      option.onSuccess();
+    } catch (e: any) {
+      Message.error(e?.message || '上传失败');
+      option.onError(e);
+    } finally {
+      loadingRef.value = false;
+    }
+  };
+
+  const onIconUpload = (option: Parameters<typeof uploadAsset>[0]) => uploadAsset(option, 'icon');
+  const onBgUpload = (option: Parameters<typeof uploadAsset>[0]) => uploadAsset(option, 'bg');
 
   const effectGuide = computed(() => getItemEffectGuide(modalForm.value.itemType));
   const effectJsonPlaceholder = computed(() => {
@@ -422,6 +537,8 @@
     isEdit.value = false;
     editId.value = 0;
     modalForm.value = { ...defaultModalForm };
+    iconPreviewUrl.value = '';
+    bgPreviewUrl.value = '';
     modalVisible.value = true;
   };
   const showEditModal = (record: any) => {
@@ -439,6 +556,7 @@
       active: record.active !== false,
       effectJsonText: JSON.stringify(record.effectJson || {}, null, 2),
     };
+    syncAssetPreview();
     modalVisible.value = true;
   };
 
@@ -526,5 +644,44 @@
     margin: 0 0 8px;
     padding-left: 18px;
     line-height: 1.6;
+  }
+  .asset-thumb {
+    position: relative;
+    width: 96px;
+    height: 96px;
+    border: 1px dashed var(--color-border-3);
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    background: var(--color-fill-2);
+  }
+  .asset-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  .asset-thumb-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    height: 100%;
+    font-size: 12px;
+    color: var(--color-text-3);
+  }
+  .asset-thumb-mask {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgb(255 255 255 / 0.65);
+  }
+  .asset-hint {
+    display: block;
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--color-text-3);
   }
 </style>
