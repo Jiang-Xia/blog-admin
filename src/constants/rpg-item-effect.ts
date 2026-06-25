@@ -7,15 +7,17 @@ export interface ItemEffectGuide {
 
 export const ITEM_EFFECT_GUIDES: Record<string, ItemEffectGuide> = {
   achievement: {
-    summary: '成就定义专用。达成条件、经验奖励等也可在「成就管理」页维护。',
+    summary:
+      '成就定义专用。先在系统物品创建 achievement 类型，再在「成就管理」关联并配置 trackEvent。',
     fields: [
-      'maxProgress：达成所需次数',
+      'maxProgress：行为类=累计次数；sign_in/consecutive_sign=目标天数；level_up=目标等级',
       'expReward：完成奖励经验',
+      'trackEvent：触发事件（article/comment/sign_in/level_up 等，必填）',
+      'achievementConfigured：成就管理写入，标记已完成配置',
       'badge.color：徽章颜色（HEX，如 #4ade80）',
-      'trackEvent：可选，追踪事件类型',
       'revealName / revealDescription：隐藏成就揭示文案',
     ],
-    example: { maxProgress: 1, expReward: 20, badge: { color: '#4ade80' } },
+    example: { maxProgress: 7, expReward: 30, trackEvent: 'sign_in', badge: { color: '#4ade80' } },
   },
   title: {
     summary: '称号装扮。展示名称用「名称」字段，扩展配置通常留空即可。',

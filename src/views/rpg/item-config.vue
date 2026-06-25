@@ -130,7 +130,7 @@
       v-model:visible="modalVisible"
       :title="isEdit ? '编辑物品' : '新增物品'"
       :width="720"
-      @ok="handleModalOk"
+      @before-ok="handleModalOk"
       @cancel="modalVisible = false"
     >
       <a-form
@@ -563,19 +563,23 @@
   const handleModalOk = async () => {
     if (!modalForm.value.code || !modalForm.value.name) {
       Message.warning('编码和名称不能为空');
-      return;
+      return false;
     }
     const payload = buildPayload();
-    if (!payload) return;
-    if (isEdit.value) {
-      await updateItemConfig(editId.value, payload);
-      Message.success('更新成功');
-    } else {
-      await createItemConfig({ code: modalForm.value.code, ...payload });
-      Message.success('创建成功');
+    if (!payload) return false;
+    try {
+      if (isEdit.value) {
+        await updateItemConfig(editId.value, payload);
+        Message.success('更新成功');
+      } else {
+        await createItemConfig({ code: modalForm.value.code, ...payload });
+        Message.success('创建成功');
+      }
+      loadData();
+      return true;
+    } catch {
+      return false;
     }
-    modalVisible.value = false;
-    loadData();
   };
 
   const handleDelete = (record: any) => {

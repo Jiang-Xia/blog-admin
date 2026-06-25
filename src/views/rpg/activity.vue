@@ -126,7 +126,7 @@
       v-model:visible="modalVisible"
       :title="isEdit ? '编辑活动' : '新增活动'"
       :width="720"
-      @ok="handleModalOk"
+      @before-ok="handleModalOk"
       @cancel="modalVisible = false"
     >
       <a-form :model="modalForm" :label-col-props="{ span: 7 }" :wrapper-col-props="{ span: 17 }">
@@ -369,18 +369,22 @@
   const handleModalOk = async () => {
     if (!modalForm.value.code || !modalForm.value.name) {
       Message.warning('编码和名称不能为空');
-      return;
+      return false;
     }
-    if (isEdit.value) {
-      const { code, ...data } = modalForm.value;
-      await updateActivity(editId.value, data);
-      Message.success('更新成功');
-    } else {
-      await createActivity(modalForm.value);
-      Message.success('创建成功');
+    try {
+      if (isEdit.value) {
+        const { code, ...data } = modalForm.value;
+        await updateActivity(editId.value, data);
+        Message.success('更新成功');
+      } else {
+        await createActivity(modalForm.value);
+        Message.success('创建成功');
+      }
+      loadData();
+      return true;
+    } catch {
+      return false;
     }
-    modalVisible.value = false;
-    loadData();
   };
 
   const handleDelete = (record: any) => {

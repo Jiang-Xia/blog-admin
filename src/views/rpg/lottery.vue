@@ -151,7 +151,7 @@
       v-model:visible="modalVisible"
       :title="isEdit ? '编辑奖池条目' : '新增奖池条目'"
       :width="640"
-      @ok="handleModalOk"
+      @before-ok="handleModalOk"
       @cancel="modalVisible = false"
     >
       <a-alert v-if="!isEdit" type="info" class="pool-modal-tip">
@@ -500,11 +500,11 @@
   const handleModalOk = async () => {
     if (!modalForm.value.itemCode) {
       Message.warning('请选择系统物品');
-      return;
+      return false;
     }
     if (modalForm.value.probability == null) {
       Message.warning('请填写概率');
-      return;
+      return false;
     }
     try {
       if (isEdit.value) {
@@ -515,10 +515,10 @@
         await createLotteryPool(buildPoolPayload());
         Message.success('新增成功');
       }
-      modalVisible.value = false;
       loadData();
+      return true;
     } catch {
-      // 错误由 request 拦截器提示
+      return false;
     }
   };
 
