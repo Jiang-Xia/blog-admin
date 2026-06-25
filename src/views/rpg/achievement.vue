@@ -81,7 +81,7 @@
         :data="tableData"
         :bordered="false"
         scrollbar
-        :scroll="{ x: 1200, y: 600 }"
+        :scroll="{ x: 1680, y: 600 }"
       >
         <template #columns>
           <a-table-column title="状态" data-index="active" :width="80">
@@ -104,6 +104,13 @@
           <a-table-column title="分类" data-index="category" :width="90">
             <template #cell="{ record }">
               <a-tag>{{ categoryLabel(record.category) }}</a-tag>
+            </template>
+          </a-table-column>
+          <a-table-column title="稀有度" data-index="rarity" :width="90">
+            <template #cell="{ record }">
+              <a-tag :color="rarityColor(record.rarity)">
+                {{ rarityLabel(record.rarity) }}
+              </a-tag>
             </template>
           </a-table-column>
           <a-table-column title="追踪事件" data-index="trackEvent" :width="110">
@@ -134,6 +141,36 @@
                 +{{ record.expReward }}
               </span>
               <span v-else>—</span>
+            </template>
+          </a-table-column>
+          <a-table-column title="HP" data-index="hpReward" :width="70" align="center">
+            <template #cell="{ record }">
+              <span v-if="record.itemLinked && record.hpReward">+{{ record.hpReward }}</span>
+              <span v-else-if="record.itemLinked">—</span>
+              <span v-else>—</span>
+            </template>
+          </a-table-column>
+          <a-table-column title="钻石" data-index="currencyReward" :width="70" align="center">
+            <template #cell="{ record }">
+              <span v-if="record.itemLinked && record.currencyReward">
+                +{{ record.currencyReward }}
+              </span>
+              <span v-else-if="record.itemLinked">—</span>
+              <span v-else>—</span>
+            </template>
+          </a-table-column>
+          <a-table-column title="抽奖券" data-index="ticketReward" :width="80" align="center">
+            <template #cell="{ record }">
+              <span v-if="record.itemLinked && record.ticketReward">
+                +{{ record.ticketReward }}
+              </span>
+              <span v-else-if="record.itemLinked">—</span>
+              <span v-else>—</span>
+            </template>
+          </a-table-column>
+          <a-table-column title="物品奖励" data-index="rewardItems" :width="140" ellipsis tooltip>
+            <template #cell="{ record }">
+              {{ record.itemLinked ? formatItemCodes(record.rewardItems) : '—' }}
             </template>
           </a-table-column>
           <a-table-column title="隐藏" data-index="isHidden" :width="60">
@@ -167,12 +204,12 @@
     <a-modal
       v-model:visible="modalVisible"
       :title="isEdit ? '编辑成就' : '新增成就'"
-      :width="720"
+      :width="800"
       @before-ok="handleModalOk"
       @cancel="modalVisible = false"
     >
       <a-alert v-if="!isEdit" type="info" class="achievement-modal-tip">
-        成就须从「系统物品」选择，名称/描述/图标由系统物品决定；此处配置追踪事件与达成规则。
+        成就须从「系统物品」选择，名称/描述/图标/稀有度由系统物品决定；此处配置追踪事件与达成规则。徽章颜色随稀有度自动展示。
       </a-alert>
       <a-form
         :model="modalForm"
@@ -209,6 +246,11 @@
               {{ itemTypeLabel(selectedItem.itemType) }}
             </a-descriptions-item>
             <a-descriptions-item label="编码">{{ selectedItem.code }}</a-descriptions-item>
+            <a-descriptions-item label="稀有度">
+              <a-tag :color="rarityColor(selectedItem.rarity)">
+                {{ rarityLabel(selectedItem.rarity) }}
+              </a-tag>
+            </a-descriptions-item>
             <a-descriptions-item label="图标">{{ selectedItem.icon || '—' }}</a-descriptions-item>
             <a-descriptions-item label="描述" :span="2">
               {{ selectedItem.description || '—' }}
@@ -256,18 +298,6 @@
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item label="经验奖励" required>
-              <a-input-number
-                v-model="modalForm.expReward"
-                :min="0"
-                placeholder="不小于 0"
-                style="width: 100%"
-              />
-            </a-form-item>
-          </a-col>
-        </a-row>
-        <a-row :gutter="16">
-          <a-col :span="12">
             <a-form-item label="排序" required>
               <a-input-number
                 v-model="modalForm.sort"
@@ -277,6 +307,8 @@
               />
             </a-form-item>
           </a-col>
+        </a-row>
+        <a-row :gutter="16">
           <a-col :span="12">
             <a-form-item label="状态">
               <a-radio-group v-model="modalForm.active">
@@ -285,8 +317,6 @@
               </a-radio-group>
             </a-form-item>
           </a-col>
-        </a-row>
-        <a-row :gutter="16">
           <a-col :span="12">
             <a-form-item label="隐藏成就">
               <a-radio-group v-model="modalForm.isHidden">
@@ -296,6 +326,102 @@
             </a-form-item>
           </a-col>
         </a-row>
+
+        <a-divider orientation="left">完成奖励</a-divider>
+        <a-row :gutter="16">
+          <a-col :span="12">
+            <a-form-item label="经验奖励" required>
+              <a-input-number
+                v-model="modalForm.expReward"
+                :min="0"
+                placeholder="不小于 0"
+                style="width: 100%"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="HP奖励">
+              <a-input-number
+                v-model="modalForm.hpReward"
+                :min="0"
+                :precision="0"
+                placeholder="0"
+                style="width: 100%"
+              />
+            </a-form-item>
+          </a-col>
+        </a-row>
+        <a-row :gutter="16">
+          <a-col :span="12">
+            <a-form-item label="钻石奖励">
+              <a-input-number
+                v-model="modalForm.currencyReward"
+                :min="0"
+                :precision="0"
+                placeholder="0"
+                style="width: 100%"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="抽奖券">
+              <a-input-number
+                v-model="modalForm.ticketReward"
+                :min="0"
+                :precision="0"
+                placeholder="0"
+                style="width: 100%"
+              />
+            </a-form-item>
+          </a-col>
+        </a-row>
+        <a-row :gutter="16">
+          <a-col :span="24">
+            <a-form-item label="物品奖励">
+              <a-select
+                v-model="modalForm.rewardItems"
+                placeholder="可选：称号/头像框/消耗品等"
+                allow-search
+                allow-clear
+                multiple
+                :loading="grantableItemsLoading"
+              >
+                <a-option
+                  v-for="item in grantableItemOptions"
+                  :key="item.code"
+                  :value="item.code"
+                  :label="`${item.name} (${item.code})`"
+                >
+                  {{ item.name }} ({{ item.code }}) · {{ grantableItemTypeLabel(item.itemType) }}
+                </a-option>
+              </a-select>
+            </a-form-item>
+          </a-col>
+        </a-row>
+
+        <template v-if="modalForm.isHidden">
+          <a-divider orientation="left">隐藏成就揭示</a-divider>
+          <a-row :gutter="16">
+            <a-col :span="12">
+              <a-form-item label="揭示名称">
+                <a-input
+                  v-model="modalForm.revealName"
+                  placeholder="完成后展示的名称"
+                  allow-clear
+                />
+              </a-form-item>
+            </a-col>
+            <a-col :span="12">
+              <a-form-item label="揭示描述">
+                <a-input
+                  v-model="modalForm.revealDescription"
+                  placeholder="完成后展示的描述"
+                  allow-clear
+                />
+              </a-form-item>
+            </a-col>
+          </a-row>
+        </template>
       </a-form>
     </a-modal>
   </div>
@@ -323,6 +449,12 @@
     getItemConfigList,
   } from '@/api/rpg';
   import useLoading from '@/hooks/loading';
+  import {
+    loadGrantableItemOptions,
+    formatItemCodes,
+    grantableItemTypeLabel,
+    type GrantableItemOption,
+  } from '@/utils/rpg-grantable-items';
 
   interface ItemOption {
     code: string;
@@ -330,6 +462,7 @@
     description?: string;
     itemType: string;
     icon?: string;
+    rarity?: string;
     active?: boolean;
     effectJson?: Record<string, unknown> | string | null;
   }
@@ -359,6 +492,23 @@
     special: '特殊',
   };
   const categoryLabel = (category: string) => CATEGORY_LABELS[category] || category;
+
+  const RARITY_LABELS: Record<string, string> = {
+    common: '普通',
+    rare: '稀有',
+    epic: '史诗',
+    legendary: '传说',
+  };
+  const rarityLabel = (rarity: string) => RARITY_LABELS[rarity] || rarity || '普通';
+  const rarityColor = (rarity: string) => {
+    const map: Record<string, string> = {
+      common: 'gray',
+      rare: 'blue',
+      epic: 'purple',
+      legendary: 'orangered',
+    };
+    return map[rarity] || 'gray';
+  };
 
   /** 与 blog-server AchievementEvent 一致 */
   const trackEventOptions = [
@@ -430,6 +580,12 @@
     trackEvent: undefined as string | undefined,
     maxProgress: 1,
     expReward: 10,
+    hpReward: 0,
+    currencyReward: 0,
+    ticketReward: 0,
+    rewardItems: [] as string[],
+    revealName: '',
+    revealDescription: '',
     sort: 10,
     active: true,
     isHidden: 0,
@@ -438,6 +594,43 @@
 
   const itemOptions = ref<ItemOption[]>([]);
   const itemOptionsLoading = ref(false);
+  const grantableItemOptions = ref<GrantableItemOption[]>([]);
+  const grantableItemsLoading = ref(false);
+  /** 加载可发放物品（称号/头像框等） */
+  const loadGrantableItems = async () => {
+    grantableItemsLoading.value = true;
+    try {
+      grantableItemOptions.value = await loadGrantableItemOptions();
+    } finally {
+      grantableItemsLoading.value = false;
+    }
+  };
+
+  /** 从列表行或 effectJson 解析成就模态框初始值 */
+  const parseAchievementFormFromRecord = (record: any) => {
+    const effect = record.effectJson || {};
+    const items = Array.isArray(record.rewardItems)
+      ? record.rewardItems
+      : Array.isArray(effect.items)
+        ? effect.items
+        : [];
+    return {
+      itemCode: record.code,
+      category: record.category,
+      trackEvent: record.trackEvent || effect.trackEvent,
+      maxProgress: record.maxProgress ?? effect.maxProgress ?? 1,
+      expReward: record.expReward ?? effect.expReward ?? 10,
+      hpReward: record.hpReward ?? effect.hpReward ?? 0,
+      currencyReward: record.currencyReward ?? effect.currencyReward ?? 0,
+      ticketReward: record.ticketReward ?? effect.ticketReward ?? 0,
+      rewardItems: [...items],
+      revealName: effect.revealName || '',
+      revealDescription: effect.revealDescription || '',
+      sort: record.sort,
+      active: record.active !== false,
+      isHidden: record.isHidden ?? 0,
+    };
+  };
 
   const selectedItem = computed(() =>
     itemOptions.value.find((item) => item.code === modalForm.value.itemCode),
@@ -510,37 +703,46 @@
     editId.value = 0;
     modalForm.value = { ...defaultModalForm };
     modalVisible.value = true;
-    await loadItemOptions('create');
+    await Promise.all([loadItemOptions('create'), loadGrantableItems()]);
   };
 
   const showEditModal = async (record: any) => {
     isEdit.value = true;
     editId.value = record.id;
-    await loadItemOptions('edit');
-    modalForm.value = {
-      itemCode: record.code,
-      category: record.category,
-      trackEvent: record.trackEvent || record.effectJson?.trackEvent,
-      maxProgress: record.maxProgress ?? record.effectJson?.maxProgress ?? 1,
-      expReward: record.expReward ?? record.effectJson?.expReward ?? 10,
-      sort: record.sort,
-      active: record.active !== false,
-      isHidden: record.isHidden ?? 0,
-    };
+    await Promise.all([loadItemOptions('edit'), loadGrantableItems()]);
+    modalForm.value = parseAchievementFormFromRecord(record);
     modalVisible.value = true;
   };
 
-  const buildAchievementPayload = () => ({
-    category: modalForm.value.category,
-    sort: modalForm.value.sort,
-    active: modalForm.value.active,
-    isHidden: modalForm.value.isHidden,
-    effectJson: {
+  const buildAchievementPayload = () => {
+    const effectJson: Record<string, unknown> = {
       maxProgress: modalForm.value.maxProgress,
       expReward: modalForm.value.expReward,
       trackEvent: modalForm.value.trackEvent,
-    },
-  });
+      hpReward: modalForm.value.hpReward ?? 0,
+      currencyReward: modalForm.value.currencyReward ?? 0,
+      ticketReward: modalForm.value.ticketReward ?? 0,
+    };
+    if (modalForm.value.rewardItems?.length) {
+      effectJson.items = [...modalForm.value.rewardItems];
+    } else {
+      effectJson.items = [];
+    }
+    if (modalForm.value.isHidden) {
+      effectJson.revealName = modalForm.value.revealName?.trim() || null;
+      effectJson.revealDescription = modalForm.value.revealDescription?.trim() || null;
+    } else {
+      effectJson.revealName = null;
+      effectJson.revealDescription = null;
+    }
+    return {
+      category: modalForm.value.category,
+      sort: modalForm.value.sort,
+      active: modalForm.value.active,
+      isHidden: modalForm.value.isHidden,
+      effectJson,
+    };
+  };
 
   /** 成就配置必填校验（新增/编辑均适用） */
   const validateModalForm = (): boolean => {
@@ -563,6 +765,14 @@
     if (modalForm.value.expReward == null || modalForm.value.expReward < 0) {
       Message.warning('请填写经验奖励（不小于 0）');
       return false;
+    }
+    const extraRewards = ['hpReward', 'currencyReward', 'ticketReward'] as const;
+    for (const key of extraRewards) {
+      const val = modalForm.value[key];
+      if (val != null && val < 0) {
+        Message.warning('额外奖励不能为负数');
+        return false;
+      }
     }
     if (modalForm.value.sort == null || modalForm.value.sort < 0) {
       Message.warning('请填写排序（不小于 0）');

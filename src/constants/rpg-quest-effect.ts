@@ -6,10 +6,11 @@ export interface QuestEffectGuide {
 }
 
 export const QUEST_EFFECT_GUIDE: QuestEffectGuide = {
-  summary: '领取任务奖励时的额外发放。经验/HP/钻石用上方独立字段，此处主要用于物品奖励。',
+  summary:
+    '领取任务奖励时的额外发放。经验/HP/钻石/抽奖券用表单独立字段；物品奖励通过多选系统物品配置。',
   fields: [
-    'items：系统物品 code 数组，领取时调用 grantItems（如 ["title_lucky_cat"]）',
-    '留空或 {} 表示无额外物品奖励',
+    'ticketReward：抽奖券数量（写入 effectJson）',
+    'items：系统物品 code 数组，领取时 grantItems（称号/头像框等）',
   ],
-  example: { items: ['title_lucky_cat'] },
+  example: { ticketReward: 1, items: ['lottery_frame_star'] },
 };

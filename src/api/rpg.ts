@@ -176,6 +176,15 @@ export const uploadItemAsset = (file: File, icon: string, assetType: 'icon' | 'b
   return request.post('/admin/rpg/items/upload-asset', form);
 };
 
+/** 删除系统物品 icon/bg 磁盘文件；query: icon + assetType */
+export const deleteItemAsset = (icon: string, assetType: 'icon' | 'bg') => {
+  return request({
+    url: '/admin/rpg/items/asset',
+    method: 'delete',
+    params: { icon, assetType },
+  });
+};
+
 // ========== 活动/赛季管理 ==========
 
 export const getActivityList = (params: Record<string, any>) => {
