@@ -5756,6 +5756,20 @@ pkg-types@^2.3.0:
     exsolve "^1.0.7"
     pathe "^2.0.3"
 
+playwright-core@1.61.1:
+  version "1.61.1"
+  resolved "https://registry.npmmirror.com/playwright-core/-/playwright-core-1.61.1.tgz"
+  integrity sha512-h7Qlt6m4REp25qvIdvbDtVmD4LqVXfpRxhORv9L0jzETM05p4fuPJ3dKyuSXQxDSbXnmS79HAgi9589lGSpLkg==
+
+playwright@^1.61.1:
+  version "1.61.1"
+  resolved "https://registry.npmmirror.com/playwright/-/playwright-1.61.1.tgz"
+  integrity sha512-DWnY5o3YbLWK4GovuAVwpqL+1VwGNdUGrRr++8j8PtQQzvAVZUIMjKQ90fY689sEJZJBbZVw1rXaOKSTitkzPQ==
+  dependencies:
+    playwright-core "1.61.1"
+  optionalDependencies:
+    fsevents "2.3.2"
+
 possible-typed-array-names@^1.0.0:
   version "1.0.0"
   resolved "https://registry.npmmirror.com/possible-typed-array-names/-/possible-typed-array-names-1.0.0.tgz"

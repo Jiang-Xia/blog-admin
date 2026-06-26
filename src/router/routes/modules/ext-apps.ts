@@ -112,5 +112,15 @@ export default {
         },
       ],
     },
+    {
+      path: 'rag/index',
+      name: 'RagIndex',
+      component: () => import('@/views/rag/index.vue'),
+      meta: {
+        locale: 'menu.server.ragIndex',
+        requiresAuth: true,
+        roles: ['1', '2'],
+      },
+    },
   ],
 };

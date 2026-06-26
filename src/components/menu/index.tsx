@@ -1,4 +1,4 @@
-import { defineComponent, ref, computed } from 'vue';
+import { defineComponent, ref, computed, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter, type RouteRecordRaw } from 'vue-router';
 import type { RouteMeta } from 'vue-router';
@@ -59,27 +59,35 @@ export default defineComponent({
         }
         if (item.children?.length) {
           item.children.forEach((el) => {
-            backtrack(el, [...keys], target);
+            backtrack(el, [...keys, item.name as string], target);
           });
         }
       };
       menuTree.value.forEach((el: RouteRecordRaw) => {
         if (isFind) return; // Performance optimization
-        backtrack(el, [el.name as string], name);
+        backtrack(el, [], name);
       });
       return result;
     };
-    listenerRouteChange((newRoute) => {
-      const { requiresAuth, activeMenu, hideInMenu } = newRoute.meta;
+    const syncMenuState = (targetRoute: typeof route) => {
+      const { requiresAuth, activeMenu, hideInMenu } = targetRoute.meta;
       if (requiresAuth && (!hideInMenu || activeMenu)) {
-        const menuOpenKeys = findMenuOpenKeys((activeMenu || newRoute.name) as string);
+        const menuOpenKeys = findMenuOpenKeys((activeMenu || targetRoute.name) as string);
+        if (!menuOpenKeys.length) return;
 
         const keySet = new Set([...menuOpenKeys, ...openKeys.value]);
         openKeys.value = [...keySet];
 
         selectedKey.value = [activeMenu || menuOpenKeys[menuOpenKeys.length - 1]];
       }
+    };
+    listenerRouteChange((newRoute) => {
+      syncMenuState(newRoute);
     }, true);
+    // 服务端菜单异步加载后 menuTree 才就绪，需重新计算展开项
+    watch(menuTree, () => {
+      syncMenuState(route);
+    });
     const setCollapse = (val: boolean) => {
       if (appStore.device === 'desktop') appStore.updateSettings({ menuCollapse: val });
     };

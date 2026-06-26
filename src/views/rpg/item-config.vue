@@ -11,10 +11,20 @@
           >
             <a-row :gutter="16">
               <a-col :span="8">
-                <a-form-item label="关键词">
+                <a-form-item label="物品名称">
                   <a-input
                     v-model="formModel.keyword"
-                    placeholder="物品名称"
+                    placeholder="模糊匹配名称"
+                    allow-clear
+                    @press-enter="search"
+                  />
+                </a-form-item>
+              </a-col>
+              <a-col :span="8">
+                <a-form-item label="物品编码">
+                  <a-input
+                    v-model="formModel.code"
+                    placeholder="模糊匹配编码"
                     allow-clear
                     @press-enter="search"
                   />
@@ -129,12 +139,13 @@
     <a-modal
       v-model:visible="modalVisible"
       :title="isEdit ? '编辑物品' : '新增物品'"
-      :width="720"
-      @ok="handleModalOk"
+      :width="960"
+      @before-ok="handleModalOk"
       @cancel="modalVisible = false"
     >
       <a-form
         :model="modalForm"
+        class="item-config-modal-form"
         :label-col-props="{ flex: '84px' }"
         :wrapper-col-props="{ flex: '1' }"
       >
@@ -191,7 +202,12 @@
         <a-row :gutter="16">
           <a-col :span="12">
             <a-form-item label="图标">
-              <a-input v-model="modalForm.icon" placeholder="图标ID" allow-clear />
+              <a-input
+                v-model="modalForm.icon"
+                placeholder="图标ID，如 dragon"
+                allow-clear
+                @change="syncAssetPreview"
+              />
             </a-form-item>
           </a-col>
           <a-col :span="12">
@@ -201,23 +217,127 @@
           </a-col>
         </a-row>
         <a-row :gutter="16">
+          <a-col :span="12">
+            <a-form-item label="图标图">
+              <div class="asset-thumb-wrap">
+                <a-upload
+                  :show-file-list="false"
+                  accept="image/png,image/webp,image/jpeg,image/svg+xml"
+                  :custom-request="onIconUpload"
+                >
+                  <template #upload-button>
+                    <div
+                      class="asset-thumb"
+                      :class="{
+                        'is-loading': iconUploading || iconDeleting,
+                        'has-image': !!iconPreviewUrl,
+                      }"
+                    >
+                      <img
+                        v-if="iconPreviewUrl"
+                        :src="iconPreviewUrl"
+                        alt="图标预览"
+                        @error="iconPreviewUrl = ''"
+                      />
+                      <div v-else class="asset-thumb-empty">
+                        <icon-plus :size="18" />
+                        <span>上传 icon</span>
+                      </div>
+                      <div v-if="iconUploading || iconDeleting" class="asset-thumb-mask">
+                        <a-spin :size="16" />
+                      </div>
+                    </div>
+                  </template>
+                </a-upload>
+                <a-button
+                  v-if="iconPreviewUrl && !iconUploading && !iconDeleting"
+                  class="asset-thumb-remove"
+                  size="mini"
+                  shape="circle"
+                  type="primary"
+                  status="danger"
+                  @click="confirmRemoveAsset('icon')"
+                >
+                  <icon-delete :size="12" />
+                </a-button>
+              </div>
+              <span class="asset-hint">
+                文件名与上方「图标」ID 相同，支持 PNG / WebP / JPG / SVG；未上传时前台用 emoji 占位
+              </span>
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="背景图">
+              <div class="asset-thumb-wrap">
+                <a-upload
+                  :show-file-list="false"
+                  accept="image/png,image/webp,image/jpeg,image/svg+xml"
+                  :custom-request="onBgUpload"
+                >
+                  <template #upload-button>
+                    <div
+                      class="asset-thumb"
+                      :class="{
+                        'is-loading': bgUploading || bgDeleting,
+                        'has-image': !!bgPreviewUrl,
+                      }"
+                    >
+                      <img
+                        v-if="bgPreviewUrl"
+                        :src="bgPreviewUrl"
+                        alt="背景预览"
+                        @error="bgPreviewUrl = ''"
+                      />
+                      <div v-else class="asset-thumb-empty">
+                        <icon-plus :size="18" />
+                        <span>上传背景</span>
+                      </div>
+                      <div v-if="bgUploading || bgDeleting" class="asset-thumb-mask">
+                        <a-spin :size="16" />
+                      </div>
+                    </div>
+                  </template>
+                </a-upload>
+                <a-button
+                  v-if="bgPreviewUrl && !bgUploading && !bgDeleting"
+                  class="asset-thumb-remove"
+                  size="mini"
+                  shape="circle"
+                  type="primary"
+                  status="danger"
+                  @click="confirmRemoveAsset('bg')"
+                >
+                  <icon-delete :size="12" />
+                </a-button>
+              </div>
+              <span class="asset-hint"> 可选；文件名同样与「图标」ID 一致，用于物品卡片底图 </span>
+            </a-form-item>
+          </a-col>
+        </a-row>
+        <a-row :gutter="16">
           <a-col :span="24">
             <a-form-item label="扩展配置" class="effect-form-item">
-              <div class="effect-guide">
-                <div class="effect-guide__summary">{{ effectGuide.summary }}</div>
-                <ul v-if="effectGuide.fields.length" class="effect-guide__fields">
-                  <li v-for="field in effectGuide.fields" :key="field">{{ field }}</li>
-                </ul>
-                <a-button size="mini" type="outline" @click="fillEffectTemplate"
-                  >填入示例模板</a-button
-                >
-              </div>
-              <a-textarea
-                v-model="modalForm.effectJsonText"
-                :placeholder="effectJsonPlaceholder"
-                :auto-size="{ minRows: 4, maxRows: 10 }"
-                allow-clear
-              />
+              <a-row :gutter="16" class="effect-json-row">
+                <a-col :span="12">
+                  <div class="effect-guide">
+                    <div class="effect-guide__summary">{{ effectGuide.summary }}</div>
+                    <ul v-if="effectGuide.fields.length" class="effect-guide__fields">
+                      <li v-for="field in effectGuide.fields" :key="field">{{ field }}</li>
+                    </ul>
+                    <a-button size="mini" type="outline" @click="fillEffectTemplate"
+                      >填入示例模板</a-button
+                    >
+                  </div>
+                </a-col>
+                <a-col :span="12">
+                  <a-textarea
+                    v-model="modalForm.effectJsonText"
+                    :placeholder="effectJsonPlaceholder"
+                    :auto-size="{ minRows: 8, maxRows: 12 }"
+                    allow-clear
+                  />
+                </a-col>
+              </a-row>
             </a-form-item>
           </a-col>
         </a-row>
@@ -241,6 +361,10 @@
 </template>
 
 <script lang="ts" setup>
+  /**
+   * 系统物品管理：CRUD + icon/bg 上传与删除
+   * 上传落盘 blog-server/public/rpgAssets/，文件名 = 图标 ID 字段
+   */
   import { ref, reactive, computed } from 'vue';
   import { Message, Modal } from '@arco-design/web-vue';
   import {
@@ -256,7 +380,11 @@
     createItemConfig,
     updateItemConfig,
     deleteItemConfig,
+    uploadItemAsset,
+    deleteItemAsset,
   } from '@/api/rpg';
+  import { resolveStaticUrl } from '@/api/resources';
+  import { probeRpgItemAssetUrl, resolveRpgItemAssetPreview } from '@/utils/rpg-item-asset';
   import useLoading from '@/hooks/loading';
   import { getItemEffectGuide } from '@/constants/rpg-item-effect';
 
@@ -293,6 +421,7 @@
   const { loading, setLoading } = useLoading(true);
   const formModel = ref({
     keyword: '',
+    code: '',
     itemType: undefined as string | undefined,
     page: 1,
     pageSize: 20,
@@ -318,6 +447,98 @@
   const modalForm = ref({ ...defaultModalForm });
   const jsonVisible = ref(false);
   const jsonPreviewText = ref('');
+  const iconUploading = ref(false);
+  const bgUploading = ref(false);
+  const iconDeleting = ref(false);
+  const bgDeleting = ref(false);
+  const iconPreviewUrl = ref('');
+  const bgPreviewUrl = ref('');
+
+  /** 编辑弹窗打开或修改图标 ID 时，探测已上传资产；无文件则留空，避免硬编码 .png 裂图 */
+  const syncAssetPreview = async () => {
+    const key = modalForm.value.icon?.trim();
+    if (!key || key === 'default') {
+      iconPreviewUrl.value = '';
+      bgPreviewUrl.value = '';
+      return;
+    }
+    const [iconUrl, bgUrl] = await Promise.all([
+      probeRpgItemAssetUrl('itemIcon', key),
+      probeRpgItemAssetUrl('itemBg', key),
+    ]);
+    iconPreviewUrl.value = iconUrl;
+    bgPreviewUrl.value = bgUrl;
+  };
+
+  /** 上传 icon/bg 至 blog-server；需先填图标 ID，成功后刷新预览 URL */
+  const uploadAsset = async (
+    option: { fileItem: { file?: File }; onSuccess: () => void; onError: (e: Error) => void },
+    assetType: 'icon' | 'bg',
+  ) => {
+    const icon = modalForm.value.icon?.trim();
+    if (!icon || icon === 'default') {
+      Message.warning('请先填写图标 ID');
+      option.onError(new Error('missing icon'));
+      return;
+    }
+    const file = option.fileItem.file;
+    if (!file) {
+      option.onError(new Error('missing file'));
+      return;
+    }
+    const loadingRef = assetType === 'icon' ? iconUploading : bgUploading;
+    loadingRef.value = true;
+    try {
+      const res: any = await uploadItemAsset(file, icon, assetType);
+      const url = res?.data?.url || res?.url;
+      if (assetType === 'icon') {
+        iconPreviewUrl.value = resolveStaticUrl(url);
+      } else {
+        bgPreviewUrl.value = resolveStaticUrl(url);
+      }
+      Message.success(assetType === 'icon' ? '图标上传成功' : '背景上传成功');
+      option.onSuccess();
+    } catch (e: any) {
+      Message.error(e?.message || '上传失败');
+      option.onError(e);
+    } finally {
+      loadingRef.value = false;
+    }
+  };
+
+  const onIconUpload = (option: Parameters<typeof uploadAsset>[0]) => uploadAsset(option, 'icon');
+  const onBgUpload = (option: Parameters<typeof uploadAsset>[0]) => uploadAsset(option, 'bg');
+
+  /** 删除已上传的 icon/bg 磁盘文件，并清空预览 */
+  const confirmRemoveAsset = (assetType: 'icon' | 'bg') => {
+    const icon = modalForm.value.icon?.trim();
+    if (!icon || icon === 'default') {
+      Message.warning('请先填写图标 ID');
+      return;
+    }
+    const label = assetType === 'icon' ? '图标图' : '背景图';
+    Modal.confirm({
+      title: `删除${label}`,
+      content: `确定删除已上传的${label}吗？删除后前台将回退为 emoji / 无底图展示。`,
+      onOk: async () => {
+        const loadingRef = assetType === 'icon' ? iconDeleting : bgDeleting;
+        loadingRef.value = true;
+        try {
+          await deleteItemAsset(icon, assetType);
+          if (assetType === 'icon') {
+            iconPreviewUrl.value = '';
+          } else {
+            bgPreviewUrl.value = '';
+          }
+          Message.success('删除成功');
+        } catch (e: any) {
+          Message.error(e?.message || '删除失败');
+        } finally {
+          loadingRef.value = false;
+        }
+      },
+    });
+  };
 
   const effectGuide = computed(() => getItemEffectGuide(modalForm.value.itemType));
   const effectJsonPlaceholder = computed(() => {
@@ -372,7 +593,7 @@
     loadData();
   };
   const reset = () => {
-    formModel.value = { keyword: '', itemType: undefined, page: 1, pageSize: 20 };
+    formModel.value = { keyword: '', code: '', itemType: undefined, page: 1, pageSize: 20 };
     pagination.current = 1;
     loadData();
   };
@@ -422,6 +643,8 @@
     isEdit.value = false;
     editId.value = 0;
     modalForm.value = { ...defaultModalForm };
+    iconPreviewUrl.value = '';
+    bgPreviewUrl.value = '';
     modalVisible.value = true;
   };
   const showEditModal = (record: any) => {
@@ -439,25 +662,36 @@
       active: record.active !== false,
       effectJsonText: JSON.stringify(record.effectJson || {}, null, 2),
     };
+    const preview = resolveRpgItemAssetPreview(record.iconUrl, record.bgUrl);
+    iconPreviewUrl.value = preview.iconPreview;
+    bgPreviewUrl.value = preview.bgPreview;
+    // 列表未带 URL 或磁盘扩展名非 png 时，后台再探测一次
+    if (!iconPreviewUrl.value || !bgPreviewUrl.value) {
+      syncAssetPreview();
+    }
     modalVisible.value = true;
   };
 
   const handleModalOk = async () => {
     if (!modalForm.value.code || !modalForm.value.name) {
       Message.warning('编码和名称不能为空');
-      return;
+      return false;
     }
     const payload = buildPayload();
-    if (!payload) return;
-    if (isEdit.value) {
-      await updateItemConfig(editId.value, payload);
-      Message.success('更新成功');
-    } else {
-      await createItemConfig({ code: modalForm.value.code, ...payload });
-      Message.success('创建成功');
+    if (!payload) return false;
+    try {
+      if (isEdit.value) {
+        await updateItemConfig(editId.value, payload);
+        Message.success('更新成功');
+      } else {
+        await createItemConfig({ code: modalForm.value.code, ...payload });
+        Message.success('创建成功');
+      }
+      loadData();
+      return true;
+    } catch {
+      return false;
     }
-    modalVisible.value = false;
-    loadData();
   };
 
   const handleDelete = (record: any) => {
@@ -501,22 +735,37 @@
       padding-top: 6px;
     }
     :deep(.arco-form-item-content) {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
       width: 100%;
+    }
+    .effect-json-row {
+      width: 100%;
+      align-items: stretch;
     }
     .effect-guide,
     :deep(.arco-textarea-wrapper) {
       width: 100%;
+      min-height: 196px;
+    }
+  }
+  .item-config-modal-form {
+    :deep(.arco-row) {
+      width: 100%;
+    }
+    :deep(.arco-form-item) {
+      margin-bottom: 16px;
     }
   }
   .effect-guide {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 196px;
     padding: 10px 12px;
     background: var(--color-fill-2);
     border-radius: 4px;
     font-size: 12px;
     color: var(--color-text-2);
+    box-sizing: border-box;
   }
   .effect-guide__summary {
     margin-bottom: 6px;
@@ -526,5 +775,59 @@
     margin: 0 0 8px;
     padding-left: 18px;
     line-height: 1.6;
+  }
+  .asset-thumb-wrap {
+    position: relative;
+    display: inline-block;
+  }
+  .asset-thumb-remove {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    z-index: 1;
+    width: 22px;
+    min-width: 22px;
+    height: 22px;
+    padding: 0;
+    box-shadow: 0 1px 4px rgb(0 0 0 / 0.2);
+  }
+  .asset-thumb {
+    position: relative;
+    width: 96px;
+    height: 96px;
+    border: 1px dashed var(--color-border-3);
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    background: var(--color-fill-2);
+  }
+  .asset-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  .asset-thumb-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    height: 100%;
+    font-size: 12px;
+    color: var(--color-text-3);
+  }
+  .asset-thumb-mask {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgb(255 255 255 / 0.65);
+  }
+  .asset-hint {
+    display: block;
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--color-text-3);
   }
 </style>

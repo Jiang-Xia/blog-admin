@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <a-card class="general-card" title="每日任务管理">
+    <a-card class="general-card" title="任务管理">
       <a-row>
         <a-col :flex="1">
           <a-form
@@ -25,6 +25,17 @@
                   <a-select v-model="formModel.type" placeholder="请选择类型" allow-clear>
                     <a-option value="daily">每日</a-option>
                     <a-option value="weekly">每周</a-option>
+                    <a-option value="special">一次性</a-option>
+                  </a-select>
+                </a-form-item>
+              </a-col>
+              <a-col :span="8">
+                <a-form-item label="子类型">
+                  <a-select v-model="formModel.questSubtype" placeholder="请选择子类型" allow-clear>
+                    <a-option value="daily">每日</a-option>
+                    <a-option value="bounty">悬赏</a-option>
+                    <a-option value="weekly">周常</a-option>
+                    <a-option value="special">特殊</a-option>
                   </a-select>
                 </a-form-item>
               </a-col>
@@ -73,7 +84,7 @@
         :data="tableData"
         :bordered="false"
         scrollbar
-        :scroll="{ x: 1200, y: 600 }"
+        :scroll="{ x: 1580, y: 600 }"
       >
         <template #columns>
           <a-table-column title="编码" data-index="code" :width="140" />
@@ -81,7 +92,15 @@
           <a-table-column title="描述" data-index="description" :width="160" ellipsis tooltip />
           <a-table-column title="类型" data-index="type" :width="80">
             <template #cell="{ record }">
-              <a-tag :color="record.type === 'daily' ? 'blue' : 'purple'">
+              <a-tag
+                :color="
+                  record.type === 'special'
+                    ? 'orangered'
+                    : record.type === 'daily'
+                      ? 'blue'
+                      : 'purple'
+                "
+              >
                 {{ questTypeLabel(record.type) }}
               </a-tag>
             </template>
@@ -102,7 +121,29 @@
               <a-tag>{{ questSubtypeLabel(record.questSubtype) }}</a-tag>
             </template>
           </a-table-column>
-          <a-table-column title="生命奖励" data-index="hpReward" :width="90" align="center" />
+          <a-table-column title="生命奖励" data-index="hpReward" :width="90" align="center">
+            <template #cell="{ record }">
+              <span v-if="record.hpReward">+{{ record.hpReward }}</span>
+              <span v-else>—</span>
+            </template>
+          </a-table-column>
+          <a-table-column title="钻石奖励" data-index="currencyReward" :width="90" align="center">
+            <template #cell="{ record }">
+              <span v-if="record.currencyReward">+{{ record.currencyReward }}</span>
+              <span v-else>—</span>
+            </template>
+          </a-table-column>
+          <a-table-column title="抽奖券" data-index="ticketReward" :width="80" align="center">
+            <template #cell="{ record }">
+              <span v-if="getQuestTicketReward(record)">+{{ getQuestTicketReward(record) }}</span>
+              <span v-else>—</span>
+            </template>
+          </a-table-column>
+          <a-table-column title="物品奖励" data-index="rewardItems" :width="140" ellipsis tooltip>
+            <template #cell="{ record }">
+              {{ formatItemCodes(getQuestRewardItems(record)) }}
+            </template>
+          </a-table-column>
           <a-table-column title="排序" data-index="sort" :width="60" align="center" />
           <a-table-column title="状态" data-index="active" :width="80">
             <template #cell="{ record }">
@@ -137,11 +178,18 @@
     <a-modal
       v-model:visible="modalVisible"
       :title="isEdit ? '编辑任务' : '新增任务'"
-      :width="720"
-      @ok="handleModalOk"
+      :width="800"
+      @before-ok="handleModalOk"
       @cancel="modalVisible = false"
     >
-      <a-form :model="modalForm" :label-col-props="{ span: 7 }" :wrapper-col-props="{ span: 17 }">
+      <a-form
+        :model="modalForm"
+        layout="horizontal"
+        class="quest-modal-form"
+        :label-col-props="{ flex: '96px' }"
+        :wrapper-col-props="{ flex: '1' }"
+      >
+        <a-divider orientation="left">任务配置</a-divider>
         <a-row :gutter="16">
           <a-col :span="12">
             <a-form-item label="编码" required>
@@ -165,6 +213,7 @@
               <a-select v-model="modalForm.type">
                 <a-option value="daily">每日</a-option>
                 <a-option value="weekly">每周</a-option>
+                <a-option value="special">一次性</a-option>
               </a-select>
             </a-form-item>
           </a-col>
@@ -175,38 +224,52 @@
               <a-select v-model="modalForm.targetAction">
                 <a-option value="sign_in">签到</a-option>
                 <a-option value="comment">评论</a-option>
+                <a-option value="reply">回复</a-option>
                 <a-option value="article">发布文章</a-option>
                 <a-option value="like">点赞</a-option>
                 <a-option value="collect">收藏</a-option>
                 <a-option value="msgboard">留言</a-option>
                 <a-option value="tip">打赏</a-option>
+                <a-option value="lottery_draw">抽奖</a-option>
+                <a-option value="social_cheer">加油</a-option>
+                <a-option value="social_flower">送花</a-option>
+                <a-option value="social_egg">扔鸡蛋</a-option>
+                <a-option value="guild_join">加入公会</a-option>
+                <a-option value="pet_hatch">获得宠物</a-option>
               </a-select>
             </a-form-item>
           </a-col>
           <a-col :span="12">
             <a-form-item label="子类型">
-              <a-select v-model="modalForm.questSubtype">
-                <a-option value="daily">daily</a-option>
-                <a-option value="bounty">bounty</a-option>
-                <a-option value="special">special</a-option>
+              <a-select v-model="modalForm.questSubtype" @change="onQuestSubtypeChange">
+                <a-option value="daily">每日</a-option>
+                <a-option value="bounty">悬赏</a-option>
+                <a-option value="weekly">周常</a-option>
+                <a-option value="special">特殊</a-option>
               </a-select>
             </a-form-item>
           </a-col>
         </a-row>
         <a-row :gutter="16">
           <a-col :span="12">
-            <a-form-item label="目标次数"> </a-form-item>
+            <a-form-item label="目标次数">
+              <a-input-number
+                v-model="modalForm.targetCount"
+                :min="1"
+                :precision="0"
+                style="width: 100%"
+              />
+            </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item label="HP奖励"> </a-form-item>
-          </a-col>
-        </a-row>
-        <a-row :gutter="16">
-          <a-col :span="12">
-            <a-form-item label="经验奖励"> </a-form-item>
-          </a-col>
-          <a-col :span="12">
-            <a-form-item label="排序"> </a-form-item>
+            <a-form-item label="排序">
+              <a-input-number
+                v-model="modalForm.sort"
+                :min="0"
+                :precision="0"
+                style="width: 100%"
+              />
+            </a-form-item>
           </a-col>
         </a-row>
         <a-row :gutter="16">
@@ -219,12 +282,86 @@
             </a-form-item>
           </a-col>
         </a-row>
+
+        <a-divider orientation="left">完成奖励</a-divider>
+        <a-row :gutter="16">
+          <a-col :span="12">
+            <a-form-item label="经验奖励">
+              <a-input-number
+                v-model="modalForm.expReward"
+                :min="0"
+                :precision="0"
+                style="width: 100%"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="HP奖励">
+              <a-input-number
+                v-model="modalForm.hpReward"
+                :min="0"
+                :precision="0"
+                style="width: 100%"
+              />
+            </a-form-item>
+          </a-col>
+        </a-row>
+        <a-row :gutter="16">
+          <a-col :span="12">
+            <a-form-item label="钻石奖励">
+              <a-input-number
+                v-model="modalForm.currencyReward"
+                :min="0"
+                :precision="0"
+                placeholder="0"
+                style="width: 100%"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="12">
+            <a-form-item label="抽奖券">
+              <a-input-number
+                v-model="modalForm.ticketReward"
+                :min="0"
+                :precision="0"
+                placeholder="0"
+                style="width: 100%"
+              />
+            </a-form-item>
+          </a-col>
+        </a-row>
+        <a-row :gutter="16">
+          <a-col :span="24">
+            <a-form-item label="物品奖励">
+              <a-select
+                v-model="modalForm.rewardItems"
+                placeholder="可选：称号/头像框/消耗品等"
+                allow-search
+                allow-clear
+                multiple
+                :loading="grantableItemsLoading"
+              >
+                <a-option
+                  v-for="item in grantableItemOptions"
+                  :key="item.code"
+                  :value="item.code"
+                  :label="`${item.name} (${item.code})`"
+                >
+                  {{ item.name }} ({{ item.code }}) · {{ grantableItemTypeLabel(item.itemType) }}
+                </a-option>
+              </a-select>
+            </a-form-item>
+          </a-col>
+        </a-row>
       </a-form>
     </a-modal>
   </div>
 </template>
 
 <script lang="ts" setup>
+  /**
+   * 任务管理：CRUD，支持经验/HP/钻石/抽奖券/物品奖励配置
+   */
   import { ref, reactive } from 'vue';
   import type { Pagination } from '@/types/global';
   import { Message, Modal } from '@arco-design/web-vue';
@@ -237,35 +374,55 @@
   } from '@arco-design/web-vue/es/icon';
   import { getQuestList, createQuest, updateQuest, deleteQuest } from '@/api/rpg';
   import useLoading from '@/hooks/loading';
+  import {
+    loadGrantableItemOptions,
+    formatItemCodes,
+    grantableItemTypeLabel,
+    type GrantableItemOption,
+  } from '@/utils/rpg-grantable-items';
 
   const QUEST_TYPE_LABELS: Record<string, string> = {
     daily: '每日',
     weekly: '每周',
+    special: '一次性',
   };
   const QUEST_SUBTYPE_LABELS: Record<string, string> = {
     daily: '每日',
     bounty: '悬赏',
+    weekly: '周常',
     special: '特殊',
   };
   const TARGET_ACTION_LABELS: Record<string, string> = {
     sign_in: '签到',
     comment: '评论',
+    reply: '回复',
     article: '发布文章',
     like: '点赞',
     collect: '收藏',
     msgboard: '留言',
     tip: '打赏',
+    lottery_draw: '抽奖',
+    social_cheer: '加油',
+    social_flower: '送花',
+    social_egg: '扔鸡蛋',
+    guild_join: '加入公会',
+    pet_hatch: '获得宠物',
   };
 
   const questTypeLabel = (type: string) => QUEST_TYPE_LABELS[type] || type;
   const questSubtypeLabel = (subtype: string) => QUEST_SUBTYPE_LABELS[subtype] || subtype;
   const targetActionLabel = (action: string) => TARGET_ACTION_LABELS[action] || action;
 
+  const getQuestTicketReward = (record: any) => record.effectJson?.ticketReward ?? 0;
+  const getQuestRewardItems = (record: any) =>
+    Array.isArray(record.effectJson?.items) ? record.effectJson.items : [];
+
   const { loading, setLoading } = useLoading(true);
 
   const generateFormModel = () => ({
     keyword: '',
     type: undefined as string | undefined,
+    questSubtype: undefined as string | undefined,
     active: undefined as string | undefined,
     page: 1,
     pageSize: 20,
@@ -279,6 +436,9 @@
   const modalVisible = ref(false);
   const isEdit = ref(false);
   const editId = ref<number>(0);
+  const grantableItemOptions = ref<GrantableItemOption[]>([]);
+  const grantableItemsLoading = ref(false);
+
   const defaultModalForm = {
     code: '',
     name: '',
@@ -289,10 +449,66 @@
     targetCount: 1,
     expReward: 10,
     hpReward: 0,
+    currencyReward: 0,
+    ticketReward: 0,
+    rewardItems: [] as string[],
     sort: 10,
     active: true,
   };
   const modalForm = ref({ ...defaultModalForm });
+
+  const loadGrantableItems = async () => {
+    grantableItemsLoading.value = true;
+    try {
+      grantableItemOptions.value = await loadGrantableItemOptions();
+    } finally {
+      grantableItemsLoading.value = false;
+    }
+  };
+
+  const buildQuestEffectJson = () => {
+    const ticketReward = modalForm.value.ticketReward ?? 0;
+    const items = modalForm.value.rewardItems ?? [];
+    if (ticketReward <= 0 && !items.length) return null;
+    const effectJson: Record<string, unknown> = {};
+    if (ticketReward > 0) effectJson.ticketReward = ticketReward;
+    if (items.length) effectJson.items = [...items];
+    return effectJson;
+  };
+
+  /** 子类型为 special/weekly 时同步 type，避免进度日期键不一致 */
+  const onQuestSubtypeChange = (subtype: string) => {
+    if (subtype === 'special') {
+      modalForm.value.type = 'special';
+    } else if (subtype === 'weekly') {
+      modalForm.value.type = 'weekly';
+    } else if (modalForm.value.type === 'special' || modalForm.value.type === 'weekly') {
+      modalForm.value.type = 'daily';
+    }
+  };
+
+  const buildPayload = () => {
+    const targetCount = modalForm.value.targetCount ?? 1;
+    if (targetCount < 1) {
+      Message.warning('目标次数至少为 1');
+      return null;
+    }
+
+    return {
+      name: modalForm.value.name,
+      description: modalForm.value.description || '',
+      type: modalForm.value.type,
+      questSubtype: modalForm.value.questSubtype,
+      targetAction: modalForm.value.targetAction,
+      targetCount,
+      expReward: modalForm.value.expReward ?? 0,
+      hpReward: modalForm.value.hpReward ?? 0,
+      currencyReward: modalForm.value.currencyReward ?? 0,
+      sort: modalForm.value.sort ?? 10,
+      active: modalForm.value.active,
+      effectJson: buildQuestEffectJson(),
+    };
+  };
 
   const loadData = async () => {
     setLoading(true);
@@ -333,16 +549,18 @@
     loadData();
   };
 
-  const showCreateModal = () => {
+  const showCreateModal = async () => {
     isEdit.value = false;
     editId.value = 0;
     modalForm.value = { ...defaultModalForm };
     modalVisible.value = true;
+    await loadGrantableItems();
   };
 
-  const showEditModal = (record: any) => {
+  const showEditModal = async (record: any) => {
     isEdit.value = true;
     editId.value = record.id;
+    const effect = record.effectJson || {};
     modalForm.value = {
       code: record.code,
       name: record.name,
@@ -350,30 +568,39 @@
       type: record.type,
       questSubtype: record.questSubtype || 'daily',
       targetAction: record.targetAction,
-      targetCount: record.targetCount,
-      expReward: record.expReward,
+      targetCount: record.targetCount ?? 1,
+      expReward: record.expReward ?? 0,
       hpReward: record.hpReward ?? 0,
-      sort: record.sort,
-      active: record.active,
+      currencyReward: record.currencyReward ?? 0,
+      ticketReward: effect.ticketReward ?? 0,
+      rewardItems: Array.isArray(effect.items) ? [...effect.items] : [],
+      sort: record.sort ?? 10,
+      active: record.active !== false,
     };
     modalVisible.value = true;
+    await loadGrantableItems();
   };
 
   const handleModalOk = async () => {
     if (!modalForm.value.code || !modalForm.value.name) {
       Message.warning('编码和名称不能为空');
-      return;
+      return false;
     }
-    if (isEdit.value) {
-      const { code, ...data } = modalForm.value;
-      await updateQuest(editId.value, data);
-      Message.success('更新成功');
-    } else {
-      await createQuest(modalForm.value);
-      Message.success('新增成功');
+    const payload = buildPayload();
+    if (!payload) return false;
+    try {
+      if (isEdit.value) {
+        await updateQuest(editId.value, payload);
+        Message.success('更新成功');
+      } else {
+        await createQuest({ code: modalForm.value.code, ...payload });
+        Message.success('新增成功');
+      }
+      loadData();
+      return true;
+    } catch {
+      return false;
     }
-    modalVisible.value = false;
-    loadData();
   };
 
   const handleDelete = (record: any) => {
@@ -396,6 +623,20 @@
 <style scoped lang="less">
   .container {
     padding: 20px;
+  }
+  .quest-modal-form {
+    :deep(.arco-divider-text-left) {
+      margin: 4px 0 12px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--color-text-2);
+    }
+    :deep(.arco-row) {
+      width: 100%;
+    }
+    :deep(.arco-form-item) {
+      margin-bottom: 16px;
+    }
   }
   :deep(.arco-table-th) {
     &:last-child {

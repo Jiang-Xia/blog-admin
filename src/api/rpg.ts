@@ -167,6 +167,24 @@ export const deleteItemConfig = (id: number) => {
   return request({ url: `/admin/rpg/items/${id}`, method: 'delete' });
 };
 
+/** 上传系统物品 icon/bg；落盘 rpgAssets/itemIcon|itemBg，form: file + icon + assetType */
+export const uploadItemAsset = (file: File, icon: string, assetType: 'icon' | 'bg') => {
+  const form = new FormData();
+  form.append('file', file);
+  form.append('icon', icon);
+  form.append('assetType', assetType);
+  return request.post('/admin/rpg/items/upload-asset', form);
+};
+
+/** 删除系统物品 icon/bg 磁盘文件；query: icon + assetType */
+export const deleteItemAsset = (icon: string, assetType: 'icon' | 'bg') => {
+  return request({
+    url: '/admin/rpg/items/asset',
+    method: 'delete',
+    params: { icon, assetType },
+  });
+};
+
 // ========== 活动/赛季管理 ==========
 
 export const getActivityList = (params: Record<string, any>) => {
