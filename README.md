@@ -147,6 +147,10 @@ npm run deploy
 
 build 直接读根目录 `.env.production`；SSH 见 `deploy/pm2/deploy.local.env`。详见 [deploy/pm2/README.md](deploy/pm2/README.md)。
 
+### Docker 本地试验
+
+与 Go 单体 compose 联调见 [deploy/docker/README.md](deploy/docker/README.md)（端口 `9856`，API → `localhost:8000`）。
+
 ### 代码检查
 ```bash
 npm run lint
