@@ -9,6 +9,7 @@
   "scripts": {
     "dev:debug": "vite --debug --config ./config/vite.config.dev.ts",
     "dev": "vite --config ./config/vite.config.dev.ts",
+    "dev:go-online": "vite --config ./config/vite.config.dev.ts --mode go-online",
     "build": "vue-tsc --noEmit && vite build --config ./config/vite.config.prod.ts",
     "report": "cross-env REPORT=true npm run build",
     "preview": "npm run build && vite preview --host",
