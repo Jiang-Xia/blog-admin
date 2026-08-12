@@ -55,6 +55,9 @@
                 style="width: 120px"
               />
             </a-form-item>
+            <a-form-item v-if="showRechargeFilters" :label="t('payOrder.form.anomalyOnly')">
+              <a-switch v-model="searchForm.anomalyOnly" @change="onAnomalyOnlyChange" />
+            </a-form-item>
             <a-form-item>
               <a-space>
                 <a-button type="primary" @click="handleSearch">
@@ -98,6 +101,13 @@
       </a-row>
 
       <!-- 表格 -->
+      <a-alert
+        v-if="showRechargeFilters && searchForm.anomalyOnly && !loading && tableData.length === 0"
+        type="info"
+        style="margin-bottom: 12px"
+      >
+        {{ t('payOrder.anomaly.empty') }}
+      </a-alert>
       <a-table
         :loading="loading"
         row-key="id"
@@ -107,7 +117,7 @@
         :row-selection="rowSelection"
         v-model:selected-keys="selectedRowKeys"
         scrollbar
-        :scroll="{ x: 1580, y: 600 }"
+        :scroll="{ x: 1720, y: 600 }"
       >
         <template #columns>
           <a-table-column :title="t('payOrder.table.status')" :width="100" align="center">
@@ -183,6 +193,26 @@
               <span v-else>-</span>
             </template>
           </a-table-column>
+          <a-table-column
+            v-if="showRechargeColumns"
+            :title="t('payOrder.table.anomaly')"
+            :width="140"
+            align="center"
+          >
+            <template #cell="{ record }">
+              <a-space v-if="record.rechargeInfo?.anomalyCodes?.length" wrap>
+                <a-tag
+                  v-for="code in record.rechargeInfo.anomalyCodes"
+                  :key="code"
+                  color="red"
+                  size="small"
+                >
+                  {{ t(`payOrder.anomaly.${code}`) }}
+                </a-tag>
+              </a-space>
+              <span v-else style="color: #86909c">-</span>
+            </template>
+          </a-table-column>
           <a-table-column :title="t('payOrder.table.totalAmount')" :width="100" align="right">
             <template #cell="{ record }">
               <span style="font-weight: 600; color: #165dff">¥{{ record.totalAmount }}</span>
@@ -217,7 +247,7 @@
               }}
             </template>
           </a-table-column>
-          <a-table-column :title="t('payOrder.table.action')" :width="300" fixed="right">
+          <a-table-column :title="t('payOrder.table.action')" :width="340" fixed="right">
             <template #cell="{ record }">
               <a-space wrap>
                 <a-button
@@ -228,6 +258,16 @@
                   @click="openRecharge(record)"
                 >
                   {{ t('payOrder.action.recharge') }}
+                </a-button>
+                <a-button
+                  v-if="canReconcileOrder(record)"
+                  type="text"
+                  size="small"
+                  status="success"
+                  :loading="reconcilingNo === record.outTradeNo"
+                  @click="handleReconcile(record)"
+                >
+                  {{ t('payOrder.action.reconcile') }}
                 </a-button>
                 <!-- 只有已支付才能退款 -->
                 <a-button
@@ -249,9 +289,9 @@
                 >
                   {{ t('payOrder.action.close') }}
                 </a-button>
-                <!-- 待支付状态可主动查询 -->
+                <!-- 待支付/已支付可主动查单（已支付用于同步退款累计） -->
                 <a-button
-                  v-if="record.status === 'PENDING'"
+                  v-if="['PENDING', 'PAID', 'REFUNDED'].includes(record.status)"
                   type="text"
                   size="small"
                   @click="handleQuery(record)"
@@ -360,7 +400,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref, reactive, computed, onMounted } from 'vue';
+  import { ref, reactive, computed, onMounted, nextTick } from 'vue';
   import { useI18n } from 'vue-i18n';
   import { Message, Modal } from '@arco-design/web-vue';
   import {
@@ -370,6 +410,7 @@
     queryPayOrder,
     deletePayOrders,
     markPayOrderRechargeFulfilled,
+    reconcilePayOrder,
   } from '@/api/pay-order';
   import { rechargeDiamonds } from '@/api/rpg';
   import useUserStore from '@/store/modules/user';
@@ -394,6 +435,7 @@
     subject: '',
     orderSource: '' as '' | 'rpg_recharge',
     rechargeUid: '',
+    anomalyOnly: false,
   });
 
   const showRechargeFilters = computed(() => searchForm.orderSource === 'rpg_recharge');
@@ -402,6 +444,7 @@
   // 表格数据
   const loading = ref(false);
   const deleteLoading = ref(false);
+  const reconcilingNo = ref('');
   const tableData = ref<any[]>([]);
   const selectedRowKeys = ref<(string | number)[]>([]);
   const rowSelection = reactive({
@@ -439,6 +482,11 @@
     record.orderSource === 'rpg_recharge' &&
     record.rechargeInfo?.uid &&
     !record.rechargeInfo?.fulfilled;
+
+  /** 博客充值单可一键对账（有异常时优先展示；PAID/REFUNDED 也可主动对） */
+  const canReconcileOrder = (record: any) =>
+    record.orderSource === 'rpg_recharge' &&
+    ['PENDING', 'PAID', 'REFUNDED'].includes(record.status);
 
   const openRecharge = (record: any) => {
     rechargeForm.uid = Number(record.rechargeInfo.uid);
@@ -491,6 +539,10 @@
       if (showRechargeFilters.value && searchForm.rechargeUid) {
         params.rechargeUid = searchForm.rechargeUid;
       }
+      if (showRechargeFilters.value && searchForm.anomalyOnly) {
+        params.anomalyOnly = '1';
+        params.bizType = 'rpg_recharge';
+      }
 
       const res = (await getPayOrderList(params)) as any;
       const responseData = res?.data || res;
@@ -508,9 +560,16 @@
     loadData();
   };
 
+  /** 开关 change 可能早于 v-model 落地，用传入值并 nextTick 再查 */
+  const onAnomalyOnlyChange = (checked: boolean | string | number) => {
+    searchForm.anomalyOnly = checked === true || checked === 'true' || checked === 1;
+    nextTick(() => handleSearch());
+  };
+
   const onOrderSourceChange = () => {
     if (searchForm.orderSource !== 'rpg_recharge') {
       searchForm.rechargeUid = '';
+      searchForm.anomalyOnly = false;
     }
   };
 
@@ -520,6 +579,7 @@
     searchForm.subject = '';
     searchForm.orderSource = '';
     searchForm.rechargeUid = '';
+    searchForm.anomalyOnly = false;
     handleSearch();
   };
 
@@ -643,6 +703,27 @@
       loadData();
     } catch (err) {
       console.error('查询状态失败', err);
+    }
+  };
+
+  /** 一键对账：同步支付宝并补发钻/补扣钻 */
+  const handleReconcile = async (record: any) => {
+    reconcilingNo.value = record.outTradeNo;
+    try {
+      const res = (await reconcilePayOrder(record.outTradeNo)) as any;
+      const data = res?.data || res;
+      if (data?.alipaySuccess === false) {
+        Message.warning(data?.message || '对账失败');
+      } else if ((data?.remainingAnomalies || []).length > 0 || data?.statusDrift) {
+        Message.warning(data?.message || t('payOrder.reconcile.stillAnomaly'));
+      } else {
+        Message.success(data?.message || t('payOrder.reconcile.success'));
+      }
+      loadData();
+    } catch (err) {
+      console.error('对账失败', err);
+    } finally {
+      reconcilingNo.value = '';
     }
   };
 

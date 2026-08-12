@@ -62,3 +62,12 @@ export const markPayOrderRechargeFulfilled = (outTradeNo: string) => {
     data: { out_trade_no: outTradeNo },
   });
 };
+
+/** 充值单一键对账（查支付宝 + 补发钻/补扣钻） */
+export const reconcilePayOrder = (outTradeNo: string) => {
+  return request({
+    url: '/pay/order/reconcile',
+    method: 'post',
+    data: { out_trade_no: outTradeNo },
+  });
+};
