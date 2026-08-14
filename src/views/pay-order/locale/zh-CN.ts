@@ -12,6 +12,7 @@ export default {
   'payOrder.form.placeholder.orderSource': '全部来源',
   'payOrder.orderSource.all': '全部',
   'payOrder.orderSource.rpgRecharge': '博客充值',
+  'payOrder.orderSource.siteTip': '关于页赞赏',
   'payOrder.orderSource.external': '其它',
   'payOrder.form.rechargeUid': '充值用户',
   'payOrder.form.placeholder.rechargeUid': '用户 uid',

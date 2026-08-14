@@ -12,6 +12,7 @@ export default {
   'payOrder.form.placeholder.orderSource': 'All sources',
   'payOrder.orderSource.all': 'All',
   'payOrder.orderSource.rpgRecharge': 'Blog recharge',
+  'payOrder.orderSource.siteTip': 'About tip',
   'payOrder.orderSource.external': 'Other',
   'payOrder.form.rechargeUid': 'Recharge uid',
   'payOrder.form.placeholder.rechargeUid': 'User uid',

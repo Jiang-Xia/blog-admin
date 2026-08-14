@@ -45,6 +45,7 @@
                 <a-option value="rpg_recharge">{{
                   t('payOrder.orderSource.rpgRecharge')
                 }}</a-option>
+                <a-option value="site_tip">{{ t('payOrder.orderSource.siteTip') }}</a-option>
               </a-select>
             </a-form-item>
             <a-form-item v-if="showRechargeFilters" :label="t('payOrder.form.rechargeUid')">
@@ -149,6 +150,9 @@
             <template #cell="{ record }">
               <a-tag v-if="record.orderSource === 'rpg_recharge'" color="purple" size="small">
                 {{ t('payOrder.orderSource.rpgRecharge') }}
+              </a-tag>
+              <a-tag v-else-if="record.orderSource === 'site_tip'" color="orangered" size="small">
+                {{ t('payOrder.orderSource.siteTip') }}
               </a-tag>
               <a-tag v-else color="gray" size="small">
                 {{ t('payOrder.orderSource.external') }}
@@ -433,7 +437,7 @@
     outTradeNo: '',
     status: undefined as string | undefined,
     subject: '',
-    orderSource: '' as '' | 'rpg_recharge',
+    orderSource: '' as '' | 'rpg_recharge' | 'site_tip',
     rechargeUid: '',
     anomalyOnly: false,
   });
@@ -637,11 +641,13 @@
 
   const submitRefund = async () => {
     const remaining = maxRefundAmount.value;
-    if (!refundForm.refundAmount || refundForm.refundAmount <= 0) {
-      Message.warning('请输入退款金额');
+    // 归一到分：避免 0.01 浮点写成 0.0100000002 被支付宝拒收
+    const amount = Number(Number(refundForm.refundAmount || 0).toFixed(2));
+    if (!(amount >= 0.01)) {
+      Message.warning('退款金额须至少 ¥0.01');
       return;
     }
-    if (refundForm.refundAmount > remaining) {
+    if (amount > remaining) {
       Message.warning(`退款金额不能超过剩余可退金额 ¥${remaining.toFixed(2)}`);
       return;
     }
@@ -649,7 +655,7 @@
     try {
       const res = (await refundPayOrder({
         out_trade_no: currentOrder.value.outTradeNo,
-        refund_amount: String(refundForm.refundAmount),
+        refund_amount: amount.toFixed(2),
         refund_reason: refundForm.refundReason || '用户申请退款',
       })) as any;
       const data = res?.data || res;
