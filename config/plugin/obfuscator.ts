@@ -2,7 +2,9 @@
  * 生产构建代码混淆：封装 vite-plugin-bundle-obfuscator。
  * 仅在 VITE_ENABLE_OBFUSCATE=true 时由 vite.config.prod 挂载。
  * autoExcludeNodeModules=false，保留项目自有 manualChunks，仅靠 excludes 跳过 vendor。
- * 反调试走 obfuscator 自带 debugProtection / disableConsoleOutput。
+ *
+ * 实测：stringArray / splitStrings / controlFlowFlattening / debugProtection
+ * 均可能弄坏登录页等 Vue scoped 样式，故保持关闭；只做标识符混淆 + 剥 console。
  *
  * options 透传 javascript-obfuscator，完整说明见：
  * https://github.com/javascript-obfuscator/javascript-obfuscator#javascript-obfuscator-options
@@ -33,43 +35,53 @@ export default function configObfuscatorPlugin(): PluginOption {
     threadPool: true, // 多线程混淆，加快大包构建
     options: {
       // —— 输出形态 ——
-      compact: true, // 压成单行，去掉多余空白
-      simplify: true, // 简化语法树，便于后续变换
+      compact: true, // 压成单行，去掉换行与多余空白
+      simplify: true, // 简化 AST（合并表达式等），便于后续变换、略减体积
 
-      // —— 控制流（提升阅读成本，有运行时开销） ——
-      controlFlowFlattening: true, // 打乱 if/循环等控制流，约可慢 1.5x
-      controlFlowFlatteningThreshold: 0.5, // 参与扁平化的节点比例 0~1，越高越慢越难读
-      deadCodeInjection: false, // 注入无用代码；关：避免包体暴涨
+      // —— 控制流 ——
+      // 把 if/for/while 等改写成 switch+状态机，难读，运行可慢约 1.5x；易弄坏 Vue 渲染 → 关
+      controlFlowFlattening: false,
+      controlFlowFlatteningThreshold: 0.75, // 参与扁平化的节点比例 0~1（仅 flattening 开启时生效）
+      // 插入永不执行的废代码，增大体积与阅读成本 → 关（包体会暴涨）
+      deadCodeInjection: false,
 
       // —— 反调试 / 控制台 ——
-      debugProtection: true, // 打开 DevTools 时用 debugger 等手段打断调试
-      debugProtectionInterval: 2000, // 每隔 N ms 复查；0 表示只检查一次
-      disableConsoleOutput: true, // 替换 console.* 为空实现，避免控制台泄信息
+      // 检测 DevTools，用 debugger 等打断调试；验证样式时请先别开 F12，以免误判
+      debugProtection: true,
+      debugProtectionInterval: 2000, // 每隔 N ms 复查
+      disableConsoleOutput: true, // 把 console.log/warn/error 等替换为空函数，减少控制台泄信息
 
       // —— 标识符 / 全局 ——
-      identifierNamesGenerator: 'hexadecimal', // 变量名风格：hexadecimal | mangled | dictionary
-      renameGlobals: false, // 是否重命名全局变量；关：避免弄坏未声明的全局引用
-      selfDefending: false, // 代码被美化/格式化后自毁；关：减少与部分打包工具冲突
-      log: false, // obfuscator 内部日志（非 Vite 插件 log）
+      identifierNamesGenerator: 'hexadecimal', // 变量/函数名风格：hexadecimal | mangled | dictionary
+      // 是否重命名全局变量；开了易弄坏未在作用域声明的全局引用 → 关
+      renameGlobals: false,
+      // 代码被美化/格式化后“自毁”（运行异常）；易与打包工具冲突 → 关
+      selfDefending: false,
+      log: false, // javascript-obfuscator 自身是否打内部日志（非 Vite 插件 log）
 
       // —— 字面量变换 ——
-      numbersToExpressions: false, // 数字改成表达式（如 123 → 0x7b^0）；关：少一点开销
-      splitStrings: true, // 长字符串拆成拼接片段
-      splitStringsChunkLength: 8, // 每段字符数
-      transformObjectKeys: false, // 是否混淆对象键名；关：避免破坏运行时依赖字面键的逻辑
-      unicodeEscapeSequence: false, // 字符串变 \uXXXX；关：可读性差且收益有限
+      // 数字改成表达式，如 123 → 0x7b^0，增加阅读成本
+      numbersToExpressions: true,
+      // 把长字符串切成多段再拼接；短 class / data-v 被切开后易与 CSS 对不齐 → 关
+      splitStrings: false,
+      splitStringsChunkLength: 10, // 每段字符数（仅 splitStrings 开启时生效）
+      // 混淆对象字面量的键名；可能影响依赖字面键的逻辑，本地验证中
+      transformObjectKeys: true,
+      // 字符串改成 \uXXXX 转义形式；体积膨胀大、收益低 → 关
+      unicodeEscapeSequence: false,
 
-      // —— 字符串数组（核心防抄手段） ——
-      stringArray: true, // 字面量抽到数组，代码里改为下标访问
+      // —— 字符串数组（核心“藏字符串”手段；会破坏 Vue scoped，整组关闭） ——
+      // 把字符串抽到数组，代码里改成 a[i] 访问；曾导致登录页样式错乱 → 关
+      stringArray: false,
       stringArrayThreshold: 0.75, // 参与抽取的字符串比例 0~1
-      stringArrayEncoding: ['base64'], // 数组项编码：[] | base64 | rc4
-      stringArrayCallsTransform: true, // 把对 stringArray 的调用再包一层，增加还原难度
-      stringArrayCallsTransformThreshold: 0.5, // 上述变换比例
-      stringArrayIndexShift: true, // 访问时对下标做偏移运算
-      stringArrayRotate: true, // 构建时旋转数组顺序
-      stringArrayShuffle: true, // 构建时打乱数组顺序
+      stringArrayEncoding: [], // 数组项编码：[] 无编码 | base64 | rc4
+      stringArrayCallsTransform: false, // 对 stringArray 的调用再包一层函数
+      stringArrayCallsTransformThreshold: 0.5, // 上述包装比例
+      stringArrayIndexShift: false, // 访问下标时做偏移运算
+      stringArrayRotate: false, // 构建时旋转数组顺序
+      stringArrayShuffle: false, // 构建时打乱数组顺序
       stringArrayWrappersCount: 1, // 访问包装函数层数
-      stringArrayWrappersChainedCalls: true, // 包装函数之间链式调用
+      stringArrayWrappersChainedCalls: false, // 包装函数之间是否链式调用
       stringArrayWrappersParametersMaxCount: 2, // 包装函数最大参数个数
       stringArrayWrappersType: 'variable', // 包装形态：variable | function
     },

@@ -120,7 +120,7 @@ VITE_ENABLE_OBFUSCATE=false
 
 | 变量 | 作用 |
 |------|------|
-| `VITE_ENABLE_OBFUSCATE` | `true` 时混淆业务 JS，并启用插件自带 `debugProtection` / `disableConsoleOutput`，同时 esbuild.drop 剥离 console/debugger（excludes 跳过 arco/vue/chart/md-editor/xlsx） |
+| `VITE_ENABLE_OBFUSCATE` | `true` 时轻量混淆业务 JS（变量名 hexadecimal + disableConsoleOutput + esbuild.drop）。**不开** stringArray / splitStrings / controlFlowFlattening / debugProtection（会破坏 Vue scoped 样式） |
 
 关闭混淆的明文构建：`npm run build:plain`。
 
