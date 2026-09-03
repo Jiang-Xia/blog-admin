@@ -1,4 +1,6 @@
 import { createApp } from 'vue';
+import ArcoVue from '@arco-design/web-vue';
+import ArcoVueIcon from '@arco-design/web-vue/es/icon';
 import globalComponents from '@/components';
 import dayjs from 'dayjs';
 import router from './router';
@@ -8,14 +10,15 @@ import directive from './directive';
 
 // import './mock';
 import App from './App.vue';
+// 全量主题 CSS：业务 less 依赖 --color-bg-* / --arcoblue-* 等变量；仅按需组件样式会漏 token
+import '@arco-design/web-vue/dist/arco.less';
 import '@/assets/style/index.less';
-// Message/Modal/Notification 为命令式 API，组件 Resolver 不会注入样式，需显式引入
-import '@arco-design/web-vue/es/message/style/css.js';
-import '@arco-design/web-vue/es/modal/style/css.js';
-import '@arco-design/web-vue/es/notification/style/css.js';
+import 'md-editor-v3/lib/style.css';
 
 const app = createApp(App);
 
+app.use(ArcoVue, { componentPrefix: 'a' });
+app.use(ArcoVueIcon);
 app.use(router);
 app.use(store);
 app.use(i18n);
