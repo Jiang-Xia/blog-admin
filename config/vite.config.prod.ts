@@ -12,10 +12,31 @@ export default mergeConfig(
     build: {
       rollupOptions: {
         output: {
-          manualChunks: {
-            arco: ['@arco-design/web-vue'],
-            chart: ['echarts', 'vue-echarts'],
-            vue: ['vue', 'vue-router', 'pinia', '@vueuse/core', 'vue-i18n'],
+          // 按需引入后模块路径为 es/*，用 id 匹配才能把实际打进包的 Arco 码收进同一 vendor
+          manualChunks(id) {
+            if (id.includes('node_modules')) {
+              if (id.includes('@arco-design')) return 'arco';
+              if (
+                id.includes('echarts') ||
+                id.includes('vue-echarts') ||
+                id.includes('echarts-wordcloud')
+              ) {
+                return 'chart';
+              }
+              if (
+                id.includes('vue-router') ||
+                id.includes('/pinia/') ||
+                id.includes('\\pinia\\') ||
+                id.includes('@vueuse/core') ||
+                id.includes('vue-i18n') ||
+                /[/\\]vue[/\\]/.test(id)
+              ) {
+                return 'vue';
+              }
+              if (id.includes('md-editor-v3')) return 'md-editor';
+              if (id.includes('xlsx')) return 'xlsx';
+            }
+            return undefined;
           },
           // 1.用于自定义构建结果中的静态资源名称
           // 2.定义各类型文件的目录分类

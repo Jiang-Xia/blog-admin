@@ -308,7 +308,6 @@
   import { userInfo } from '@/api/login';
   import { Message, Modal } from '@arco-design/web-vue';
   import request from '@/api/request';
-  import * as XLSX from 'xlsx';
   import { COVER_IMAGE } from '@/utils/image-compress';
 
   const coverThumbWidth = 56;
@@ -505,6 +504,9 @@
       }
 
       exportLoading.value = true;
+
+      // 导出时再加载 xlsx，避免列表页首包携带整库
+      const XLSX = await import('xlsx');
 
       // 使用勾选的数据进行导出
       const articles = selectedRows.value.map((v) => {

@@ -5,7 +5,8 @@
   import { useUserStore } from '@/store';
   import request from '@/api/request';
 
-  import { Message, Modal, FileItem, Input, Select } from '@arco-design/web-vue';
+  import { Message, Modal, Input, Select } from '@arco-design/web-vue';
+  import type { FileItem } from '@arco-design/web-vue';
   import { useClipboard } from '@vueuse/core';
   import { xAdminStore } from '@/utils';
   import useLoading from '@/hooks/loading';
