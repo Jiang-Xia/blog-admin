@@ -12,7 +12,7 @@ export default defineConfig({
     vue(),
     vueJsx(),
     svgLoader({ svgoConfig: {} }),
-    // 按需自动导入 Message 等 API；样式由 Components sideEffect 与 main.ts 命令式样式兜底
+    // Message 等 API：AutoImport 解析；样式在 main.ts 命令式兜底（见 Arco 按需文档）
     AutoImport({
       resolvers: [ArcoResolver()],
     }),

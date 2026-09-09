@@ -2,6 +2,7 @@
  * Arco Design 组件 / Icon 按需自动注册，并注入对应 css sideEffect。
  * https://github.com/antfu/unplugin-vue-components
  * https://arco.design/vue/docs/start
+ * main.ts 不再 app.use(ArcoVue)；全局仅保留 es/style token。
  */
 import Components from 'unplugin-vue-components/vite';
 import { ArcoResolver } from 'unplugin-vue-components/resolvers';

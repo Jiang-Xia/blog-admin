@@ -35,7 +35,7 @@ export default defineConfig(({ mode }) => {
             // 按需引入后模块路径为 es/*，用 id 匹配才能把实际打进包的 Arco 码收进同一 vendor
             manualChunks(id) {
               if (id.includes('node_modules')) {
-                if (id.includes('@arco-design')) return 'arco';
+                // Arco 不单独 manualChunks：否则全站用过的组件会并进同一包并被 entry preload
                 if (
                   id.includes('echarts') ||
                   id.includes('vue-echarts') ||
