@@ -13,7 +13,6 @@ import App from './App.vue';
 // 全量主题 CSS：业务 less 依赖 --color-bg-* / --arcoblue-* 等变量；仅按需组件样式会漏 token
 import '@arco-design/web-vue/dist/arco.less';
 import '@/assets/style/index.less';
-import 'md-editor-v3/lib/style.css';
 
 const app = createApp(App);
 

@@ -18,6 +18,7 @@
   const { t } = useI18n();
   import useLoading from '@/hooks/loading';
   import useChartOption from '@/hooks/chart-option';
+  import Chart from '@/components/chart/index.vue';
   import { ref, computed } from 'vue';
   import type { ListState } from '@/types/global';
   import { getAllCategory } from '@/api/category';

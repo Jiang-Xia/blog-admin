@@ -164,12 +164,16 @@
   import { Message, Modal } from '@arco-design/web-vue';
   import { useRoute, useRouter } from 'vue-router';
   import type { ValidatedError } from '@arco-design/web-vue/es/form/interface';
-  // import { computed, onBeforeUnmount, onMounted } from 'vue'
-  import { MdEditor } from 'md-editor-v3';
-  // 仅文章编辑页需要，避免全局打进首包 CSS
-  import 'md-editor-v3/lib/style.css';
+  import { defineAsyncComponent } from 'vue';
   import { useAppStore, useTabBarStore } from '@/store';
   import { useTableNoPageList } from '@/hooks/data';
+
+  /** 编辑页再拉 md-editor，避免打进登录首包 */
+  const MdEditor = defineAsyncComponent(async () => {
+    await import('md-editor-v3/lib/style.css');
+    const mod = await import('md-editor-v3');
+    return mod.MdEditor;
+  });
 
   const { t } = useI18n();
   const appStore = useAppStore();

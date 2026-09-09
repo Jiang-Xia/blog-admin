@@ -53,7 +53,7 @@ export default defineConfig(({ mode }) => {
                 ) {
                   return 'vue';
                 }
-                if (id.includes('md-editor-v3')) return 'md-editor';
+                // md-editor 不单独 manualChunks：否则共享导出易被 entry/layout 静态依赖，登录页仍会 preload
                 if (id.includes('xlsx')) return 'xlsx';
               }
               return undefined;

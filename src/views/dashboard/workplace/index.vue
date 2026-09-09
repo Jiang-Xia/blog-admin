@@ -41,7 +41,6 @@
   import dayjs from 'dayjs';
   import request from '@/api/request';
   import { onMounted, reactive, ref } from 'vue';
-  import guidance from '@/utils/guidance';
   import Banner from './components/banner.vue';
   import DataPanel from './components/data-panel.vue';
   import ContentChart from './components/content-chart.vue';
@@ -103,7 +102,11 @@
       loadedData.value = true;
       console.log(loadedData.value);
     });
-  onMounted(guidance);
+  // 引导脚本按需加载，避免首包携带 shepherd
+  onMounted(async () => {
+    const { default: guidance } = await import('@/utils/guidance');
+    guidance();
+  });
 </script>
 
 <script lang="ts">
