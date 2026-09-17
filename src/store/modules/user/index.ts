@@ -4,7 +4,7 @@ import { setToken, clearToken, getToken } from '@/utils/auth';
 import { removeRouteListener } from '@/utils/route-listener';
 import { userInfo, userLogin } from '@/api/login';
 // import { UserState } from './types';
-import { rsaEncrypt } from '@/utils/crypto';
+import { encryptLoginPassword } from '@/utils/gateway-crypto';
 import useAppStore from '../app';
 
 interface UserState {
@@ -86,7 +86,7 @@ const useUserStore = defineStore('user', {
               username: accountLogin.username,
               authCode: accountLogin.authCode,
               captchaId: accountLogin.captchaId,
-              password: rsaEncrypt(accountLogin.password),
+              password: encryptLoginPassword(accountLogin.password),
               admin: true,
             },
             'account',

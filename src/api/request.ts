@@ -3,16 +3,19 @@ import { Message, Modal } from '@arco-design/web-vue';
 import { useUserStore } from '@/store';
 import { getToken } from '@/utils/auth';
 import { baseUrl } from '@/config';
-import { aesEncrypt, aesDecrypt } from '@/utils/crypto';
+import {
+  createGatewayEnvelope,
+  createGatewayKeyHeaders,
+  openGatewayEnvelope,
+  type GatewaySession,
+} from '@/utils/gateway-crypto';
 
-// 线上“紧急开关”：本地缓存有值则关闭加密（key 需尽量隐晦，避免被随意调试）
-// 规则：长一些 + 含项目指纹（admin）但不直白暴露项目名/用途
+// 线上“紧急开关”：本地缓存有值则关闭加密
 const DISABLE_ENCRYPT_STORAGE_KEY = '__bxp__spa_admin__k3Y9p2__fuse__v1';
 const openEncryptByEnv = import.meta.env.VITE_NUXT_OPEN_ENCRYPT === 'true';
 const openEncrypt =
   openEncryptByEnv &&
   (() => {
-    // 线上部署时支持通过本地缓存一键关闭加密（有值即关闭）
     if (import.meta.env.MODE !== 'production') {
       return true;
     }
@@ -22,42 +25,16 @@ const openEncrypt =
       return true;
     }
   })();
+
 const isMultipartBody = (body: unknown): body is FormData => {
   return typeof FormData !== 'undefined' && body instanceof FormData;
 };
 
-// 加密请求 body
-const encryptMsg = (body: any, url: string) => {
-  const bool = url.includes('encrypt');
-  // FormData 不能 JSON 序列化，加密会破坏 multipart 文件上传
-  if (bool && body && isMultipartBody(body)) {
-    return body;
-  }
-  if (bool && body) {
-    // console.log('encryptMsg-body====>', JSON.stringify(body));
-    body = aesEncrypt(JSON.stringify(body));
-    // console.log('encryptMsg-body====>', body)
-    // console.log('encryptMsg-body====>', { content: body, })
-    return {
-      content: body,
-    };
-  }
-  return body;
+/** 在 axios config 上挂载本请求网关会话，供响应拦截器验签解密 */
+type GatewayAxiosConfig = InternalAxiosRequestConfig & {
+  gatewaySession?: GatewaySession | null;
 };
 
-// 解密响应 body
-const decryptMsg = (body: any, url: string) => {
-  const bool = url.includes('encrypt');
-  if (bool && body && body.content) {
-    body = aesDecrypt(body.content);
-    body = JSON.parse(body);
-    // console.log('decryptMsg-body', body);
-    return body;
-  }
-  return body;
-};
-
-// 自定义请求和相应拦截器
 export interface HttpResponse<T = unknown> {
   status: number;
   message: string;
@@ -78,36 +55,48 @@ function errorMsg(msg: string) {
   Message.error(msg);
 }
 const request = axios.create();
-// 设置代理需配置不能为全网址
 request.defaults.baseURL = baseUrl;
 if (openEncrypt) {
   request.defaults.baseURL = `${baseUrl}/encrypt`;
 }
+
 request.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    // let each request carry token
-    // this example using the JWT token
-    // Authorization is a custom headers key
-    // please modify it according to the actual situation
     const token = getToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-      // console.log('token2: ', config.headers.Authorization);
     }
-    config.data = encryptMsg(config.data, config.baseURL as string);
+
+    const gwConfig = config as GatewayAxiosConfig;
+    if (openEncrypt) {
+      const data = config.data;
+      if (data && !isMultipartBody(data)) {
+        const packed = createGatewayEnvelope(data);
+        config.data = packed.envelope;
+        gwConfig.gatewaySession = packed.session;
+      } else {
+        // GET/DELETE/multipart：头传 encKey，响应仍加密
+        const keyed = createGatewayKeyHeaders();
+        config.headers = {
+          ...(config.headers as Record<string, string>),
+          ...keyed.headers,
+        } as InternalAxiosRequestConfig['headers'];
+        gwConfig.gatewaySession = keyed.session;
+      }
+    }
     return config;
   },
-  (error) => {
-    // do something
-    return Promise.reject(error);
-  },
+  (error) => Promise.reject(error),
 );
-// add response interceptors
+
 request.interceptors.response.use(
-  (response: AxiosResponse<HttpResponse>) => {
-    const res = decryptMsg(response.data, response.config.baseURL as string);
-    const { status } = response; // http自带状态码
-    // if the custom code is not 20000, it is judged as an error.
+  (response: AxiosResponse) => {
+    const gwConfig = response.config as GatewayAxiosConfig;
+    let res: any = response.data;
+    if (openEncrypt && res?.content && res?.iv && gwConfig.gatewaySession) {
+      res = openGatewayEnvelope(res, gwConfig.gatewaySession);
+    }
+    const { status } = response;
     if ((status >= 200 && status < 300) || status === 304) {
       if (res?.code !== undefined && res.code !== 200) {
         Message.error(res.message || 'Error');
@@ -123,18 +112,16 @@ request.interceptors.response.use(
   },
   (error) => {
     console.error('error: ', error);
-    const base = error.response?.config?.baseURL as string | undefined;
+    const gwConfig = error.response?.config as GatewayAxiosConfig | undefined;
     const rawData = error.response && error.response.data;
-    // 开启加密时，后端异常也可能是加密包裹的 { content }，这里需要同步解密才能拿到真实 message/bizCode
     let data: any = rawData;
     try {
-      if (base && typeof base === 'string') {
-        data = decryptMsg(rawData, base);
+      if (openEncrypt && rawData?.content && rawData?.iv && gwConfig?.gatewaySession) {
+        data = openGatewayEnvelope(rawData, gwConfig.gatewaySession);
       }
     } catch {
       data = rawData;
     }
-    // 统一错误结构，方便调用方按 code/status/requestId 做精细化处理。
     const requestId =
       error.response?.headers?.['x-request-id'] || error.response?.headers?.['request-id'];
     const requestError: AppRequestError = {
@@ -168,7 +155,6 @@ request.interceptors.response.use(
           errorMsg(requestError.message || '请求失败');
       }
     } else if (error.message.includes('timeout')) {
-      // 请求超时或者网络有问题
       errorMsg('请求超时，请稍后重试');
     } else {
       errorMsg('请求失败，请检查网络是否已连接');
