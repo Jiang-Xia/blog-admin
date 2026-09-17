@@ -1,6 +1,6 @@
 /**
  * 遗留静态 AES / RSA 工具。
- * HTTP 网关请用 utils/gateway-crypto.ts；本文件 CryptoJS 按需引入。
+ * HTTP 网关请用 utils/gateway-crypto/；本文件 CryptoJS 按需引入。
  */
 import AES from 'crypto-js/aes';
 import Base64 from 'crypto-js/enc-base64';
