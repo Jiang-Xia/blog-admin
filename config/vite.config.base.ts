@@ -12,35 +12,11 @@ export default defineConfig({
     vue(),
     vueJsx(),
     svgLoader({ svgoConfig: {} }),
+    // Message 等 API：AutoImport 解析；样式在 main.ts 命令式兜底（见 Arco 按需文档）
     AutoImport({
       resolvers: [ArcoResolver()],
     }),
     configArcoResolverPlugin(),
-
-    // VitePWA({
-    //   registerType: 'autoUpdate',
-    //   includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
-    //   manifest: {
-    //     icons: [
-    //       {
-    //         src: 'logo.png',
-    //         sizes: '192x192',
-    //         type: 'image/png',
-    //       },
-    //       {
-    //         src: 'logo.png',
-    //         sizes: '512x512',
-    //         type: 'image/png',
-    //       },
-    //       {
-    //         src: 'logo.png',
-    //         sizes: '512x512',
-    //         type: 'image/png',
-    //         purpose: 'any maskable',
-    //       },
-    //     ],
-    //   },
-    // }),
   ],
   resolve: {
     alias: [

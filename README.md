@@ -113,7 +113,16 @@ src/
 VITE_API_BASE_URL=http://localhost:5000/api/v1
 VITE_PREFIX_PATH=/x-blog
 VITE_NUXT_OPEN_ENCRYPT=false
+VITE_ENABLE_OBFUSCATE=false
 ```
+
+生产构建开关（`.env.production`，默认开启）：
+
+| 变量 | 作用 |
+|------|------|
+| `VITE_ENABLE_OBFUSCATE` | `true` 时轻量混淆业务 JS（变量名 hexadecimal + disableConsoleOutput + esbuild.drop）。**不开** stringArray / splitStrings / controlFlowFlattening / debugProtection（会破坏 Vue scoped 样式） |
+
+关闭混淆的明文构建：`npm run build:plain`。
 
 ### 推荐IDE
 - [VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.volar) - Vue3 官方推荐的开发工具
@@ -135,6 +144,8 @@ yarn dev
 ### 生产构建
 ```bash
 npm run build
+# 关闭混淆
+npm run build:plain
 ```
 
 ### 一键部署（生产静态）

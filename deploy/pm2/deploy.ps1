@@ -102,15 +102,18 @@ function Copy-ToRemote {
 Write-Host "==> Remote static dir: $RemoteDir"
 Write-Host "==> Build env: .env.production (project root)"
 
-# [1/4] 本地 Vite 生产构建
+# [1/4] 本地 Vite 生产构建（依赖由本地维护；DEPLOY_NPM_CI=1 时才强制 npm ci）
 Write-Host '==> [1/4] Build'
 Push-Location $Root
-npm ci --ignore-scripts   # 跳过 husky postinstall
-npm run build
-Pop-Location
-
-if (-not (Test-Path (Join-Path $Root 'dist/index.html'))) {
-  throw 'Build failed: dist/index.html not found'
+try {
+  if ($env:DEPLOY_NPM_CI -eq '1') {
+    npm ci --ignore-scripts
+    if ($LASTEXITCODE -ne 0) { throw 'npm ci failed' }
+  }
+  npm run build
+  if ($LASTEXITCODE -ne 0) { throw 'Build failed' }
+} finally {
+  Pop-Location
 }
 
 # [2/4] 仅打包 dist 目录内容（tar 根即 index.html）

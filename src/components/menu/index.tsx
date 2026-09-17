@@ -2,6 +2,9 @@ import { defineComponent, ref, computed, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter, type RouteRecordRaw } from 'vue-router';
 import type { RouteMeta } from 'vue-router';
+// TSX 无法走 unplugin 模板按需解析，须显式引入，否则 resolveComponent('a-menu') 会落到无样式自定义标签
+import { Menu, SubMenu, MenuItem } from '@arco-design/web-vue';
+import '@arco-design/web-vue/es/menu/style/css.js';
 import { useAppStore } from '@/store';
 import { listenerRouteChange } from '@/utils/route-listener';
 import { openWindow, regexUrl } from '@/utils';
@@ -102,7 +105,7 @@ export default defineComponent({
               : null;
             const node =
               element?.children && element?.children.length !== 0 ? (
-                <a-sub-menu
+                <SubMenu
                   key={element?.name}
                   v-slots={{
                     icon,
@@ -110,11 +113,11 @@ export default defineComponent({
                   }}
                 >
                   {travel(element?.children)}
-                </a-sub-menu>
+                </SubMenu>
               ) : (
-                <a-menu-item key={element?.name} v-slots={{ icon }} onClick={() => goto(element)}>
+                <MenuItem key={element?.name} v-slots={{ icon }} onClick={() => goto(element)}>
                   {element?.meta?.locale ? t(element?.meta?.locale) : ''}
-                </a-menu-item>
+                </MenuItem>
               );
             nodes.push(node as never);
           });
@@ -125,7 +128,7 @@ export default defineComponent({
     };
 
     return () => (
-      <a-menu
+      <Menu
         v-model:collapsed={collapsed.value}
         v-model:open-keys={openKeys.value}
         show-collapse-button={appStore.device !== 'mobile'}
@@ -138,7 +141,7 @@ export default defineComponent({
         accordion
       >
         {renderSubMenu()}
-      </a-menu>
+      </Menu>
     );
   },
 });

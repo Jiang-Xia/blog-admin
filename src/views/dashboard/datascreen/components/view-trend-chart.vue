@@ -18,6 +18,7 @@
   import { useI18n } from 'vue-i18n';
   import useChartOption from '@/hooks/chart-option';
   import { graphic } from 'echarts';
+  import Chart from '@/components/chart/index.vue';
 
   const { t } = useI18n();
 

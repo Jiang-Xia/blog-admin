@@ -5,7 +5,11 @@
   import { useUserStore } from '@/store';
   import request from '@/api/request';
 
-  import { Message, Modal, FileItem, Input, Select } from '@arco-design/web-vue';
+  import { Message, Modal, Input, Select } from '@arco-design/web-vue';
+  import type { FileItem } from '@arco-design/web-vue';
+  // h() 渲染的 Input/Select 不会走模板 resolver，需显式拉样式
+  import '@arco-design/web-vue/es/input/style/css.js';
+  import '@arco-design/web-vue/es/select/style/css.js';
   import { useClipboard } from '@vueuse/core';
   import { xAdminStore } from '@/utils';
   import useLoading from '@/hooks/loading';

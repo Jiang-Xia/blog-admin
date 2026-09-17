@@ -1,11 +1,9 @@
-export const publicKey = `
------BEGIN PUBLIC KEY-----
+export const publicKey = `-----BEGIN PUBLIC KEY-----
 MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAMbhQdr30GxvE3SYAJVILYLo7/6XqAnm
 5hHesj5X+Ub76s45DBuI3ip+qIsnFKMaX8gKDYcUzqiKDjeOJLD/910CAwEAAQ==
------END PUBLIC KEY-----
-`;
-export const privateKey = `
------BEGIN PRIVATE KEY-----
+-----END PUBLIC KEY-----`;
+
+export const privateKey = `-----BEGIN PRIVATE KEY-----
 MIIBUgIBADANBgkqhkiG9w0BAQEFAASCATwwggE4AgEAAkEAxuFB2vfQbG8TdJgA
 lUgtgujv/peoCebmEd6yPlf5RvvqzjkMG4jeKn6oiycUoxpfyAoNhxTOqIoON44k
 sP/3XQIDAQABAkEAgI12Pg3VYWHjF4hxSA1hra7YAp8Q9WWU7ZQfbwD6lpB4F27o
@@ -14,12 +12,19 @@ JTTJDt8OlDILLKJ4H8lPAiEA3jWW8xAiXT0CPHsr6kb0t55O6ZaqKCOUSYFybcsE
 8ZMCH07CgvS/UnANKROqrj2i9MWDF0cN1g7W9Bo/vRgcMtECIBeebpsLXfu3HmO7
 W+GdBSn3Q8AEabW2gm6Fudn9uFrNAh9iGHgttb3Xm3RlGIlqKq1hWZX8k5uAjJ1C
 oeSH/2K8
------END PRIVATE KEY-----
-`;
-// 服务端公钥
-export const serverPublicKey = `
------BEGIN PUBLIC KEY-----
-MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAL9r8jKkfORpiunFylF4XwvNi06sTD3N
-4hYLAmGNmviZ1IhCnu4VZ0sShdj7LYfh/Rw5IuqY55XXr6zVB/LzQ70CAwEAAQ==
------END PUBLIC KEY-----
-`;
+-----END PRIVATE KEY-----`;
+
+/** 服务端 RSA 公钥（2048），登录与 gatewayCrypto=aes 封 key 共用 */
+export const serverPublicKey = `-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqoyuytldk/BDUvuGUDwW
+RplrndYgD0rS+5iP3OOMLH6peR/mjCNkeBQWHmXMfl6KXfwNncYkqtUzANqE7fOv
+AoYtiDsnoCAhifhCqIp8+6a0k4WfPztOMSfXyWsTKG85kyMseXE1EWQ+Dy5C0WA8
+7adrEr2ceR+jPbsWZA1byQfaL/sHTm9DrcP3QNM9RSVG5tiRQlG8cGSuM3WaKKsA
+Fp6wIfkDfKkTXLxQq8C+foFciklA9bCy7gy8k9myT7n+6XIjAIOxeGhcGavB6fAW
+wKSr0Q6iopAGJBye+/4pdeuJjdr2MkYR6442lSuBTmNdYKJv/4r3TSGG5u9Inl57
+owIDAQAB
+-----END PUBLIC KEY-----`;
+
+/** 服务端 SM2 公钥，gatewayCrypto=gm 时登录与封 key 共用 */
+export const serverSm2PublicKey =
+  '0405cb0f1a59c22f9dadf6d000f084388df10a413cdcc34578b140e1d9f7478315e9785e9f4428864c571cc3b593ec519b5d3f282178b8bfb581f963c7429e5d45';

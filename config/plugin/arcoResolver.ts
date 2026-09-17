@@ -1,24 +1,22 @@
 /**
- * If you use the template method for development, you can use the unplugin-vue-components plugin to enable on-demand loading support.
- * 按需引入
+ * Arco Design 组件 / Icon 按需自动注册，并注入对应 css sideEffect。
  * https://github.com/antfu/unplugin-vue-components
  * https://arco.design/vue/docs/start
- * Although the Pro project is full of imported components, this plugin will be used by default.
- * 虽然Pro项目中是全量引入组件，但此插件会默认使用。
+ * main.ts 不再 app.use(ArcoVue)；全局仅保留 es/style token。
  */
 import Components from 'unplugin-vue-components/vite';
 import { ArcoResolver } from 'unplugin-vue-components/resolvers';
 
 export default function configArcoResolverPlugin() {
-  const arcoResolverPlugin = Components({
-    dirs: [], // Avoid parsing src/components.  避免解析到src/components
+  return Components({
+    dirs: [], // Avoid parsing src/components.  避免解析到 src/components
     deep: false,
     resolvers: [
       ArcoResolver({
         sideEffect: true,
         resolveIcons: true,
+        importStyle: 'css',
       }),
     ],
   });
-  return arcoResolverPlugin;
 }

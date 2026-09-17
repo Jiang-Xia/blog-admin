@@ -14,6 +14,7 @@
   import { ref, onMounted, watch } from 'vue';
   import { useI18n } from 'vue-i18n';
   import useChartOption from '@/hooks/chart-option';
+  import Chart from '@/components/chart/index.vue';
   import 'echarts-wordcloud';
 
   const { t } = useI18n();
