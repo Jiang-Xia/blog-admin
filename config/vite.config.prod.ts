@@ -24,7 +24,7 @@ export default defineConfig(({ mode }) => {
       build: {
         // 混淆场景下勿产出 sourcemap，避免映射回源码
         sourcemap: false,
-        // 与混淆一并：构建期剥离 console / debugger（插件另有 disableConsoleOutput / debugProtection）
+        // 与混淆一并：构建期剥离 console / debugger（插件另有 disableConsoleOutput）
         esbuild: enableObfuscate
           ? {
               drop: ['console', 'debugger'],

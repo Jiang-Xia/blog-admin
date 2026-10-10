@@ -120,7 +120,7 @@ VITE_ENABLE_OBFUSCATE=false
 
 | 变量 | 作用 |
 |------|------|
-| `VITE_ENABLE_OBFUSCATE` | `true` 时轻量混淆业务 JS（变量名 hexadecimal + disableConsoleOutput + esbuild.drop）。**不开** stringArray / splitStrings / controlFlowFlattening / debugProtection（会破坏 Vue scoped 样式） |
+| `VITE_ENABLE_OBFUSCATE` | `true` 时轻量混淆业务 JS（变量名 hexadecimal + disableConsoleOutput + esbuild.drop）。**不开** stringArray / splitStrings / controlFlowFlattening / debugProtection / transformObjectKeys（前几项破坏 Vue scoped；`transformObjectKeys` 会导致登录表单校验读到 null） |
 
 关闭混淆的明文构建：`npm run build:plain`。
 

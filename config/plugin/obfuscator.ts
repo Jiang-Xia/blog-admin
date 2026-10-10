@@ -3,8 +3,13 @@
  * 仅在 VITE_ENABLE_OBFUSCATE=true 时由 vite.config.prod 挂载。
  * autoExcludeNodeModules=false，保留项目自有 manualChunks，仅靠 excludes 跳过 vendor。
  *
- * 实测：stringArray / splitStrings / controlFlowFlattening / debugProtection
- * 均可能弄坏登录页等 Vue scoped 样式，故保持关闭；只做标识符混淆 + 剥 console。
+ * 实测勿开（会破坏 Vue / Arco 运行时）：
+ * - stringArray / splitStrings → Vue scoped 样式对不齐
+ * - controlFlowFlattening / debugProtection → 渲染/调试异常
+ * - transformObjectKeys → 表单 model 键与 field="password" 等字面量错位，
+ *   校验时报 Cannot read properties of null (reading 'password'|'username'|'authCode')
+ *
+ * 安全默认：仅 hexadecimal 标识符 + compact/simplify + disableConsoleOutput。
  *
  * options 透传 javascript-obfuscator，完整说明见：
  * https://github.com/javascript-obfuscator/javascript-obfuscator#javascript-obfuscator-options
@@ -46,9 +51,9 @@ export default function configObfuscatorPlugin(): PluginOption {
       deadCodeInjection: false,
 
       // —— 反调试 / 控制台 ——
-      // 检测 DevTools，用 debugger 等打断调试；验证样式时请先别开 F12，以免误判
-      debugProtection: true,
-      debugProtectionInterval: 2000, // 每隔 N ms 复查
+      // 检测 DevTools 并插入 debugger；与 README / .env 约定一致保持关闭
+      debugProtection: false,
+      debugProtectionInterval: 0,
       disableConsoleOutput: true, // 把 console.log/warn/error 等替换为空函数，减少控制台泄信息
 
       // —— 标识符 / 全局 ——
@@ -60,13 +65,13 @@ export default function configObfuscatorPlugin(): PluginOption {
       log: false, // javascript-obfuscator 自身是否打内部日志（非 Vite 插件 log）
 
       // —— 字面量变换 ——
-      // 数字改成表达式，如 123 → 0x7b^0，增加阅读成本
-      numbersToExpressions: true,
+      // 数字改成表达式易拖慢热路径，收益低 → 关
+      numbersToExpressions: false,
       // 把长字符串切成多段再拼接；短 class / data-v 被切开后易与 CSS 对不齐 → 关
       splitStrings: false,
       splitStringsChunkLength: 10, // 每段字符数（仅 splitStrings 开启时生效）
-      // 混淆对象字面量的键名；可能影响依赖字面键的逻辑，本地验证中
-      transformObjectKeys: true,
+      // 改对象字面量键名会弄坏 Arco Form field ↔ model 绑定 → 必须关
+      transformObjectKeys: false,
       // 字符串改成 \uXXXX 转义形式；体积膨胀大、收益低 → 关
       unicodeEscapeSequence: false,
 
