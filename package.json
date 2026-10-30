@@ -45,6 +45,7 @@
     "dayjs": "^1.11.23",
     "echarts": "^6.1.0",
     "echarts-wordcloud": "^2.1.0",
+    "go-captcha-vue": "^2.0.7",
     "jsencrypt": "^3.5.4",
     "md-editor-v3": "^7.0.0",
     "mitt": "^3.0.1",

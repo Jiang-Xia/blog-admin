@@ -72,41 +72,8 @@
             </template>
           </a-input-password>
         </a-form-item>
-        <a-form-item
-          field="authCode"
-          :rules="[{ required: true, message: '验证码必填' }]"
-          :validate-trigger="['change', 'blur']"
-          hide-label
-        >
-          <a-input
-            :model-value="userInfo.authCode"
-            :placeholder="t('login.form.imageCode.placeholder')"
-            allow-clear
-            :max-length="GRAPHIC_CAPTCHA_LENGTH"
-            :input-attrs="graphicCaptchaNativeInputAttrs"
-            @update:model-value="onGraphicCaptchaModelUpdate"
-          >
-            <template #suffix>
-              <template v-if="authCodeUrl && !authCodeLoadError">
-                <img
-                  class="captcha-img"
-                  :src="authCodeUrl"
-                  alt="验证码"
-                  @click="changeAuthCodeUrlDebounced"
-                  @error="authCodeLoadError = true"
-                />
-              </template>
-              <button
-                v-else
-                class="captcha-placeholder"
-                type="button"
-                @click="changeAuthCodeUrlDebounced"
-              >
-                点击获取
-              </button>
-            </template>
-          </a-input>
-        </a-form-item>
+        <!-- 进页随机；graphic 内嵌，slide/click/rotate 点登录后弹窗 -->
+        <LoginHumanCheck ref="humanCheckRef" />
       </template>
 
       <!-- 邮箱登录表单 -->
@@ -160,11 +127,8 @@
 
       <a-space :size="16" direction="vertical">
         <div class="login-form-password-actions">
-          <a-checkbox
-            checked="rememberAccount"
-            :model-value="loginConfig.rememberAccount"
-            @change="setRememberAccount as any"
-          >
+          <!-- 仅记住账号/邮箱，绝不落盘密码（与「记住密码」区分） -->
+          <a-checkbox :model-value="loginConfig.rememberAccount" @change="onRememberAccountChange">
             {{ t('login.form.rememberAccount') }}
           </a-checkbox>
           <a-link>{{ t('login.form.forgetPassword') }}</a-link>
@@ -183,7 +147,6 @@
 
 <script lang="ts" setup>
   import { ref, reactive, onUnmounted, watch } from 'vue';
-  import { useDebounceFn } from '@vueuse/core';
   import { useRoute, useRouter } from 'vue-router';
   import { Message } from '@arco-design/web-vue';
   import type { ValidatedError } from '@arco-design/web-vue/es/form/interface';
@@ -192,19 +155,18 @@
   import { useUserStore } from '@/store';
   import useLoading from '@/hooks/loading';
   import type { LoginData } from '@/api/user';
-  import { getAuthCode, getEmailAuthCode } from '@/api/login';
+  import { getEmailAuthCode } from '@/api/login';
   import { shouldRefreshGraphicCaptcha } from '@/constants/graphic-captcha-error';
   import {
     createSanitizedModelUpdater,
     EMAIL_VERIFICATION_CODE_LENGTH,
     emailVerificationCodeNativeInputAttrs,
-    GRAPHIC_CAPTCHA_LENGTH,
-    graphicCaptchaNativeInputAttrs,
     sanitizeEmailVerificationCodeInput,
-    sanitizeGraphicCaptchaInput,
     watchCaptchaInput,
   } from '@/utils/captcha-input';
   import { LOGIN_ACCOUNT_MAX_LENGTH, isLoginAccount } from '@/utils/username';
+  import LoginHumanCheck from './login-human-check.vue';
+  import type { AdminHumanPayload } from './login-human-check.vue';
 
   const router = useRouter();
   const { t } = useI18n();
@@ -212,13 +174,19 @@
   const { loading, setLoading } = useLoading();
   const userStore = useUserStore();
   const { query } = useRoute();
+  const humanCheckRef = ref<{
+    ensureReady: () => Promise<AdminHumanPayload | null>;
+    reset: () => Promise<void>;
+  } | null>(null);
 
-  // 登录方式：account 或 email
-  const loginType = ref<'account' | 'email'>('account');
-
+  /**
+   * 记住账号：localStorage（VueUse useStorage）只存账号标识与开关，不存密码。
+   * 常见做法是「记住账号」≠「记住密码」；密码由浏览器 Password Manager 处理更安全。
+   */
   const loginConfig = useStorage('login-config', {
     rememberAccount: true,
-    username: '', // 演示默认值
+    loginType: 'account' as 'account' | 'email',
+    username: '',
     email: '',
   });
   // 清理历史版本遗留的明文密码字段，避免继续持久化敏感信息。
@@ -229,22 +197,18 @@
     delete (loginConfig.value as Record<string, unknown>).emailPassword;
   }
 
+  // 登录方式：随记住账号一并回填，方便下次直接进上次用的入口
+  const loginType = ref<'account' | 'email'>(
+    loginConfig.value.loginType === 'email' ? 'email' : 'account',
+  );
+
   const userInfo = reactive({
-    username: loginConfig.value.username,
+    username: loginConfig.value.rememberAccount ? loginConfig.value.username || '' : '',
     password: '',
-    authCode: '',
-    email: loginConfig.value.email,
+    email: loginConfig.value.rememberAccount ? loginConfig.value.email || '' : '',
     emailAuthCode: '',
   });
 
-  watchCaptchaInput(
-    () => userInfo.authCode,
-    (value) => {
-      userInfo.authCode = value;
-    },
-    sanitizeGraphicCaptchaInput,
-    watch,
-  );
   watchCaptchaInput(
     () => userInfo.emailAuthCode,
     (value) => {
@@ -254,9 +218,6 @@
     watch,
   );
 
-  const onGraphicCaptchaModelUpdate = createSanitizedModelUpdater((value) => {
-    userInfo.authCode = value;
-  }, sanitizeGraphicCaptchaInput);
   const onEmailAuthCodeModelUpdate = createSanitizedModelUpdater((value) => {
     userInfo.emailAuthCode = value;
   }, sanitizeEmailVerificationCodeInput);
@@ -280,16 +241,21 @@
     values: Record<string, any>;
   }) => {
     if (!errors) {
-      setLoading(true);
       try {
         // 根据登录方式准备登录数据
         let loginData: LoginData;
         if (loginType.value === 'account') {
+          // slide/click/rotate 先弹窗（此时不进入 loading）；取消则中断
+          const human = (await humanCheckRef.value?.ensureReady()) || null;
+          if (!human) {
+            return;
+          }
           loginData = {
             username: values.username,
             password: values.password,
-            authCode: values.authCode,
-            captchaId: captchaId.value,
+            ...(human.captchaVerification
+              ? { captchaVerification: human.captchaVerification }
+              : { authCode: human.authCode, captchaId: human.captchaId }),
           };
         } else {
           loginData = {
@@ -298,6 +264,7 @@
           };
         }
 
+        setLoading(true);
         await userStore.login(loginData);
         const { redirect, ...othersQuery } = router.currentRoute.value.query;
         router.push({
@@ -307,20 +274,11 @@
           },
         });
         Message.success(t('login.form.login.success'));
-        const { rememberAccount } = loginConfig.value;
-
-        // 保存登录信息
-        if (loginType.value === 'account') {
-          loginConfig.value.username = rememberAccount ? values.username : '';
-        } else {
-          loginConfig.value.email = rememberAccount ? values.email : '';
-        }
+        persistRememberedAccount(values);
       } catch (err: any) {
         errorMessage.value = err?.message || '';
         if (loginType.value === 'account' && shouldRefreshGraphicCaptcha(err?.bizCode)) {
-          void changeAuthCodeUrl();
-          userInfo.authCode = '';
-          captchaId.value = '';
+          void humanCheckRef.value?.reset();
         }
       } finally {
         setLoading(false);
@@ -328,31 +286,33 @@
     }
   };
 
-  const setRememberAccount = (value: boolean) => {
-    loginConfig.value.rememberAccount = value;
-  };
-
-  // 图片验证码
-  const authCodeUrl = ref('');
-  const changeAuthCodeUrl = async () => {
-    try {
-      const res = await getAuthCode();
-      authCodeUrl.value = `data:image/svg+xml;base64,${res.captchaBase64}`;
-      captchaId.value = res.captchaId || '';
-      authCodeLoadError.value = false;
-    } catch {
-      authCodeUrl.value = '';
-      captchaId.value = '';
-      authCodeLoadError.value = true;
-      // 错误提示由 axios 全局拦截器统一处理
+  /** 登录成功后按开关写入/清空本地账号（useStorage 自动同步 localStorage） */
+  const persistRememberedAccount = (values: Record<string, any>) => {
+    loginConfig.value.loginType = loginType.value;
+    if (!loginConfig.value.rememberAccount) {
+      loginConfig.value.username = '';
+      loginConfig.value.email = '';
+      return;
+    }
+    if (loginType.value === 'account') {
+      loginConfig.value.username = String(values.username || '').trim();
+    } else {
+      loginConfig.value.email = String(values.email || '').trim();
     }
   };
-  const authCodeLoadError = ref(false);
-  const captchaId = ref('');
-  const changeAuthCodeUrlDebounced = useDebounceFn(() => {
-    void changeAuthCodeUrl();
-  }, 300);
-  void changeAuthCodeUrl();
+
+  /**
+   * 勾选状态写入 localStorage；取消时立刻清掉已存账号，
+   * 避免「关了开关但下次仍回填」。
+   */
+  const onRememberAccountChange = (value: boolean | (string | number | boolean)[]) => {
+    const checked = value === true;
+    loginConfig.value.rememberAccount = checked;
+    if (!checked) {
+      loginConfig.value.username = '';
+      loginConfig.value.email = '';
+    }
+  };
 
   // 邮箱验证码相关
   const emailCaptchaText = ref(t('login.form.getEmailCaptcha'));
@@ -472,29 +432,5 @@
       background: linear-gradient(left, rgb(0 168 255 / 50%), rgb(185 0 255 / 50%)) no-repeat;
       border-radius: 5px;
     }
-  }
-
-  .captcha-img {
-    height: 30px;
-    width: 86px;
-    margin-right: -12px;
-    cursor: pointer;
-    border-radius: 4px;
-    user-select: none;
-    background: rgba(255, 255, 255, 0.06);
-  }
-
-  .captcha-placeholder {
-    height: 30px;
-    width: 86px;
-    margin-right: -12px;
-    cursor: pointer;
-    border-radius: 4px;
-    border: 1px dashed var(--color-border-2);
-    color: var(--color-text-3);
-    background: transparent;
-    padding: 0 8px;
-    font-size: 12px;
-    line-height: 28px;
   }
 </style>

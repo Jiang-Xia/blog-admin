@@ -5,8 +5,11 @@ import type { UserState } from '@/store/modules/user/types';
 export interface AccountLoginData {
   username: string;
   password: string;
-  authCode: string;
+  /** 字符图答案；与 captchaVerification 二选一 */
+  authCode?: string;
   captchaId?: string;
+  /** 滑动/点选二次校验 token */
+  captchaVerification?: string;
 }
 
 export interface EmailLoginData {

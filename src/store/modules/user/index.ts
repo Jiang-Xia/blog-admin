@@ -77,20 +77,21 @@ const useUserStore = defineStore('user', {
     // Login
     async login(loginForm: LoginData) {
       try {
-        // 判断是手机号登录还是邮箱登录
-        if ('username' in loginForm && 'authCode' in loginForm) {
-          // 账号登录
+        // 账号登录：字符图 authCode 或行为验证 captchaVerification
+        if ('username' in loginForm) {
           const accountLogin = loginForm as AccountLoginData;
-          const res = await userLogin(
-            {
-              username: accountLogin.username,
-              authCode: accountLogin.authCode,
-              captchaId: accountLogin.captchaId,
-              password: encryptLoginPassword(accountLogin.password),
-              admin: true,
-            },
-            'account',
-          );
+          const payload: Record<string, unknown> = {
+            username: accountLogin.username,
+            password: encryptLoginPassword(accountLogin.password),
+            admin: true,
+          };
+          if (accountLogin.captchaVerification) {
+            payload.captchaVerification = accountLogin.captchaVerification;
+          } else {
+            payload.authCode = accountLogin.authCode;
+            payload.captchaId = accountLogin.captchaId;
+          }
+          const res = await userLogin(payload, 'account');
           const user = res.info.user as UserState;
           setToken(res.info.token);
           this.$state.token = res.info.token;
